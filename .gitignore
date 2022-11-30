@@ -1,3 +1,6 @@
+# custom binaries
+libsodium/
+
 # OSX
 #
 .DS_Store
