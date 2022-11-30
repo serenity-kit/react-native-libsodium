@@ -1,8 +1,5 @@
-#ifndef RNLIBSODIUM_H
-#define RNLIBSODIUM_H
+#include <jsi/jsilib.h>
+#include <jsi/jsi.h>
 
-namespace rnlibsodium {
-  double multiply(double a, double b);
-}
-
-#endif /* RNLIBSODIUM_H */
+void installRnlibsodium(facebook::jsi::Runtime& jsiRuntime);
+void cleanUpRnlibsodium();

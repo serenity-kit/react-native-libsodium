@@ -1,27 +1,34 @@
+#import "react-native-rnlibsodium.h"
+#import <React/RCTBridge+Private.h>
+#import <React/RCTUtils.h>
 #import "Rnlibsodium.h"
 
 @implementation Rnlibsodium
+
+@synthesize bridge=_bridge;
+@synthesize methodQueue = _methodQueue;
+
 RCT_EXPORT_MODULE()
 
-// Example method
-// See // https://reactnative.dev/docs/native-modules-ios
-RCT_REMAP_METHOD(multiply,
-                 multiplyWithA:(double)a withB:(double)b
-                 withResolver:(RCTPromiseResolveBlock)resolve
-                 withRejecter:(RCTPromiseRejectBlock)reject)
-{
-    NSNumber *result = @(rnlibsodium::multiply(a, b));
-
-    resolve(result);
++ (BOOL)requiresMainQueueSetup {
+  return YES;
 }
 
-// Don't compile this code when we build for the old architecture.
-#ifdef RCT_NEW_ARCH_ENABLED
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
-    (const facebook::react::ObjCTurboModule::InitParams &)params
-{
-    return std::make_shared<facebook::react::NativeRnlibsodiumSpecJSI>(params);
+- (void)setBridge:(RCTBridge *)bridge {
+  _bridge = bridge;
+  _setBridgeOnMainQueue = RCTIsMainQueue();
+
+  RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+  if (!cxxBridge.runtime) {
+    return;
+  }
+
+  installRnlibsodium(*(facebook::jsi::Runtime *)cxxBridge.runtime);
 }
-#endif
+
+- (void)invalidate {
+  cleanUpRnlibsodium();
+}
+
 
 @end
