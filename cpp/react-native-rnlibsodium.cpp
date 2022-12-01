@@ -57,19 +57,19 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "from_base64", std::move(from_base64));
 
-  auto to_base64 = jsi::Function::createFromHostFunction(
+  auto to_base64_from_string = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "to_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "to_base64_from_string"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_string] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_string] variant can't be null");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -81,7 +81,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         return jsi::String::createFromUtf8(runtime, base64String);
       });
-  jsiRuntime.global().setProperty(jsiRuntime, "to_base64", std::move(to_base64));
+  jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_string", std::move(to_base64_from_string));
 }
 
 void cleanUpRnlibsodium()
