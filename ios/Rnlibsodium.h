@@ -1,5 +1,6 @@
 #import "react-native-rnlibsodium.h"
 #import <React/RCTBridgeModule.h>
+#import "sodium.h"
 
 @interface Rnlibsodium : NSObject <RCTBridgeModule>
 
