@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
-  s.vendored_frameworks = "libsodium/libsodium-apple/Clibsodium.xcframework"
+  s.vendored_frameworks = "libsodium/build/libsodium-apple/Clibsodium.xcframework"
 
   s.dependency "React-Core"
 
