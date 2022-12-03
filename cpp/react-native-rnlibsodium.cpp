@@ -11,6 +11,7 @@ using namespace facebook;
 // get the runtime and create native functions
 void installRnlibsodium(jsi::Runtime &jsiRuntime)
 {
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_KEYBYTES", (int)crypto_secretbox_KEYBYTES);
 
   auto multiply = jsi::Function::createFromHostFunction(
       jsiRuntime,

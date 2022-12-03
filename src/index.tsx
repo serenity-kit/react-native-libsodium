@@ -22,6 +22,7 @@ declare global {
     variant: base64_variants
   ): string;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
+  var crypto_secretbox_KEYBYTES: number;
 }
 
 export const multiply = global.multiply;
@@ -51,3 +52,5 @@ export const crypto_secretbox_keygen = (): Uint8Array => {
   const result = global.jsi_crypto_secretbox_keygen();
   return new Uint8Array(result);
 };
+
+export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;

@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 import {
+  crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
   from_base64,
   to_base64,
@@ -16,6 +17,7 @@ export default function App() {
   console.log({ resultBase64, resultUint8Array, result2Base64, resultString });
   const secretBoxKey = crypto_secretbox_keygen();
   console.log({ secretBoxKey });
+  console.log({ crypto_secretbox_KEYBYTES });
 
   return (
     <View style={styles.container}>
