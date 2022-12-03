@@ -34,11 +34,11 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64_to_arraybuffer] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64_to_arraybuffer] variant can't be null");
         }
 
         std::string base64String = arguments[0].asString(runtime).utf8(runtime);
@@ -47,7 +47,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> uint8Vector;
         uint8Vector.resize(base64String.size());
 
-        size_t length = 10;
+        size_t length = 0;
         sodium_base642bin((uint8_t *)uint8Vector.data(), uint8Vector.size(), (char *)base64String.data(), base64String.size(), nullptr, &length, nullptr, variant);
 
         uint8Vector.resize(length);
@@ -126,6 +126,26 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_uint8_array", std::move(to_base64_from_uint8_array));
+
+  auto rn_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      0,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        unsigned char key[crypto_secretbox_KEYBYTES];
+        crypto_secretbox_keygen(key);
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(key))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "rn_crypto_secretbox_keygen", std::move(rn_crypto_secretbox_keygen));
 }
 
 void cleanUpRnlibsodium()

@@ -1,7 +1,12 @@
 import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
-import { from_base64, to_base64, to_string } from 'react-native-rnlibsodium';
+import {
+  crypto_secretbox_keygen,
+  from_base64,
+  to_base64,
+  to_string,
+} from 'react-native-rnlibsodium';
 
 export default function App() {
   const resultBase64 = to_base64('Hello World');
@@ -9,6 +14,8 @@ export default function App() {
   const result2Base64 = to_base64(resultUint8Array);
   const resultString = to_string(resultUint8Array);
   console.log({ resultBase64, resultUint8Array, result2Base64, resultString });
+  const secretBoxKey = crypto_secretbox_keygen();
+  console.log({ secretBoxKey });
 
   return (
     <View style={styles.container}>

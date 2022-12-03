@@ -21,6 +21,7 @@ declare global {
     input: ArrayBuffer,
     variant: base64_variants
   ): string;
+  function rn_crypto_secretbox_keygen(): ArrayBuffer;
 }
 
 export const multiply = global.multiply;
@@ -44,4 +45,9 @@ export const to_base64 = (
   } else {
     return global.to_base64_from_uint8_array(input.buffer, variantToUse);
   }
+};
+
+export const crypto_secretbox_keygen = (): Uint8Array => {
+  const result = global.rn_crypto_secretbox_keygen();
+  return new Uint8Array(result);
 };
