@@ -13,15 +13,15 @@ declare global {
     input: string,
     variant?: base64_variants
   ): ArrayBuffer;
-  function to_base64_from_string(
+  function jsi_to_base64_from_string(
     input: string,
     variant: base64_variants
   ): string;
-  function to_base64_from_uint8_array(
+  function jsi_to_base64_from_arraybuffer(
     input: ArrayBuffer,
     variant: base64_variants
   ): string;
-  function rn_crypto_secretbox_keygen(): ArrayBuffer;
+  function jsi_crypto_secretbox_keygen(): ArrayBuffer;
 }
 
 export const multiply = global.multiply;
@@ -41,13 +41,13 @@ export const to_base64 = (
 ): string => {
   const variantToUse = variant || base64_variants.URLSAFE_NO_PADDING;
   if (typeof input === 'string') {
-    return global.to_base64_from_string(input, variantToUse);
+    return global.jsi_to_base64_from_string(input, variantToUse);
   } else {
-    return global.to_base64_from_uint8_array(input.buffer, variantToUse);
+    return global.jsi_to_base64_from_arraybuffer(input.buffer, variantToUse);
   }
 };
 
 export const crypto_secretbox_keygen = (): Uint8Array => {
-  const result = global.rn_crypto_secretbox_keygen();
+  const result = global.jsi_crypto_secretbox_keygen();
   return new Uint8Array(result);
 };

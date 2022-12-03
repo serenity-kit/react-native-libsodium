@@ -65,19 +65,19 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "from_base64_to_arraybuffer", std::move(from_base64_to_arraybuffer));
 
-  auto to_base64_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_to_base64_from_string = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "to_base64_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_base64_from_string"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_string] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_string] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_string] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_string] variant can't be null");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -89,26 +89,26 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         return jsi::String::createFromUtf8(runtime, base64String);
       });
-  jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_string", std::move(to_base64_from_string));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_string", std::move(jsi_to_base64_from_string));
 
-  auto to_base64_from_uint8_array = jsi::Function::createFromHostFunction(
+  auto jsi_to_base64_from_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "to_base64_from_uint8_array"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_base64_from_arraybuffer"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] value can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] value must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] value must be an ArrayBuffer");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] variant can't be null");
         }
 
         auto dataArrayBuffer =
@@ -125,9 +125,9 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         return jsi::String::createFromUtf8(runtime, base64String);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_uint8_array", std::move(to_base64_from_uint8_array));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_arraybuffer", std::move(jsi_to_base64_from_arraybuffer));
 
-  auto rn_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
+  auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
       0,
@@ -145,7 +145,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         return returnBufferAsObject;
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "rn_crypto_secretbox_keygen", std::move(rn_crypto_secretbox_keygen));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_keygen", std::move(jsi_crypto_secretbox_keygen));
 }
 
 void cleanUpRnlibsodium()
