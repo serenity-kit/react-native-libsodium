@@ -12,6 +12,15 @@ using namespace facebook;
 void installRnlibsodium(jsi::Runtime &jsiRuntime)
 {
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_KEYBYTES", (int)crypto_secretbox_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_NONCEBYTES", (int)crypto_secretbox_NONCEBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_SALTBYTES", (int)crypto_pwhash_SALTBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_ALG_DEFAULT", (int)crypto_pwhash_ALG_DEFAULT);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_OPSLIMIT_INTERACTIVE", (int)crypto_pwhash_OPSLIMIT_INTERACTIVE);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_MEMLIMIT_INTERACTIVE", (int)crypto_pwhash_MEMLIMIT_INTERACTIVE);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_PUBLICKEYBYTES", (int)crypto_box_PUBLICKEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_SECRETKEYBYTES", (int)crypto_box_SECRETKEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
 
   auto multiply = jsi::Function::createFromHostFunction(
       jsiRuntime,
