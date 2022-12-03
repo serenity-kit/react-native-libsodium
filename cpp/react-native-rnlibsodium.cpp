@@ -26,7 +26,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
   // Registers the function on the global object
   jsiRuntime.global().setProperty(jsiRuntime, "multiply", std::move(multiply));
 
-  auto from_base64 = jsi::Function::createFromHostFunction(
+  auto from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
       2,
@@ -47,15 +47,23 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> uint8Vector;
         uint8Vector.resize(base64String.size());
 
-        size_t length = 0;
+        size_t length = 10;
         sodium_base642bin((uint8_t *)uint8Vector.data(), uint8Vector.size(), (char *)base64String.data(), base64String.size(), nullptr, &length, nullptr, variant);
 
         uint8Vector.resize(length);
 
-        return jsi::String::createFromUtf8(runtime, uint8Vector.data(), uint8Vector.size());
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)length)
+                                               .asObject(runtime);
+
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), uint8Vector.data(), uint8Vector.size());
+
+        return returnBufferAsObject;
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "from_base64", std::move(from_base64));
+  jsiRuntime.global().setProperty(jsiRuntime, "from_base64_to_arraybuffer", std::move(from_base64_to_arraybuffer));
 
   auto to_base64_from_string = jsi::Function::createFromHostFunction(
       jsiRuntime,
@@ -82,6 +90,42 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         return jsi::String::createFromUtf8(runtime, base64String);
       });
   jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_string", std::move(to_base64_from_string));
+
+  auto to_base64_from_uint8_array = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "to_base64_from_uint8_array"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] value can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] value must be an ArrayBuffer");
+        }
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][to_base64_from_uint8_array] variant can't be null");
+        }
+
+        auto dataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *data = dataArrayBuffer.data(runtime);
+        auto dataLength = dataArrayBuffer.length(runtime);
+
+        uint8_t variant = arguments[1].asNumber();
+
+        std::string base64String;
+        base64String.resize(sodium_base64_encoded_len(dataLength, variant));
+        sodium_bin2base64((char *)base64String.data(), base64String.size(), data, dataLength, variant);
+
+        return jsi::String::createFromUtf8(runtime, base64String);
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "to_base64_from_uint8_array", std::move(to_base64_from_uint8_array));
 }
 
 void cleanUpRnlibsodium()

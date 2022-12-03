@@ -1,15 +1,18 @@
 import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
-import { from_base64, multiply, to_base64 } from 'react-native-rnlibsodium';
+import { from_base64, to_base64, to_string } from 'react-native-rnlibsodium';
 
 export default function App() {
+  const resultBase64 = to_base64('Hello World');
+  const resultUint8Array = from_base64(resultBase64);
+  const result2Base64 = to_base64(resultUint8Array);
+  const resultString = to_string(resultUint8Array);
+  console.log({ resultBase64, resultUint8Array, result2Base64, resultString });
+
   return (
     <View style={styles.container}>
-      <Text>
-        Result: {multiply()} {to_base64('wow', 1)}
-        {from_base64(to_base64('wow', 1), 1)}
-      </Text>
+      <Text>{to_base64('wow')}</Text>
     </View>
   );
 }
