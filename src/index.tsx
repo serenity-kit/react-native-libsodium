@@ -88,3 +88,6 @@ export const crypto_kdf_keygen = (): Uint8Array => {
   const result = global.jsi_crypto_kdf_keygen();
   return new Uint8Array(result);
 };
+
+// add no-op ready to match the libsodium-wrappers API
+export const ready: Promise<void> = new Promise((resolve) => resolve());
