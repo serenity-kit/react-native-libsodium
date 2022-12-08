@@ -385,6 +385,109 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         return returnBufferAsObject;
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair_from_arraybuffer", std::move(jsi_crypto_sign_keypair_from_arraybuffer));
+
+  auto jsi_crypto_sign_verify_detached_from_string = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_verify_detached_from_string"),
+      3,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] signature can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] signature must be an ArrayBuffer");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] message can't be null");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] publicKey can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] publicKey must be an ArrayBuffer");
+        }
+
+        auto signatureDataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *signature = signatureDataArrayBuffer.data(runtime);
+
+        std::string utf8String = arguments[1].asString(runtime).utf8(runtime);
+
+        auto publicKeyDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
+
+        int result = crypto_sign_verify_detached(signature, (uint8_t *)utf8String.data(), utf8String.length(), publicKey);
+
+        return jsi::Value(bool(result == 0));
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_verify_detached_from_string", std::move(jsi_crypto_sign_verify_detached_from_string));
+
+  auto jsi_crypto_sign_verify_detached_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_verify_detached_from_arraybuffer"),
+      3,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature must be an ArrayBuffer");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message must be an ArrayBuffer");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey must be an ArrayBuffer");
+        }
+
+        auto signatureDataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *signature = signatureDataArrayBuffer.data(runtime);
+
+        auto messageDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *message = messageDataArrayBuffer.data(runtime);
+
+        auto publicKeyDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
+
+        int result = crypto_sign_verify_detached(signature, message, messageDataArrayBuffer.length(runtime), publicKey);
+
+        return jsi::Value(bool(result == 0));
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_verify_detached_from_arraybuffer", std::move(jsi_crypto_sign_verify_detached_from_arraybuffer));
 }
 
 void cleanUpRnlibsodium()

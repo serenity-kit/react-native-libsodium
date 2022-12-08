@@ -18,6 +18,7 @@ import {
   crypto_secretbox_NONCEBYTES,
   crypto_sign_detached,
   crypto_sign_keypair,
+  crypto_sign_verify_detached,
   from_base64,
   to_base64,
   to_hex,
@@ -69,9 +70,23 @@ export default function App() {
     'Hello World',
     sign_keypair.privateKey
   );
-  const sign_detached_from_uintarray = crypto_sign_detached(
-    from_base64(to_base64('Hello World')),
+  const sign_verify_detached_from_string = crypto_sign_verify_detached(
+    sign_detached_from_string,
+    'Hello World',
+    sign_keypair.publicKey
+  );
+
+  const sign_detached_from_uint8array_message = from_base64(
+    to_base64('Hello World')
+  );
+  const sign_detached_from_uint8array = crypto_sign_detached(
+    sign_detached_from_uint8array_message,
     sign_keypair.privateKey
+  );
+  const sign_verify_detached_from_uint8array = crypto_sign_verify_detached(
+    sign_detached_from_uint8array,
+    sign_detached_from_uint8array_message,
+    sign_keypair.publicKey
   );
 
   return (
@@ -103,8 +118,22 @@ export default function App() {
       <Text>sign_keypair.publicKey: {to_base64(sign_keypair.publicKey)}</Text>
       <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
 
-      <Text>sign_detached: {to_base64(sign_detached_from_string)}</Text>
-      <Text>sign_detached: {to_base64(sign_detached_from_uintarray)}</Text>
+      <Text>
+        sign_detached_from_string: {to_base64(sign_detached_from_string)}
+      </Text>
+      <Text>
+        sign_verify_detached_from_string:{' '}
+        {String(sign_verify_detached_from_string)}
+      </Text>
+
+      <Text>
+        sign_detached_from_uint8array:{' '}
+        {to_base64(sign_detached_from_uint8array)}
+      </Text>
+      <Text>
+        sign_verify_detached_from_uint8array:{' '}
+        {String(sign_verify_detached_from_uint8array)}
+      </Text>
     </View>
   );
 }
