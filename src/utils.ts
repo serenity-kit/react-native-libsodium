@@ -1,4 +1,5 @@
-import { base64_variants, OutputFormat } from './types';
+import { base64_variants } from './libsodium-js-utils';
+import type { OutputFormat } from './types';
 
 export function convertToOutputFormat(
   input: ArrayBuffer,

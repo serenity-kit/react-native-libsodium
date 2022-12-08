@@ -1,18 +1,17 @@
-export { to_string } from './libsodium-js-utils';
-export {
-  base64_variants,
+export type {
   KeyPair,
   KeyType,
   StringKeyPair,
   StringOutputFormat,
   Uint8ArrayOutputFormat,
-} from './types';
-import {
-  base64_variants,
-  OutputFormat,
+} from 'libsodium-wrappers';
+export { base64_variants, to_string } from './libsodium-js-utils';
+import type {
   StringOutputFormat,
   Uint8ArrayOutputFormat,
-} from './types';
+} from 'libsodium-wrappers';
+import { base64_variants } from './libsodium-js-utils';
+import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
 declare global {

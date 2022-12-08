@@ -75,3 +75,11 @@ export const to_string = (bytes: Uint8Array): string => {
   }
   return totalString;
 };
+
+// licensed under MIT, see LICENSE_Libsodiumjs
+export enum base64_variants {
+  ORIGINAL = 1,
+  ORIGINAL_NO_PADDING = 3,
+  URLSAFE = 5,
+  URLSAFE_NO_PADDING = 7,
+}
