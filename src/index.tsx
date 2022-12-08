@@ -8,6 +8,17 @@ export enum base64_variants {
 }
 
 declare global {
+  var crypto_secretbox_KEYBYTES: number;
+  var crypto_secretbox_NONCEBYTES: number;
+  var crypto_pwhash_SALTBYTES: number;
+  var crypto_pwhash_ALG_DEFAULT: number;
+  var crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
+  var crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
+  var crypto_box_PUBLICKEYBYTES: number;
+  var crypto_box_SECRETKEYBYTES: number;
+  var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
+  var crypto_kdf_KEYBYTES: number;
+
   function multiply(a: number, b: number): number;
   function from_base64_to_arraybuffer(
     input: string,
@@ -22,19 +33,24 @@ declare global {
     variant: base64_variants
   ): string;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
-  var crypto_secretbox_KEYBYTES: number;
-  var crypto_secretbox_NONCEBYTES: number;
-  var crypto_pwhash_SALTBYTES: number;
-  var crypto_pwhash_ALG_DEFAULT: number;
-  var crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
-  var crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
-  var crypto_box_PUBLICKEYBYTES: number;
-  var crypto_box_SECRETKEYBYTES: number;
-  var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
-  var crypto_kdf_KEYBYTES: number;
+  function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
 }
 
 export const multiply = global.multiply;
+
+export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
+export const crypto_secretbox_NONCEBYTES = global.crypto_secretbox_NONCEBYTES;
+export const crypto_pwhash_SALTBYTES = global.crypto_pwhash_SALTBYTES;
+export const crypto_pwhash_ALG_DEFAULT = global.crypto_pwhash_ALG_DEFAULT;
+export const crypto_pwhash_OPSLIMIT_INTERACTIVE =
+  global.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
+  global.crypto_pwhash_MEMLIMIT_INTERACTIVE;
+export const crypto_box_PUBLICKEYBYTES = global.crypto_box_PUBLICKEYBYTES;
+export const crypto_box_SECRETKEYBYTES = global.crypto_box_SECRETKEYBYTES;
+export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
+  global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
 
 export const from_base64 = (
   input: string,
@@ -62,16 +78,7 @@ export const crypto_secretbox_keygen = (): Uint8Array => {
   return new Uint8Array(result);
 };
 
-export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
-export const crypto_secretbox_NONCEBYTES = global.crypto_secretbox_NONCEBYTES;
-export const crypto_pwhash_SALTBYTES = global.crypto_pwhash_SALTBYTES;
-export const crypto_pwhash_ALG_DEFAULT = global.crypto_pwhash_ALG_DEFAULT;
-export const crypto_pwhash_OPSLIMIT_INTERACTIVE =
-  global.crypto_pwhash_OPSLIMIT_INTERACTIVE;
-export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
-  global.crypto_pwhash_MEMLIMIT_INTERACTIVE;
-export const crypto_box_PUBLICKEYBYTES = global.crypto_box_PUBLICKEYBYTES;
-export const crypto_box_SECRETKEYBYTES = global.crypto_box_SECRETKEYBYTES;
-export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
-  global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
-export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
+export const crypto_aead_xchacha20poly1305_ietf_keygen = (): Uint8Array => {
+  const result = global.jsi_crypto_aead_xchacha20poly1305_ietf_keygen();
+  return new Uint8Array(result);
+};

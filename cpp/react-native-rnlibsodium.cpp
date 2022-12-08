@@ -156,6 +156,26 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_keygen", std::move(jsi_crypto_secretbox_keygen));
+
+  auto jsi_crypto_aead_xchacha20poly1305_ietf_keygen = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      0,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        unsigned char key[crypto_aead_xchacha20poly1305_ietf_KEYBYTES];
+        crypto_aead_xchacha20poly1305_ietf_keygen(key);
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(key))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_keygen", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_keygen));
 }
 
 void cleanUpRnlibsodium()
