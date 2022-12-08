@@ -7,6 +7,8 @@ export type {
 } from 'libsodium-wrappers';
 export { base64_variants, to_string } from './libsodium-js-utils';
 import type {
+  KeyPair,
+  StringKeyPair,
   StringOutputFormat,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
@@ -44,6 +46,10 @@ declare global {
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
   function jsi_crypto_kdf_keygen(): ArrayBuffer;
+  function jsi_crypto_box_keypair(): {
+    publicKey: ArrayBuffer;
+    secretKey: ArrayBuffer;
+  };
 }
 
 export const multiply = global.multiply;
@@ -122,6 +128,22 @@ export function crypto_kdf_keygen(outputFormat: StringOutputFormat): string;
 export function crypto_kdf_keygen(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_kdf_keygen();
   return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_box_keypair(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): KeyPair;
+export function crypto_box_keypair(
+  outputFormat: StringOutputFormat
+): StringKeyPair;
+export function crypto_box_keypair(outputFormat: OutputFormat): unknown {
+  const result = global.jsi_crypto_box_keypair();
+  console.log('RESULT:', result);
+  return {
+    keyType: 'curve25519',
+    publicKey: convertToOutputFormat(result.publicKey, outputFormat),
+    privateKey: convertToOutputFormat(result.secretKey, outputFormat),
+  };
 }
 
 // add no-op ready to match the libsodium-wrappers API

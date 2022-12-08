@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
+  crypto_box_keypair,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
   crypto_kdf_KEYBYTES,
@@ -59,6 +60,8 @@ export default function App() {
   const kdf_key_base64 = crypto_kdf_keygen('base64');
   const kdf_key_hex = crypto_kdf_keygen('hex');
 
+  const box_keypair = crypto_box_keypair();
+
   return (
     <View style={styles.container}>
       <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
@@ -79,6 +82,9 @@ export default function App() {
       <Text>kdf_key:{to_base64(kdf_key)}</Text>
       <Text>kdf_key_base64:{kdf_key_base64}</Text>
       <Text>kdf_key_hex:{kdf_key_hex}</Text>
+      <Text>box_keypair.privateKey: {to_base64(box_keypair.privateKey)}</Text>
+      <Text>box_keypair.publicKey: {to_base64(box_keypair.publicKey)}</Text>
+      <Text>box_keypair.keyType: {box_keypair.keyType}</Text>
     </View>
   );
 }
