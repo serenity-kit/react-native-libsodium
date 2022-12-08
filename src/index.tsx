@@ -7,6 +7,24 @@ export enum base64_variants {
   URLSAFE_NO_PADDING = 7,
 }
 
+export type Uint8ArrayOutputFormat = 'uint8array';
+
+export type StringOutputFormat = 'text' | 'hex' | 'base64';
+
+export type KeyType = 'curve25519' | 'ed25519' | 'x25519';
+
+export interface KeyPair {
+  keyType: KeyType;
+  privateKey: Uint8Array;
+  publicKey: Uint8Array;
+}
+
+export interface StringKeyPair {
+  keyType: KeyType;
+  privateKey: string;
+  publicKey: string;
+}
+
 declare global {
   var crypto_secretbox_KEYBYTES: number;
   var crypto_secretbox_NONCEBYTES: number;
@@ -74,20 +92,58 @@ export const to_base64 = (
   }
 };
 
-export const crypto_secretbox_keygen = (): Uint8Array => {
+export function crypto_secretbox_keygen(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_secretbox_keygen(
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_secretbox_keygen(outputFormat: unknown): unknown {
   const result = global.jsi_crypto_secretbox_keygen();
-  return new Uint8Array(result);
-};
+  const resultUint8Array = new Uint8Array(result);
+  if (outputFormat === 'base64') {
+    return to_base64(resultUint8Array);
+  }
+  return resultUint8Array;
+}
 
-export const crypto_aead_xchacha20poly1305_ietf_keygen = (): Uint8Array => {
+export function crypto_aead_xchacha20poly1305_ietf_keygen(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_aead_xchacha20poly1305_ietf_keygen(
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_aead_xchacha20poly1305_ietf_keygen(
+  outputFormat: unknown
+): unknown {
   const result = global.jsi_crypto_aead_xchacha20poly1305_ietf_keygen();
-  return new Uint8Array(result);
-};
+  const resultUint8Array = new Uint8Array(result);
+  if (outputFormat === 'base64') {
+    return to_base64(resultUint8Array);
+  }
+  return resultUint8Array;
+}
 
-export const crypto_kdf_keygen = (): Uint8Array => {
+export function crypto_kdf_keygen(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_kdf_keygen(outputFormat: StringOutputFormat): string;
+export function crypto_kdf_keygen(outputFormat: unknown): unknown {
   const result = global.jsi_crypto_kdf_keygen();
-  return new Uint8Array(result);
-};
+  const resultUint8Array = new Uint8Array(result);
+  if (outputFormat === 'base64') {
+    return to_base64(resultUint8Array);
+  }
+  // if (outputFormat === 'hex') {
+  //   // toHex
+  //   return to_base64(resultUint8Array);
+  // }
+  // if (outputFormat === 'string') {
+  //   // toString
+  //   return to_base64(resultUint8Array);
+  // }
+  return resultUint8Array;
+}
 
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());

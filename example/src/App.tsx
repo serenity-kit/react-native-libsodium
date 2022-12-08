@@ -38,16 +38,29 @@ export default function App() {
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     crypto_kdf_KEYBYTES,
   });
-  const secretBoxKey = crypto_secretbox_keygen();
+  const secretbox_key = crypto_secretbox_keygen();
+  const secretbox_key_base64 = crypto_secretbox_keygen('base64');
   const aead_xchacha20poly1305_ietf_key =
     crypto_aead_xchacha20poly1305_ietf_keygen();
+  const aead_xchacha20poly1305_ietf_key_base64 =
+    crypto_aead_xchacha20poly1305_ietf_keygen('base64');
   const kdf_key = crypto_kdf_keygen();
+  const kdf_key_base64 = crypto_kdf_keygen('base64');
 
   return (
     <View style={styles.container}>
-      <Text>{to_base64(secretBoxKey)}</Text>
-      <Text>{to_base64(aead_xchacha20poly1305_ietf_key)}</Text>
-      <Text>{to_base64(kdf_key)}</Text>
+      <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
+      <Text>secretbox_key_base64: {secretbox_key_base64}</Text>
+      <Text>
+        aead_xchacha20poly1305_ietf_key:{' '}
+        {to_base64(aead_xchacha20poly1305_ietf_key)}
+      </Text>
+      <Text>
+        aead_xchacha20poly1305_ietf_key_base64:{' '}
+        {aead_xchacha20poly1305_ietf_key_base64}
+      </Text>
+      <Text>kdf_key:{to_base64(kdf_key)}</Text>
+      <Text>kdf_key_base64:{kdf_key_base64}</Text>
     </View>
   );
 }
