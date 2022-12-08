@@ -22,20 +22,6 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
 
-  auto multiply = jsi::Function::createFromHostFunction(
-      jsiRuntime,
-      jsi::PropNameID::forAscii(jsiRuntime, "multiply"), // internal function name
-      1,                                                 // number of arguments
-      // needs to return a jsi::Value
-      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-      {
-        double res = 24;
-        return jsi::Value(res);
-      });
-
-  // Registers the function on the global object
-  jsiRuntime.global().setProperty(jsiRuntime, "multiply", std::move(multiply));
-
   auto from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),

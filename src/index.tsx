@@ -28,7 +28,6 @@ declare global {
   var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
   var crypto_kdf_KEYBYTES: number;
 
-  function multiply(a: number, b: number): number;
   function from_base64_to_arraybuffer(
     input: string,
     variant?: base64_variants
@@ -51,8 +50,6 @@ declare global {
     secretKey: ArrayBuffer;
   };
 }
-
-export const multiply = global.multiply;
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
 export const crypto_secretbox_NONCEBYTES = global.crypto_secretbox_NONCEBYTES;
