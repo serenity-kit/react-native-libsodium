@@ -265,6 +265,38 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_keypair", std::move(jsi_crypto_box_keypair));
+
+  auto jsi_crypto_sign_keypair = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      0,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        unsigned char publickey[crypto_sign_PUBLICKEYBYTES];
+        unsigned char secretkey[crypto_sign_SECRETKEYBYTES];
+        crypto_sign_keypair(publickey, secretkey);
+
+        jsi::Object returnPublicKeyBufferAsObject = runtime.global()
+                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                                        .callAsConstructor(runtime, (int)sizeof(publickey))
+                                                        .asObject(runtime);
+        jsi::ArrayBuffer publicKeyArraybuffer = returnPublicKeyBufferAsObject.getArrayBuffer(runtime);
+        memcpy(publicKeyArraybuffer.data(runtime), publickey, sizeof(publickey));
+
+        jsi::Object returnSecretKeyBufferAsObject = runtime.global()
+                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                                        .callAsConstructor(runtime, (int)sizeof(secretkey))
+                                                        .asObject(runtime);
+        jsi::ArrayBuffer privateKeyArraybuffer = returnSecretKeyBufferAsObject.getArrayBuffer(runtime);
+        memcpy(privateKeyArraybuffer.data(runtime), secretkey, sizeof(secretkey));
+
+        auto object = jsi::Object(runtime);
+        object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
+        object.setProperty(runtime, "secretKey", returnSecretKeyBufferAsObject);
+        return object;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair", std::move(jsi_crypto_sign_keypair));
 }
 
 void cleanUpRnlibsodium()

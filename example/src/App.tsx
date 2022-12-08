@@ -16,6 +16,7 @@ import {
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
   crypto_secretbox_NONCEBYTES,
+  crypto_sign_keypair,
   from_base64,
   to_base64,
   to_hex,
@@ -61,6 +62,7 @@ export default function App() {
   const kdf_key_hex = crypto_kdf_keygen('hex');
 
   const box_keypair = crypto_box_keypair();
+  const sign_keypair = crypto_sign_keypair();
 
   return (
     <View style={styles.container}>
@@ -82,9 +84,14 @@ export default function App() {
       <Text>kdf_key:{to_base64(kdf_key)}</Text>
       <Text>kdf_key_base64:{kdf_key_base64}</Text>
       <Text>kdf_key_hex:{kdf_key_hex}</Text>
+
       <Text>box_keypair.privateKey: {to_base64(box_keypair.privateKey)}</Text>
       <Text>box_keypair.publicKey: {to_base64(box_keypair.publicKey)}</Text>
       <Text>box_keypair.keyType: {box_keypair.keyType}</Text>
+
+      <Text>sign_keypair.privateKey: {to_base64(sign_keypair.privateKey)}</Text>
+      <Text>sign_keypair.publicKey: {to_base64(sign_keypair.publicKey)}</Text>
+      <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
     </View>
   );
 }

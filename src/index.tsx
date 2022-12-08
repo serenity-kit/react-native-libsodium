@@ -49,6 +49,10 @@ declare global {
     publicKey: ArrayBuffer;
     secretKey: ArrayBuffer;
   };
+  function jsi_crypto_sign_keypair(): {
+    publicKey: ArrayBuffer;
+    secretKey: ArrayBuffer;
+  };
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -135,9 +139,23 @@ export function crypto_box_keypair(
 ): StringKeyPair;
 export function crypto_box_keypair(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_box_keypair();
-  console.log('RESULT:', result);
   return {
     keyType: 'curve25519',
+    publicKey: convertToOutputFormat(result.publicKey, outputFormat),
+    privateKey: convertToOutputFormat(result.secretKey, outputFormat),
+  };
+}
+
+export function crypto_sign_keypair(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): KeyPair;
+export function crypto_sign_keypair(
+  outputFormat: StringOutputFormat
+): StringKeyPair;
+export function crypto_sign_keypair(outputFormat: OutputFormat): unknown {
+  const result = global.jsi_crypto_sign_keypair();
+  return {
+    keyType: 'ed25519',
     publicKey: convertToOutputFormat(result.publicKey, outputFormat),
     privateKey: convertToOutputFormat(result.secretKey, outputFormat),
   };
