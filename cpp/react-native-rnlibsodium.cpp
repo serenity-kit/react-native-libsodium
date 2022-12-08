@@ -137,6 +137,57 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_arraybuffer", std::move(jsi_to_base64_from_arraybuffer));
 
+  auto jsi_to_hex_from_string = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex_from_string"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_string] value can't be null");
+        }
+
+        std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
+        std::string hexString;
+        hexString.resize(utf8String.size() * 2 + 1);
+        sodium_bin2hex((char *)hexString.data(), hexString.size(), (uint8_t *)utf8String.data(), utf8String.size());
+
+        return jsi::String::createFromUtf8(runtime, hexString);
+      });
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex_from_string", std::move(jsi_to_hex_from_string));
+
+  auto jsi_to_hex_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex_from_arraybuffer"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_arraybuffer] value can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_arraybuffer] value must be an ArrayBuffer");
+        }
+
+        auto dataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *data = dataArrayBuffer.data(runtime);
+        auto dataLength = dataArrayBuffer.length(runtime);
+
+        std::string hexString;
+        hexString.resize(dataLength * 2 + 1);
+
+        sodium_bin2hex((char *)hexString.data(), hexString.size(), data, dataLength);
+
+        return jsi::String::createFromUtf8(runtime, hexString);
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex_from_arraybuffer", std::move(jsi_to_hex_from_arraybuffer));
+
   auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),

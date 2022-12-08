@@ -1,29 +1,19 @@
 export { to_string } from './libsodium-js-utils';
-
-export enum base64_variants {
-  ORIGINAL = 1,
-  ORIGINAL_NO_PADDING = 3,
-  URLSAFE = 5,
-  URLSAFE_NO_PADDING = 7,
-}
-
-export type Uint8ArrayOutputFormat = 'uint8array';
-
-export type StringOutputFormat = 'text' | 'hex' | 'base64';
-
-export type KeyType = 'curve25519' | 'ed25519' | 'x25519';
-
-export interface KeyPair {
-  keyType: KeyType;
-  privateKey: Uint8Array;
-  publicKey: Uint8Array;
-}
-
-export interface StringKeyPair {
-  keyType: KeyType;
-  privateKey: string;
-  publicKey: string;
-}
+export {
+  base64_variants,
+  KeyPair,
+  KeyType,
+  StringKeyPair,
+  StringOutputFormat,
+  Uint8ArrayOutputFormat,
+} from './types';
+import {
+  base64_variants,
+  OutputFormat,
+  StringOutputFormat,
+  Uint8ArrayOutputFormat,
+} from './types';
+import { convertToOutputFormat } from './utils';
 
 declare global {
   var crypto_secretbox_KEYBYTES: number;
@@ -50,6 +40,8 @@ declare global {
     input: ArrayBuffer,
     variant: base64_variants
   ): string;
+  function jsi_to_hex_from_string(input: string): string;
+  function jsi_to_hex_from_arraybuffer(input: ArrayBuffer): string;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
   function jsi_crypto_kdf_keygen(): ArrayBuffer;
@@ -92,19 +84,23 @@ export const to_base64 = (
   }
 };
 
+export function to_hex(input: string | Uint8Array): string {
+  if (typeof input === 'string') {
+    return global.jsi_to_hex_from_string(input);
+  } else {
+    return global.jsi_to_hex_from_arraybuffer(input.buffer);
+  }
+}
+
 export function crypto_secretbox_keygen(
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_secretbox_keygen(
   outputFormat: StringOutputFormat
 ): string;
-export function crypto_secretbox_keygen(outputFormat: unknown): unknown {
+export function crypto_secretbox_keygen(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_secretbox_keygen();
-  const resultUint8Array = new Uint8Array(result);
-  if (outputFormat === 'base64') {
-    return to_base64(resultUint8Array);
-  }
-  return resultUint8Array;
+  return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_aead_xchacha20poly1305_ietf_keygen(
@@ -114,35 +110,19 @@ export function crypto_aead_xchacha20poly1305_ietf_keygen(
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_aead_xchacha20poly1305_ietf_keygen(
-  outputFormat: unknown
+  outputFormat: OutputFormat
 ): unknown {
   const result = global.jsi_crypto_aead_xchacha20poly1305_ietf_keygen();
-  const resultUint8Array = new Uint8Array(result);
-  if (outputFormat === 'base64') {
-    return to_base64(resultUint8Array);
-  }
-  return resultUint8Array;
+  return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_kdf_keygen(
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_kdf_keygen(outputFormat: StringOutputFormat): string;
-export function crypto_kdf_keygen(outputFormat: unknown): unknown {
+export function crypto_kdf_keygen(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_kdf_keygen();
-  const resultUint8Array = new Uint8Array(result);
-  if (outputFormat === 'base64') {
-    return to_base64(resultUint8Array);
-  }
-  // if (outputFormat === 'hex') {
-  //   // toHex
-  //   return to_base64(resultUint8Array);
-  // }
-  // if (outputFormat === 'string') {
-  //   // toString
-  //   return to_base64(resultUint8Array);
-  // }
-  return resultUint8Array;
+  return convertToOutputFormat(result, outputFormat);
 }
 
 // add no-op ready to match the libsodium-wrappers API
