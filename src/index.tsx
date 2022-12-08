@@ -53,6 +53,14 @@ declare global {
     publicKey: ArrayBuffer;
     secretKey: ArrayBuffer;
   };
+  function jsi_crypto_sign_keypair_from_string(
+    message: string,
+    privateKey: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_sign_keypair_from_arraybuffer(
+    message: ArrayBuffer,
+    privateKey: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -159,6 +167,36 @@ export function crypto_sign_keypair(outputFormat: OutputFormat): unknown {
     publicKey: convertToOutputFormat(result.publicKey, outputFormat),
     privateKey: convertToOutputFormat(result.secretKey, outputFormat),
   };
+}
+
+export function crypto_sign_detached(
+  message: string | Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_sign_detached(
+  message: string | Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_sign_detached(
+  message: string | Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: OutputFormat
+): unknown {
+  let result: ArrayBuffer;
+  if (typeof message === 'string') {
+    result = global.jsi_crypto_sign_keypair_from_string(
+      message,
+      privateKey.buffer
+    );
+  } else {
+    result = global.jsi_crypto_sign_keypair_from_arraybuffer(
+      message.buffer,
+      privateKey.buffer
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
 }
 
 // add no-op ready to match the libsodium-wrappers API

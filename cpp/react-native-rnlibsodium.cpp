@@ -297,6 +297,94 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair", std::move(jsi_crypto_sign_keypair));
+
+  auto jsi_crypto_sign_keypair_from_string = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_keypair_from_string"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] message can't be null");
+        }
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] secretKey can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] secretKey must be an ArrayBuffer");
+        }
+
+        std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
+
+        auto secretKeyDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
+
+        unsigned char sig[crypto_sign_BYTES];
+
+        crypto_sign_detached(sig, NULL, (uint8_t *)utf8String.data(), utf8String.length(), secretKey);
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(sig))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), sig, sizeof(sig));
+        return returnBufferAsObject;
+      });
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair_from_string", std::move(jsi_crypto_sign_keypair_from_string));
+
+  auto jsi_crypto_sign_keypair_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_keypair_from_arraybuffer"),
+      2,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] message can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] message must be an ArrayBuffer");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey must be an ArrayBuffer");
+        }
+
+        auto messageDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *message = messageDataArrayBuffer.data(runtime);
+
+        auto secretKeyDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
+
+        unsigned char sig[crypto_sign_BYTES];
+
+        crypto_sign_detached(sig, NULL, message, messageDataArrayBuffer.length(runtime), secretKey);
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(sig))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), sig, sizeof(sig));
+        return returnBufferAsObject;
+      });
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair_from_arraybuffer", std::move(jsi_crypto_sign_keypair_from_arraybuffer));
 }
 
 void cleanUpRnlibsodium()

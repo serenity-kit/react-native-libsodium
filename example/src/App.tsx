@@ -16,6 +16,7 @@ import {
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
   crypto_secretbox_NONCEBYTES,
+  crypto_sign_detached,
   crypto_sign_keypair,
   from_base64,
   to_base64,
@@ -64,6 +65,15 @@ export default function App() {
   const box_keypair = crypto_box_keypair();
   const sign_keypair = crypto_sign_keypair();
 
+  const sign_detached_from_string = crypto_sign_detached(
+    'Hello World',
+    sign_keypair.privateKey
+  );
+  const sign_detached_from_uintarray = crypto_sign_detached(
+    from_base64(to_base64('Hello World')),
+    sign_keypair.privateKey
+  );
+
   return (
     <View style={styles.container}>
       <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
@@ -92,6 +102,9 @@ export default function App() {
       <Text>sign_keypair.privateKey: {to_base64(sign_keypair.privateKey)}</Text>
       <Text>sign_keypair.publicKey: {to_base64(sign_keypair.publicKey)}</Text>
       <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
+
+      <Text>sign_detached: {to_base64(sign_detached_from_string)}</Text>
+      <Text>sign_detached: {to_base64(sign_detached_from_uintarray)}</Text>
     </View>
   );
 }
