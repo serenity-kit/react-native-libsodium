@@ -34,6 +34,7 @@ declare global {
   ): string;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
+  function jsi_crypto_kdf_keygen(): ArrayBuffer;
 }
 
 export const multiply = global.multiply;
@@ -80,5 +81,10 @@ export const crypto_secretbox_keygen = (): Uint8Array => {
 
 export const crypto_aead_xchacha20poly1305_ietf_keygen = (): Uint8Array => {
   const result = global.jsi_crypto_aead_xchacha20poly1305_ietf_keygen();
+  return new Uint8Array(result);
+};
+
+export const crypto_kdf_keygen = (): Uint8Array => {
+  const result = global.jsi_crypto_kdf_keygen();
   return new Uint8Array(result);
 };

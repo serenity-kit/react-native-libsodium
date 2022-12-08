@@ -7,6 +7,7 @@ import {
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
   crypto_kdf_KEYBYTES,
+  crypto_kdf_keygen,
   crypto_pwhash_ALG_DEFAULT,
   crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
@@ -40,11 +41,13 @@ export default function App() {
   const secretBoxKey = crypto_secretbox_keygen();
   const aead_xchacha20poly1305_ietf_key =
     crypto_aead_xchacha20poly1305_ietf_keygen();
+  const kdf_key = crypto_kdf_keygen();
 
   return (
     <View style={styles.container}>
       <Text>{to_base64(secretBoxKey)}</Text>
       <Text>{to_base64(aead_xchacha20poly1305_ietf_key)}</Text>
+      <Text>{to_base64(kdf_key)}</Text>
     </View>
   );
 }
