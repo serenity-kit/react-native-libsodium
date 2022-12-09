@@ -27,6 +27,7 @@ declare global {
   var crypto_box_SECRETKEYBYTES: number;
   var crypto_box_NONCEBYTES: number;
   var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
+  var crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
   var crypto_kdf_KEYBYTES: number;
   var crypto_pwhash_BYTES_MIN: number;
   var crypto_pwhash_BYTES_MAX: number;
@@ -142,6 +143,12 @@ declare global {
     context: string,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
+    message: string,
+    additionalData: string,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -157,6 +164,8 @@ export const crypto_box_SECRETKEYBYTES = global.crypto_box_SECRETKEYBYTES;
 export const crypto_box_NONCEBYTES = global.crypto_box_NONCEBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
   global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
+  global.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
 export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
 export const crypto_pwhash_BYTES_MIN = global.crypto_pwhash_BYTES_MIN;
 export const crypto_pwhash_BYTES_MAX = global.crypto_pwhash_BYTES_MAX;
@@ -552,6 +561,46 @@ export function crypto_kdf_derive_from_key(
     ctx,
     key.buffer
   );
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+  message: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+  message: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+  message: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  _secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  if (typeof message === 'string' && typeof additional_data === 'string') {
+    result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
+      message,
+      additional_data,
+      public_nonce.buffer,
+      key.buffer
+    );
+  } else {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
+    );
+  }
   return convertToOutputFormat(result, outputFormat);
 }
 

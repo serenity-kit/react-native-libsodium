@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 import {
+  crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_box_easy,
@@ -231,6 +232,23 @@ export default function App() {
   ) {
     throw new Error('crypto_kdf_derive_from_key failed');
   }
+
+  const aead_xchacha20poly1305_ietf_nonce = randombytes_buf(
+    crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
+  );
+  const aead_xchacha20poly1305_ietf_encrypt =
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      'Hello World',
+      'additional data',
+      null,
+      aead_xchacha20poly1305_ietf_nonce,
+      aead_xchacha20poly1305_ietf_key
+    );
+
+  console.log(
+    'aead_xchacha20poly1305_ietf_encrypt',
+    aead_xchacha20poly1305_ietf_encrypt
+  );
 
   return (
     <View style={styles.container}>
