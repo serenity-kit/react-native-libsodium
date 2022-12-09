@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 import {
+  crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
@@ -245,10 +246,17 @@ export default function App() {
       aead_xchacha20poly1305_ietf_key
     );
 
-  console.log(
-    'aead_xchacha20poly1305_ietf_encrypt',
-    aead_xchacha20poly1305_ietf_encrypt
-  );
+  const aead_xchacha20poly1305_ietf_decrypt =
+    crypto_aead_xchacha20poly1305_ietf_decrypt(
+      null,
+      aead_xchacha20poly1305_ietf_encrypt,
+      'additional data',
+      aead_xchacha20poly1305_ietf_nonce,
+      aead_xchacha20poly1305_ietf_key
+    );
+  if (to_string(aead_xchacha20poly1305_ietf_decrypt) !== 'Hello World') {
+    throw new Error('aead_xchacha20poly1305_ietf_decrypt failed');
+  }
 
   return (
     <View style={styles.container}>

@@ -149,6 +149,12 @@ declare global {
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
+    ciphertext: ArrayBuffer,
+    additionalData: string,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -599,6 +605,47 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   } else {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+  secret_nonce: string | Uint8Array | null,
+  ciphertext: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+  secret_nonce: string | Uint8Array | null,
+  ciphertext: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+  _secret_nonce: string | Uint8Array | null,
+  ciphertext: string | Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  if (typeof ciphertext !== 'string' && typeof additional_data === 'string') {
+    result =
+      global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
+        ciphertext.buffer,
+        additional_data,
+        public_nonce.buffer,
+        key.buffer
+      );
+  } else {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
     );
   }
   return convertToOutputFormat(result, outputFormat);

@@ -1422,6 +1422,84 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string));
+
+  auto jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer"),
+      6,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText must be an ArrayBuffer");
+        }
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData can't be null");
+        }
+        if (!arguments[1].isString())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData must be a string");
+        }
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce must be an ArrayBuffer");
+        }
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key can't be null");
+        }
+        if (!arguments[3].isObject() ||
+            !arguments[3].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key must be an ArrayBuffer");
+        }
+
+        auto cipherTextDataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *cipherText = cipherTextDataArrayBuffer.data(runtime);
+        unsigned long long cipherTextLength = cipherTextDataArrayBuffer.size(runtime);
+
+        std::string additionalData = arguments[1].asString(runtime).utf8(runtime);
+
+        auto nonceDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
+
+        auto keyDataArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *key = keyDataArrayBuffer.data(runtime);
+
+        unsigned long long messageLength = cipherTextLength - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+        unsigned char message[messageLength];
+
+        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(message, &messageLength, NULL, cipherText, cipherTextLength, (unsigned char *)additionalData.data(), additionalData.length(), nonce, key);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)messageLength)
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), message, messageLength);
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer));
 }
 
 void cleanUpRnlibsodium()
