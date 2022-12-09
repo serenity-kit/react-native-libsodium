@@ -28,6 +28,8 @@ declare global {
   var crypto_box_NONCEBYTES: number;
   var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
   var crypto_kdf_KEYBYTES: number;
+  var crypto_pwhash_BYTES_MIN: number;
+  var crypto_pwhash_BYTES_MAX: number;
 
   function from_base64_to_arraybuffer(
     input: string,
@@ -118,6 +120,22 @@ declare global {
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_pwhash_from_string(
+    keyLength: number,
+    password: string,
+    salt: ArrayBuffer,
+    opsLimit: number,
+    memLimit: number,
+    algorithm: number
+  ): ArrayBuffer;
+  function jsi_crypto_pwhash_from_arraybuffer(
+    keyLength: number,
+    password: ArrayBuffer,
+    salt: ArrayBuffer,
+    opsLimit: number,
+    memLimit: number,
+    algorithm: number
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -134,6 +152,8 @@ export const crypto_box_NONCEBYTES = global.crypto_box_NONCEBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
   global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
 export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
+export const crypto_pwhash_BYTES_MIN = global.crypto_pwhash_BYTES_MIN;
+export const crypto_pwhash_BYTES_MAX = global.crypto_pwhash_BYTES_MAX;
 
 export const from_base64 = (
   input: string,
@@ -444,6 +464,56 @@ export function crypto_box_open_easy(
       nonce.buffer,
       publicKey.buffer,
       privateKey.buffer
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  if (typeof password === 'string') {
+    result = global.jsi_crypto_pwhash_from_string(
+      keyLength,
+      password,
+      salt.buffer,
+      opsLimit,
+      memLimit,
+      algorithm
+    );
+  } else {
+    result = global.jsi_crypto_pwhash_from_arraybuffer(
+      keyLength,
+      password.buffer,
+      salt.buffer,
+      opsLimit,
+      memLimit,
+      algorithm
     );
   }
   return convertToOutputFormat(result, outputFormat);

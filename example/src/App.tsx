@@ -11,6 +11,7 @@ import {
   crypto_box_SECRETKEYBYTES,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
+  crypto_pwhash,
   crypto_pwhash_ALG_DEFAULT,
   crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
@@ -55,6 +56,8 @@ export default function App() {
     crypto_box_SECRETKEYBYTES,
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     crypto_kdf_KEYBYTES,
+    crypto_pwhash_BYTES_MIN,
+    crypto_pwhash_BYTES_MAX,
   });
 
   const randombytes_buf_1 = randombytes_buf(1);
@@ -177,6 +180,29 @@ export default function App() {
   );
   if (to_string(box_open_easy_from_uint8array) !== 'Hello World') {
     throw new Error('box_open_easy_from_uint8array failed');
+  }
+
+  const pwhash_salt = randombytes_buf(crypto_pwhash_SALTBYTES);
+
+  const pwhash_from_string = crypto_pwhash(
+    crypto_pwhash_BYTES_MIN,
+    'password123',
+    pwhash_salt,
+    crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    crypto_pwhash_ALG_DEFAULT
+  );
+
+  const pwhash_form_uint8array = crypto_pwhash(
+    crypto_pwhash_BYTES_MIN,
+    from_base64(to_base64('password123')),
+    pwhash_salt,
+    crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    crypto_pwhash_ALG_DEFAULT
+  );
+  if (to_base64(pwhash_from_string) !== to_base64(pwhash_form_uint8array)) {
+    throw new Error('crypto_pwhash failed');
   }
 
   return (

@@ -22,6 +22,8 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_NONCEBYTES", (int)crypto_box_NONCEBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_BYTES_MAX", (int)crypto_pwhash_BYTES_MAX);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_BYTES_MIN", (int)crypto_pwhash_BYTES_MIN);
 
   auto from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
@@ -1097,6 +1099,190 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy_from_string", std::move(jsi_crypto_box_open_easy_from_string));
+
+  auto jsi_crypto_pwhash_from_string = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash_from_string"),
+      6,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] keyLength can't be null");
+        }
+        if (!arguments[0].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] keyLength must be a number");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] password can't be null");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] salt can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] salt must be an ArrayBuffer");
+        }
+
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] outputLength can't be null");
+        }
+        if (!arguments[3].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] outputLength must be a number");
+        }
+
+        if (arguments[4].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] opsLimit can't be null");
+        }
+        if (!arguments[4].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] opsLimit must be a number");
+        }
+
+        if (arguments[5].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] algorithm can't be null");
+        }
+        if (!arguments[5].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] algorithm must be a number");
+        }
+
+        int keyLength = arguments[0].asNumber();
+
+        std::string password = arguments[1].asString(runtime).utf8(runtime);
+
+        auto saltDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *salt = saltDataArrayBuffer.data(runtime);
+
+        int opsLimit = arguments[3].asNumber();
+        int memLimit = arguments[4].asNumber();
+        int algorithm = arguments[5].asNumber();
+
+        unsigned char key[keyLength];
+
+        int result = crypto_pwhash(key, keyLength, (const char *)password.data(), password.length(), salt, opsLimit, memLimit, algorithm);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(key))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_string", std::move(jsi_crypto_pwhash_from_string));
+
+  auto jsi_crypto_pwhash_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer"),
+      6,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength can't be null");
+        }
+        if (!arguments[0].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength must be a number");
+        }
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] password can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] password must be an ArrayBuffer");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] salt can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] salt must be an ArrayBuffer");
+        }
+
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength can't be null");
+        }
+        if (!arguments[3].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength must be a number");
+        }
+
+        if (arguments[4].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit can't be null");
+        }
+        if (!arguments[4].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit must be a number");
+        }
+
+        if (arguments[5].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm can't be null");
+        }
+        if (!arguments[5].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm must be a number");
+        }
+
+        int keyLength = arguments[0].asNumber();
+
+        auto passwordDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *password = passwordDataArrayBuffer.data(runtime);
+
+        auto saltDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *salt = saltDataArrayBuffer.data(runtime);
+
+        int opsLimit = arguments[3].asNumber();
+        int memLimit = arguments[4].asNumber();
+        int algorithm = arguments[5].asNumber();
+
+        unsigned char key[keyLength];
+
+        int result = crypto_pwhash(key, keyLength, (char *)password, passwordDataArrayBuffer.length(runtime), salt, opsLimit, memLimit, algorithm);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(key))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer", std::move(jsi_crypto_pwhash_from_arraybuffer));
 }
 
 void cleanUpRnlibsodium()
