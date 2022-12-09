@@ -136,6 +136,12 @@ declare global {
     memLimit: number,
     algorithm: number
   ): ArrayBuffer;
+  function jsi_crypto_kdf_derive_from_key(
+    subkeyLength: number,
+    subkeyId: number,
+    context: string,
+    key: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -516,6 +522,36 @@ export function crypto_pwhash(
       algorithm
     );
   }
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_kdf_derive_from_key(
+  subkey_len: number,
+  subkey_id: number,
+  ctx: string,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_kdf_derive_from_key(
+  subkey_len: number,
+  subkey_id: number,
+  ctx: string,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_kdf_derive_from_key(
+  subkey_len: number,
+  subkey_id: number,
+  ctx: string,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  const result = global.jsi_crypto_kdf_derive_from_key(
+    subkey_len,
+    subkey_id,
+    ctx,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 

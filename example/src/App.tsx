@@ -9,6 +9,7 @@ import {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_kdf_derive_from_key,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
   crypto_pwhash,
@@ -203,6 +204,32 @@ export default function App() {
   );
   if (to_base64(pwhash_from_string) !== to_base64(pwhash_form_uint8array)) {
     throw new Error('crypto_pwhash failed');
+  }
+
+  const kdf_keygen = crypto_kdf_keygen();
+  const kdf_derive_from_key = crypto_kdf_derive_from_key(
+    32,
+    42,
+    'context',
+    kdf_keygen
+  );
+  const kdf_derive_from_key_2 = crypto_kdf_derive_from_key(
+    32,
+    42,
+    'context',
+    kdf_keygen
+  );
+  const kdf_derive_from_key_3 = crypto_kdf_derive_from_key(
+    32,
+    43,
+    'context',
+    kdf_keygen
+  );
+  if (
+    to_base64(kdf_derive_from_key) !== to_base64(kdf_derive_from_key_2) ||
+    to_base64(kdf_derive_from_key) === to_base64(kdf_derive_from_key_3)
+  ) {
+    throw new Error('crypto_kdf_derive_from_key failed');
   }
 
   return (

@@ -1283,6 +1283,71 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer", std::move(jsi_crypto_pwhash_from_arraybuffer));
+
+  auto jsi_crypto_kdf_derive_from_key = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_kdf_derive_from_key"),
+      4,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyLength can't be null");
+        }
+        if (!arguments[0].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyLength must be a number");
+        }
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyId can't be null");
+        }
+        if (!arguments[1].isNumber())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyId must be a number");
+        }
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] context can't be null");
+        }
+
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] masterKey can't be null");
+        }
+        if (!arguments[3].isObject() ||
+            !arguments[3].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] masterKey must be an ArrayBuffer");
+        }
+
+        int subkeyLength = arguments[0].asNumber();
+        int subkeyId = arguments[1].asNumber();
+        std::string context = arguments[2].asString(runtime).utf8(runtime);
+
+        auto masterKeyDataArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *masterKey = masterKeyDataArrayBuffer.data(runtime);
+
+        unsigned char subkey[subkeyLength];
+
+        int result = crypto_kdf_derive_from_key(subkey, subkeyLength, subkeyId, (char *)context.data(), masterKey);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] jsi_crypto_kdf_derive_from_key failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(subkey))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), subkey, sizeof(subkey));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_derive_from_key", std::move(jsi_crypto_kdf_derive_from_key));
 }
 
 void cleanUpRnlibsodium()
