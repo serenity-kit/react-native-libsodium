@@ -82,7 +82,7 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 
 MIT
 
-The `to_string` function was copied from the libsodium.js project and you can find the license at [LICENSE_libsodiumjs](LICENSE_libsodiumjs).
+The `to_string` function and `base64_variants` enum was copied from the libsodium.js project and you can find the license at [LICENSE_libsodiumjs](LICENSE_libsodiumjs).
 
 ---
 
