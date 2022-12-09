@@ -8,10 +8,30 @@ We planning to provide Android and Web support in the coming months.
 
 For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
 
-## Installation
+## Installation Expo (dev-client)
+
+This package support the Expo plugin system and can be used together with the [Expo dev-client](https://docs.expo.dev/clients/introduction/).
 
 ```sh
 npm install react-native-libsodium
+```
+
+Extend app.config.js with the following plugins entry:
+
+```js
+export default {
+  expo: {
+    …
+    plugins: [["react-native-sodium-expo-plugin", {}]],
+  }
+}
+```
+
+## Installation React Native
+
+```sh
+npm install react-native-libsodium
+cd ios && pod install
 ```
 
 ## Usage
