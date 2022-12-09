@@ -66,16 +66,6 @@ export default function App() {
   const box_keypair = crypto_box_keypair();
   const sign_keypair = crypto_sign_keypair();
 
-  const sign_detached_from_string = crypto_sign_detached(
-    'Hello World',
-    sign_keypair.privateKey
-  );
-  const sign_verify_detached_from_string = crypto_sign_verify_detached(
-    sign_detached_from_string,
-    'Hello World',
-    sign_keypair.publicKey
-  );
-
   const sign_detached_from_uint8array_message = from_base64(
     to_base64('Hello World')
   );
@@ -85,6 +75,21 @@ export default function App() {
   );
   const sign_verify_detached_from_uint8array = crypto_sign_verify_detached(
     sign_detached_from_uint8array,
+    sign_detached_from_uint8array_message,
+    sign_keypair.publicKey
+  );
+
+  const sign_detached_from_string = crypto_sign_detached(
+    'Hello World',
+    sign_keypair.privateKey
+  );
+  const sign_verify_detached_from_string = crypto_sign_verify_detached(
+    sign_detached_from_string,
+    'Hello World',
+    sign_keypair.publicKey
+  );
+  const sign_verify_detached_from_string_2 = crypto_sign_verify_detached(
+    sign_detached_from_string,
     sign_detached_from_uint8array_message,
     sign_keypair.publicKey
   );
@@ -119,20 +124,24 @@ export default function App() {
       <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
 
       <Text>
-        sign_detached_from_string: {to_base64(sign_detached_from_string)}
-      </Text>
-      <Text>
-        sign_verify_detached_from_string:{' '}
-        {String(sign_verify_detached_from_string)}
-      </Text>
-
-      <Text>
         sign_detached_from_uint8array:{' '}
         {to_base64(sign_detached_from_uint8array)}
       </Text>
       <Text>
         sign_verify_detached_from_uint8array:{' '}
         {String(sign_verify_detached_from_uint8array)}
+      </Text>
+
+      <Text>
+        sign_detached_from_string: {to_base64(sign_detached_from_string)}
+      </Text>
+      <Text>
+        sign_verify_detached_from_string:{' '}
+        {String(sign_verify_detached_from_string)}
+      </Text>
+      <Text>
+        sign_verify_detached_from_string_2:{' '}
+        {String(sign_verify_detached_from_string_2)}
       </Text>
     </View>
   );

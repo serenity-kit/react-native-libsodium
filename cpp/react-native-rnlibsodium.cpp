@@ -365,7 +365,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
         }
 
         auto messageDataArrayBuffer =
-            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *message = messageDataArrayBuffer.data(runtime);
 
         auto secretKeyDataArrayBuffer =
