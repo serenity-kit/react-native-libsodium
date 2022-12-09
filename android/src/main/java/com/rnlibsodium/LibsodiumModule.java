@@ -1,4 +1,4 @@
-package com.rnlibsodium;
+package com.libsodium;
 
 import androidx.annotation.NonNull;
 
@@ -8,11 +8,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.module.annotations.ReactModule;
 
-@ReactModule(name = RnlibsodiumModule.NAME)
-public class RnlibsodiumModule extends ReactContextBaseJavaModule {
-  public static final String NAME = "Rnlibsodium";
+@ReactModule(name = LibsodiumModule.NAME)
+public class LibsodiumModule extends ReactContextBaseJavaModule {
+  public static final String NAME = "Libsodium";
 
-  public RnlibsodiumModule(ReactApplicationContext reactContext) {
+  public LibsodiumModule(ReactApplicationContext reactContext) {
     super(reactContext);
   }
 

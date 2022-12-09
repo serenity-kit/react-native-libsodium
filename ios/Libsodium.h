@@ -1,8 +1,8 @@
-#import "react-native-rnlibsodium.h"
+#import "react-native-libsodium.h"
 #import <React/RCTBridgeModule.h>
 #import "sodium.h"
 
-@interface Rnlibsodium : NSObject <RCTBridgeModule>
+@interface Libsodium : NSObject <RCTBridgeModule>
 
 @property (nonatomic, assign) BOOL setBridgeOnMainQueue;
 

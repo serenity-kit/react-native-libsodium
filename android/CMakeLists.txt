@@ -5,7 +5,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 add_library(cpp
             SHARED
-            ../cpp/react-native-rnlibsodium.cpp
+            ../cpp/react-native-libsodium.cpp
             cpp-adapter.cpp
 )
 

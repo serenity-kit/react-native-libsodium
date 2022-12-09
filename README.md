@@ -1,17 +1,17 @@
-# react-native-rnlibsodium
+# react-native-libsodium
 
 React Native bindings to Libsodium
 
 ## Installation
 
 ```sh
-npm install react-native-rnlibsodium
+npm install react-native-libsodium
 ```
 
 ## Usage
 
 ```js
-import { multiply } from 'react-native-rnlibsodium';
+import { multiply } from 'react-native-libsodium';
 
 // ...
 

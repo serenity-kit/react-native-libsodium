@@ -33,7 +33,7 @@ import {
   to_base64,
   to_hex,
   to_string,
-} from 'react-native-rnlibsodium';
+} from 'react-native-libsodium';
 
 export default function App() {
   const resultBase64 = to_base64('Hello World');

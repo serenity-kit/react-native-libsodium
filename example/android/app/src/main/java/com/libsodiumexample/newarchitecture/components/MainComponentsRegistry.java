@@ -1,4 +1,4 @@
-package com.rnlibsodiumexample.newarchitecture.components;
+package com.libsodiumexample.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

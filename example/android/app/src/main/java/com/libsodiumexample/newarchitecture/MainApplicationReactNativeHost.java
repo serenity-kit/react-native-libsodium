@@ -1,4 +1,4 @@
-package com.rnlibsodiumexample.newarchitecture;
+package com.libsodiumexample.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.rnlibsodiumexample.BuildConfig;
-import com.rnlibsodiumexample.newarchitecture.components.MainComponentsRegistry;
-import com.rnlibsodiumexample.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.libsodiumexample.BuildConfig;
+import com.libsodiumexample.newarchitecture.components.MainComponentsRegistry;
+import com.libsodiumexample.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

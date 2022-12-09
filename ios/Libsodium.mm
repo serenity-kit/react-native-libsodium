@@ -1,9 +1,9 @@
-#import "react-native-rnlibsodium.h"
+#import "react-native-libsodium.h"
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
-#import "Rnlibsodium.h"
+#import "Libsodium.h"
 
-@implementation Rnlibsodium
+@implementation Libsodium
 
 @synthesize bridge=_bridge;
 @synthesize methodQueue = _methodQueue;
@@ -23,11 +23,11 @@ RCT_EXPORT_MODULE()
     return;
   }
 
-  installRnlibsodium(*(facebook::jsi::Runtime *)cxxBridge.runtime);
+  installLibsodium(*(facebook::jsi::Runtime *)cxxBridge.runtime);
 }
 
 - (void)invalidate {
-  cleanUpRnlibsodium();
+  cleanUpLibsodium();
 }
 
 

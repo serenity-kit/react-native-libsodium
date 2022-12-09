@@ -1,5 +1,5 @@
 {
-  "name": "react-native-rnlibsodium",
+  "name": "react-native-libsodium",
   "version": "0.3.0",
   "description": "test",
   "main": "lib/commonjs/index",
@@ -45,13 +45,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/SerenityNotes/react-native-rnlibsodium",
+  "repository": "https://github.com/SerenityNotes/react-native-libsodium",
   "author": "Nikolaus Graf <hi@serenity.re> (https://github.com/SerenityNotes)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SerenityNotes/react-native-rnlibsodium/issues"
+    "url": "https://github.com/SerenityNotes/react-native-libsodium/issues"
   },
-  "homepage": "https://github.com/SerenityNotes/react-native-rnlibsodium#readme",
+  "homepage": "https://github.com/SerenityNotes/react-native-libsodium#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

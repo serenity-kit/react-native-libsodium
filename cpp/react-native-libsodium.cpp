@@ -1,5 +1,5 @@
-// import our header file to implement the `installRnlibsodium` and `cleanUpRnlibsodium` functions
-#include "react-native-rnlibsodium.h"
+// import our header file to implement the `installLibsodium` and `cleanUpLibsodium` functions
+#include "react-native-libsodium.h"
 // useful functions manipulate strings in C++
 #include <sstream>
 // libsodium
@@ -9,7 +9,7 @@
 using namespace facebook;
 
 // get the runtime and create native functions
-void installRnlibsodium(jsi::Runtime &jsiRuntime)
+void installLibsodium(jsi::Runtime &jsiRuntime)
 {
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_KEYBYTES", (int)crypto_secretbox_KEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_NONCEBYTES", (int)crypto_secretbox_NONCEBYTES);
@@ -34,11 +34,11 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64_to_arraybuffer] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][from_base64_to_arraybuffer] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][from_base64_to_arraybuffer] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][from_base64_to_arraybuffer] variant can't be null");
         }
 
         std::string base64String = arguments[0].asString(runtime).utf8(runtime);
@@ -73,11 +73,11 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_string] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_string] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_string] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_string] variant can't be null");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -99,16 +99,16 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] value can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] value must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] value must be an ArrayBuffer");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_base64_from_arraybuffer] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] variant can't be null");
         }
 
         auto dataArrayBuffer =
@@ -135,7 +135,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_string] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_hex_from_string] value can't be null");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -155,12 +155,12 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_arraybuffer] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_hex_from_arraybuffer] value can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_to_hex_from_arraybuffer] value must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_hex_from_arraybuffer] value must be an ArrayBuffer");
         }
 
         auto dataArrayBuffer =
@@ -186,7 +186,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_randombytes_buf] size can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_randombytes_buf] size can't be null");
         }
 
         int size = arguments[0].asNumber();
@@ -209,7 +209,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][randombytes_uniform] upper_bound can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][randombytes_uniform] upper_bound can't be null");
         }
 
         int upper_bound = arguments[0].asNumber();
@@ -349,16 +349,16 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_string] message can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_string] secretKey can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_string] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_string] secretKey must be an ArrayBuffer");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -389,22 +389,22 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_arraybuffer] message can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] message must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_arraybuffer] message must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_keypair_from_arraybuffer] secretKey must be an ArrayBuffer");
         }
 
         auto messageDataArrayBuffer =
@@ -437,27 +437,27 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] signature can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_string] signature can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] signature must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_string] signature must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_string] message can't be null");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_string] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_string] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_string] publicKey must be an ArrayBuffer");
         }
 
         auto signatureDataArrayBuffer =
@@ -485,32 +485,32 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] signature must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] message must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_verify_detached_from_arraybuffer] publicKey must be an ArrayBuffer");
         }
 
         auto signatureDataArrayBuffer =
@@ -540,27 +540,27 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_string] message can't be null");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_string] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_string] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_string] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_string] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_string] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_string] key can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_string] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_string] key must be an ArrayBuffer");
         }
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
@@ -596,32 +596,32 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] message can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] message must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] message must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] key can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_easy_from_arraybuffer] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_easy_from_arraybuffer] key must be an ArrayBuffer");
         }
 
         auto messageDataArrayBuffer =
@@ -660,32 +660,32 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] ciphertext can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] ciphertext can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] ciphertext must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] ciphertext must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] key can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] key must be an ArrayBuffer");
         }
 
         auto ciphertextDataArrayBuffer =
@@ -707,7 +707,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] jsi_crypto_secretbox_open_easy_from_arraybuffer failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] jsi_crypto_secretbox_open_easy_from_arraybuffer failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -729,27 +729,27 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] ciphertext can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] ciphertext can't be null");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] key can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] key must be an ArrayBuffer");
         }
 
         std::string ciphertext = arguments[0].asString(runtime).utf8(runtime);
@@ -769,7 +769,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_secretbox_open_easy_from_string] jsi_crypto_secretbox_open_easy_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] jsi_crypto_secretbox_open_easy_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -791,37 +791,37 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] message can't be null");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] publicKey must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] secretKey can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] secretKey must be an ArrayBuffer");
         }
 
         std::string message = arguments[0].asString(runtime).utf8(runtime);
@@ -845,7 +845,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] jsi_crypto_box_easy_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] jsi_crypto_box_easy_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -867,42 +867,42 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] message can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] message must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] message must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey must be an ArrayBuffer");
         }
 
         auto messageDataArrayBuffer =
@@ -928,7 +928,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] jsi_crypto_box_easy_from_arraybuffer failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] jsi_crypto_box_easy_from_arraybuffer failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -950,42 +950,42 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] ciphertext can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] ciphertext can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] ciphertext must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] ciphertext must be an ArrayBuffer");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] publicKey must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] secretKey can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] secretKey must be an ArrayBuffer");
         }
 
         auto ciphertextDataArrayBuffer =
@@ -1011,7 +1011,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_arraybuffer] jsi_crypto_box_open_easy_from_arraybuffer failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] jsi_crypto_box_open_easy_from_arraybuffer failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1033,37 +1033,37 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] ciphertext can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] ciphertext can't be null");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] nonce can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] nonce must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] publicKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] publicKey can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] publicKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] publicKey must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] secretKey can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] secretKey must be an ArrayBuffer");
         }
 
         std::string ciphertext = arguments[0].asString(runtime).utf8(runtime);
@@ -1087,7 +1087,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1109,53 +1109,53 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] keyLength can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] keyLength can't be null");
         }
         if (!arguments[0].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] keyLength must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] keyLength must be a number");
         }
 
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] password can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] password can't be null");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] salt can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] salt can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] salt must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] salt must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] outputLength can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] outputLength can't be null");
         }
         if (!arguments[3].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] outputLength must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] outputLength must be a number");
         }
 
         if (arguments[4].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] opsLimit can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] opsLimit can't be null");
         }
         if (!arguments[4].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] opsLimit must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] opsLimit must be a number");
         }
 
         if (arguments[5].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] algorithm can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] algorithm can't be null");
         }
         if (!arguments[5].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_string] algorithm must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] algorithm must be a number");
         }
 
         int keyLength = arguments[0].asNumber();
@@ -1176,7 +1176,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1198,57 +1198,57 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength can't be null");
         }
         if (!arguments[0].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength must be a number");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] password can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] password can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] password must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] password must be an ArrayBuffer");
         }
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] salt can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] salt can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] salt must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] salt must be an ArrayBuffer");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength can't be null");
         }
         if (!arguments[3].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength must be a number");
         }
 
         if (arguments[4].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit can't be null");
         }
         if (!arguments[4].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit must be a number");
         }
 
         if (arguments[5].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm can't be null");
         }
         if (!arguments[5].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm must be a number");
         }
 
         int keyLength = arguments[0].asNumber();
@@ -1271,7 +1271,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1293,33 +1293,33 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyLength can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] subkeyLength can't be null");
         }
         if (!arguments[0].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyLength must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] subkeyLength must be a number");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyId can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] subkeyId can't be null");
         }
         if (!arguments[1].isNumber())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] subkeyId must be a number");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] subkeyId must be a number");
         }
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] context can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] context can't be null");
         }
 
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] masterKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] masterKey can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] masterKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] masterKey must be an ArrayBuffer");
         }
 
         int subkeyLength = arguments[0].asNumber();
@@ -1336,7 +1336,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_kdf_derive_from_key] jsi_crypto_kdf_derive_from_key failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] jsi_crypto_kdf_derive_from_key failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1358,37 +1358,37 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] message can't be null");
         }
         if (!arguments[0].isString())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] message must be a string");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] message must be a string");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] additionalData can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] additionalData can't be null");
         }
         if (!arguments[1].isString())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] additionalData must be a string");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] additionalData must be a string");
         }
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] nonce can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] nonce must be an ArrayBuffer");
         }
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] key can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] key must be an ArrayBuffer");
         }
 
         std::string message = arguments[0].asString(runtime).utf8(runtime);
@@ -1409,7 +1409,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1431,38 +1431,38 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText can't be null");
         }
         if (!arguments[0].isObject() ||
             !arguments[0].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] cipherText must be an ArrayBuffer");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData can't be null");
         }
         if (!arguments[1].isString())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData must be a string");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] additionalData must be a string");
         }
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] nonce must be an ArrayBuffer");
         }
         if (arguments[3].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key can't be null");
         }
         if (!arguments[3].isObject() ||
             !arguments[3].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] key must be an ArrayBuffer");
         }
 
         auto cipherTextDataArrayBuffer =
@@ -1487,7 +1487,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer failed");
         }
 
         jsi::Object returnBufferAsObject = runtime.global()
@@ -1502,7 +1502,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer));
 }
 
-void cleanUpRnlibsodium()
+void cleanUpLibsodium()
 {
   // intentionally left blank
 }

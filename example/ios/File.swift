@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  RnlibsodiumExample
+//  LibsodiumExample
 //
 
 import Foundation
