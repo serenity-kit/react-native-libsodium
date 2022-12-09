@@ -17,6 +17,7 @@ import {
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
   crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_open_easy,
   crypto_sign_detached,
   crypto_sign_keypair,
   crypto_sign_verify_detached,
@@ -115,11 +116,29 @@ export default function App() {
     secretbox_key
   );
 
+  // TODO is this a bug? or how should it be used?
+  // const secretbox_open_easy_from_string = crypto_secretbox_open_easy(
+  //   to_string(secretbox_easy_from_string),
+  //   secretbox_easy_nonce,
+  //   secretbox_key
+  // );
+  // if (to_string(secretbox_open_easy_from_string) !== 'Hello World') {
+  //   throw new Error('secretbox_open_easy_from_string failed');
+  // }
+
   const secretbox_easy_from_uint8array = crypto_secretbox_easy(
     from_base64(to_base64('Hello World')),
     secretbox_easy_nonce,
     secretbox_key
   );
+  const secretbox_open_easy_from_uint8array = crypto_secretbox_open_easy(
+    secretbox_easy_from_uint8array,
+    secretbox_easy_nonce,
+    secretbox_key
+  );
+  if (to_string(secretbox_open_easy_from_uint8array) !== 'Hello World') {
+    throw new Error('secretbox_open_easy_from_uint8array failed');
+  }
 
   return (
     <View style={styles.container}>
@@ -174,6 +193,7 @@ export default function App() {
       <Text>
         secretbox_easy_from_string: {to_base64(secretbox_easy_from_string)}
       </Text>
+
       <Text>
         secretbox_easy_from_uint8array:{' '}
         {to_base64(secretbox_easy_from_uint8array)}

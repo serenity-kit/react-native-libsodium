@@ -83,6 +83,16 @@ declare global {
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_secretbox_open_easy_from_string(
+    ciphertext: string,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_secretbox_open_easy_from_arraybuffer(
+    ciphertext: ArrayBuffer,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -291,6 +301,41 @@ export function crypto_secretbox_easy(
   } else {
     result = global.jsi_crypto_secretbox_easy_from_arraybuffer(
       message.buffer,
+      nonce.buffer,
+      key.buffer
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_secretbox_open_easy(
+  ciphertext: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_secretbox_open_easy(
+  ciphertext: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_secretbox_open_easy(
+  ciphertext: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  if (typeof ciphertext === 'string') {
+    result = global.jsi_crypto_secretbox_open_easy_from_string(
+      ciphertext,
+      nonce.buffer,
+      key.buffer
+    );
+  } else {
+    result = global.jsi_crypto_secretbox_open_easy_from_arraybuffer(
+      ciphertext.buffer,
       nonce.buffer,
       key.buffer
     );
