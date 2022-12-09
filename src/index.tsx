@@ -43,6 +43,7 @@ declare global {
   function jsi_to_hex_from_string(input: string): string;
   function jsi_to_hex_from_arraybuffer(input: ArrayBuffer): string;
   function jsi_randombytes_buf(length: number): ArrayBuffer;
+  function jsi_randombytes_uniform(upper_bound: number): number;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
   function jsi_crypto_kdf_keygen(): ArrayBuffer;
@@ -131,6 +132,10 @@ export function randombytes_buf(
 ) {
   const result = global.jsi_randombytes_buf(length);
   return convertToOutputFormat(result, outputFormat);
+}
+
+export function randombytes_uniform(upper_bound: number): number {
+  return global.jsi_randombytes_uniform(upper_bound);
 }
 
 export function crypto_secretbox_keygen(

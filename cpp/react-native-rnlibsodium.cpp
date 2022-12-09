@@ -197,6 +197,22 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_randombytes_buf", std::move(jsi_randombytes_buf));
 
+  auto jsi_randombytes_uniform = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "randombytes_uniform"),
+      1,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][randombytes_uniform] upper_bound can't be null");
+        }
+
+        int upper_bound = arguments[0].asNumber();
+        return jsi::Value((int)randombytes_uniform(upper_bound));
+      });
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_randombytes_uniform", std::move(jsi_randombytes_uniform));
+
   auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
