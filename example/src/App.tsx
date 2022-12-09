@@ -20,6 +20,7 @@ import {
   crypto_sign_keypair,
   crypto_sign_verify_detached,
   from_base64,
+  randombytes_buf,
   to_base64,
   to_hex,
   to_string,
@@ -50,6 +51,12 @@ export default function App() {
     crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     crypto_kdf_KEYBYTES,
   });
+
+  const randombytes_buf_1 = randombytes_buf(1);
+  const randombytes_buf_3 = randombytes_buf(3);
+  const randombytes_buf_9 = randombytes_buf(9);
+  console.log({ randombytes_buf_1, randombytes_buf_3, randombytes_buf_9 });
+
   const secretbox_key = crypto_secretbox_keygen();
   const secretbox_key_base64 = crypto_secretbox_keygen('base64');
   const secretbox_key_hex = crypto_secretbox_keygen('hex');

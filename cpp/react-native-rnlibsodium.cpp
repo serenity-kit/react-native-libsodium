@@ -174,6 +174,29 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex_from_arraybuffer", std::move(jsi_to_hex_from_arraybuffer));
 
+  auto jsi_randombytes_buf = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_randombytes_buf"),
+      1,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_randombytes_buf] size can't be null");
+        }
+
+        int size = arguments[0].asNumber();
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, size)
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        randombytes_buf(arraybuffer.data(runtime), size);
+        return returnBufferAsObject;
+      });
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_randombytes_buf", std::move(jsi_randombytes_buf));
+
   auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),

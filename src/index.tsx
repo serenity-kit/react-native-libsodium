@@ -42,6 +42,7 @@ declare global {
   ): string;
   function jsi_to_hex_from_string(input: string): string;
   function jsi_to_hex_from_arraybuffer(input: ArrayBuffer): string;
+  function jsi_randombytes_buf(length: number): ArrayBuffer;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
   function jsi_crypto_kdf_keygen(): ArrayBuffer;
@@ -114,6 +115,22 @@ export function to_hex(input: string | Uint8Array): string {
   } else {
     return global.jsi_to_hex_from_arraybuffer(input.buffer);
   }
+}
+
+export function randombytes_buf(
+  length: number,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function randombytes_buf(
+  length: number,
+  outputFormat: StringOutputFormat
+): string;
+export function randombytes_buf(
+  length: number,
+  outputFormat?: OutputFormat | null
+) {
+  const result = global.jsi_randombytes_buf(length);
+  return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_secretbox_keygen(
