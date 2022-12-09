@@ -73,6 +73,16 @@ declare global {
     message: ArrayBuffer,
     publicKey: ArrayBuffer
   ): boolean;
+  function jsi_crypto_secretbox_easy_from_string(
+    message: string,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_secretbox_easy_from_arraybuffer(
+    message: ArrayBuffer,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -251,6 +261,41 @@ export function crypto_sign_verify_detached(
     );
   }
   return result;
+}
+
+export function crypto_secretbox_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_secretbox_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_secretbox_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+): unknown {
+  let result: ArrayBuffer;
+  if (typeof message === 'string') {
+    result = global.jsi_crypto_secretbox_easy_from_string(
+      message,
+      nonce.buffer,
+      key.buffer
+    );
+  } else {
+    result = global.jsi_crypto_secretbox_easy_from_arraybuffer(
+      message.buffer,
+      nonce.buffer,
+      key.buffer
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
 }
 
 // add no-op ready to match the libsodium-wrappers API

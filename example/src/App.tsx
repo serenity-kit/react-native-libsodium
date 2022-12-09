@@ -13,6 +13,7 @@ import {
   crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
   crypto_pwhash_SALTBYTES,
+  crypto_secretbox_easy,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
   crypto_secretbox_NONCEBYTES,
@@ -107,6 +108,19 @@ export default function App() {
     sign_keypair.publicKey
   );
 
+  const secretbox_easy_nonce = randombytes_buf(crypto_secretbox_NONCEBYTES);
+  const secretbox_easy_from_string = crypto_secretbox_easy(
+    'Hello World',
+    secretbox_easy_nonce,
+    secretbox_key
+  );
+
+  const secretbox_easy_from_uint8array = crypto_secretbox_easy(
+    from_base64(to_base64('Hello World')),
+    secretbox_easy_nonce,
+    secretbox_key
+  );
+
   return (
     <View style={styles.container}>
       <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
@@ -155,6 +169,14 @@ export default function App() {
       <Text>
         sign_verify_detached_from_string_2:{' '}
         {String(sign_verify_detached_from_string_2)}
+      </Text>
+
+      <Text>
+        secretbox_easy_from_string: {to_base64(secretbox_easy_from_string)}
+      </Text>
+      <Text>
+        secretbox_easy_from_uint8array:{' '}
+        {to_base64(secretbox_easy_from_uint8array)}
       </Text>
     </View>
   );
