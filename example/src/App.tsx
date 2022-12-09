@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
+  crypto_box_easy,
   crypto_box_keypair,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
@@ -140,6 +141,22 @@ export default function App() {
     throw new Error('secretbox_open_easy_from_uint8array failed');
   }
 
+  const box_easy_nonce = randombytes_buf(crypto_box_NONCEBYTES);
+  const box_easy_keypair_alice = crypto_box_keypair();
+  const box_easy_keypair_bob = crypto_box_keypair();
+  const box_easy_from_string = crypto_box_easy(
+    'Hello World',
+    box_easy_nonce,
+    box_easy_keypair_alice.publicKey,
+    box_easy_keypair_bob.privateKey
+  );
+  const box_easy_from_uint8array = crypto_box_easy(
+    from_base64(to_base64('Hello World')),
+    box_easy_nonce,
+    box_easy_keypair_alice.publicKey,
+    box_easy_keypair_bob.privateKey
+  );
+
   return (
     <View style={styles.container}>
       <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
@@ -197,6 +214,11 @@ export default function App() {
       <Text>
         secretbox_easy_from_uint8array:{' '}
         {to_base64(secretbox_easy_from_uint8array)}
+      </Text>
+
+      <Text>box_easy_from_string: {to_base64(box_easy_from_string)}</Text>
+      <Text>
+        box_easy_from_uint8array: {to_base64(box_easy_from_uint8array)}
       </Text>
     </View>
   );

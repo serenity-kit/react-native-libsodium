@@ -25,6 +25,7 @@ declare global {
   var crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
   var crypto_box_PUBLICKEYBYTES: number;
   var crypto_box_SECRETKEYBYTES: number;
+  var crypto_box_NONCEBYTES: number;
   var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
   var crypto_kdf_KEYBYTES: number;
 
@@ -93,6 +94,18 @@ declare global {
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_box_easy_from_string(
+    message: string,
+    nonce: ArrayBuffer,
+    publicKey: ArrayBuffer,
+    secretKey: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_box_easy_from_arraybuffer(
+    message: ArrayBuffer,
+    nonce: ArrayBuffer,
+    publicKey: ArrayBuffer,
+    secretKey: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
@@ -105,6 +118,7 @@ export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
   global.crypto_pwhash_MEMLIMIT_INTERACTIVE;
 export const crypto_box_PUBLICKEYBYTES = global.crypto_box_PUBLICKEYBYTES;
 export const crypto_box_SECRETKEYBYTES = global.crypto_box_SECRETKEYBYTES;
+export const crypto_box_NONCEBYTES = global.crypto_box_NONCEBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
   global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
 export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
@@ -338,6 +352,46 @@ export function crypto_secretbox_open_easy(
       ciphertext.buffer,
       nonce.buffer,
       key.buffer
+    );
+  }
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_box_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_box_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_box_easy(
+  message: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  if (typeof message === 'string') {
+    result = global.jsi_crypto_box_easy_from_string(
+      message,
+      nonce.buffer,
+      publicKey.buffer,
+      privateKey.buffer
+    );
+  } else {
+    result = global.jsi_crypto_box_easy_from_arraybuffer(
+      message.buffer,
+      nonce.buffer,
+      publicKey.buffer,
+      privateKey.buffer
     );
   }
   return convertToOutputFormat(result, outputFormat);

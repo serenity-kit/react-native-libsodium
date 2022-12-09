@@ -19,6 +19,7 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_MEMLIMIT_INTERACTIVE", (int)crypto_pwhash_MEMLIMIT_INTERACTIVE);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_PUBLICKEYBYTES", (int)crypto_box_PUBLICKEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_SECRETKEYBYTES", (int)crypto_box_SECRETKEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_NONCEBYTES", (int)crypto_box_NONCEBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
 
@@ -778,6 +779,165 @@ void installRnlibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_open_easy_from_string", std::move(jsi_crypto_secretbox_open_easy_from_string));
+
+  auto jsi_crypto_box_easy_from_string = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_box_easy_from_string"),
+      4,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] message can't be null");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] nonce can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] nonce must be an ArrayBuffer");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] publicKey can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] publicKey must be an ArrayBuffer");
+        }
+
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] secretKey can't be null");
+        }
+        if (!arguments[3].isObject() ||
+            !arguments[3].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] secretKey must be an ArrayBuffer");
+        }
+
+        std::string message = arguments[0].asString(runtime).utf8(runtime);
+
+        auto nonceDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
+
+        auto publicKeyDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
+
+        auto secretKeyDataArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
+
+        int ciphertext_length = message.length() + crypto_box_MACBYTES;
+        unsigned char ciphertext[ciphertext_length];
+
+        int result = crypto_box_easy(ciphertext, (unsigned char *)message.data(), message.length(), nonce, publicKey, secretKey);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_string] jsi_crypto_box_easy_from_string failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_easy_from_string", std::move(jsi_crypto_box_easy_from_string));
+
+  auto jsi_crypto_box_easy_from_arraybuffer = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_box_easy_from_arraybuffer"),
+      4,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        if (arguments[0].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] message can't be null");
+        }
+        if (!arguments[0].isObject() ||
+            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] message must be an ArrayBuffer");
+        }
+
+        if (arguments[1].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] nonce can't be null");
+        }
+        if (!arguments[1].isObject() ||
+            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] nonce must be an ArrayBuffer");
+        }
+
+        if (arguments[2].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey can't be null");
+        }
+        if (!arguments[2].isObject() ||
+            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] publicKey must be an ArrayBuffer");
+        }
+
+        if (arguments[3].isNull())
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey can't be null");
+        }
+        if (!arguments[3].isObject() ||
+            !arguments[3].asObject(runtime).isArrayBuffer(runtime))
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] secretKey must be an ArrayBuffer");
+        }
+
+        auto messageDataArrayBuffer =
+            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *message = messageDataArrayBuffer.data(runtime);
+
+        auto nonceDataArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
+
+        auto publicKeyDataArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
+
+        auto secretKeyDataArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
+
+        int ciphertext_length = messageDataArrayBuffer.size(runtime) + crypto_box_MACBYTES;
+        unsigned char ciphertext[ciphertext_length];
+
+        int result = crypto_box_easy(ciphertext, message, messageDataArrayBuffer.size(runtime), nonce, publicKey, secretKey);
+
+        if (result != 0)
+        {
+          throw jsi::JSError(runtime, "[react-native-rnlibsodium][jsi_crypto_box_easy_from_arraybuffer] jsi_crypto_box_easy_from_arraybuffer failed");
+        }
+
+        jsi::Object returnBufferAsObject = runtime.global()
+                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
+                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .asObject(runtime);
+        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        return returnBufferAsObject;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_easy_from_arraybuffer", std::move(jsi_crypto_box_easy_from_arraybuffer));
 }
 
 void cleanUpRnlibsodium()
