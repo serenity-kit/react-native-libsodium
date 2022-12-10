@@ -6,8 +6,10 @@ import {
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
   crypto_box_easy,
   crypto_box_keypair,
+  crypto_box_NONCEBYTES,
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
@@ -16,6 +18,8 @@ import {
   crypto_kdf_keygen,
   crypto_pwhash,
   crypto_pwhash_ALG_DEFAULT,
+  crypto_pwhash_BYTES_MAX,
+  crypto_pwhash_BYTES_MIN,
   crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
   crypto_pwhash_SALTBYTES,
@@ -30,12 +34,13 @@ import {
   from_base64,
   randombytes_buf,
   randombytes_uniform,
+  ready,
   to_base64,
   to_hex,
   to_string,
 } from 'react-native-libsodium';
 
-export default function App() {
+function LibsodiumTests() {
   const resultBase64 = to_base64('Hello World');
   const resultUint8Array = from_base64(resultBase64);
   const result2Base64 = to_base64(resultUint8Array);
@@ -323,6 +328,22 @@ export default function App() {
       </Text>
     </View>
   );
+}
+
+export default function App() {
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      await ready;
+      setIsReady(true);
+    })();
+  }, []);
+
+  if (!isReady) {
+    return null;
+  }
+  return <LibsodiumTests />;
 }
 
 const styles = StyleSheet.create({

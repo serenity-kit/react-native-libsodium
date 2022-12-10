@@ -2,11 +2,13 @@
 
 React Native bindings to Libsodium aiming to be a drop-in replacement for the [libsodium-wrappers package](https://www.npmjs.com/package/libsodium-wrappers).
 
-Currently only a subset of the libsodium-wrappers exposed funtionality is implemented and only iOS support is working.
+Supported Platforms:
 
-We planning to provide Android and Web support in the coming months.
+- iOS
+- Android (coming in the next months)
+- Web
 
-For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
+Currently only a subset of the libsodium-wrappers exposed funtionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
 
 ## Installation Expo (dev-client)
 
