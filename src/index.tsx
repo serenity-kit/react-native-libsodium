@@ -17,22 +17,22 @@ import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
 declare global {
-  var crypto_secretbox_KEYBYTES: number;
-  var crypto_secretbox_NONCEBYTES: number;
-  var crypto_pwhash_SALTBYTES: number;
-  var crypto_pwhash_ALG_DEFAULT: number;
-  var crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
-  var crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
-  var crypto_box_PUBLICKEYBYTES: number;
-  var crypto_box_SECRETKEYBYTES: number;
-  var crypto_box_NONCEBYTES: number;
-  var crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
-  var crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
-  var crypto_kdf_KEYBYTES: number;
-  var crypto_pwhash_BYTES_MIN: number;
-  var crypto_pwhash_BYTES_MAX: number;
+  var jsi_crypto_secretbox_KEYBYTES: number;
+  var jsi_crypto_secretbox_NONCEBYTES: number;
+  var jsi_crypto_pwhash_SALTBYTES: number;
+  var jsi_crypto_pwhash_ALG_DEFAULT: number;
+  var jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
+  var jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
+  var jsi_crypto_box_PUBLICKEYBYTES: number;
+  var jsi_crypto_box_SECRETKEYBYTES: number;
+  var jsi_crypto_box_NONCEBYTES: number;
+  var jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
+  var jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
+  var jsi_crypto_kdf_KEYBYTES: number;
+  var jsi_crypto_pwhash_BYTES_MIN: number;
+  var jsi_crypto_pwhash_BYTES_MAX: number;
 
-  function from_base64_to_arraybuffer(
+  function jsi_from_base64_to_arraybuffer(
     input: string,
     variant?: base64_variants
   ): ArrayBuffer;
@@ -157,31 +157,32 @@ declare global {
   ): ArrayBuffer;
 }
 
-export const crypto_secretbox_KEYBYTES = global.crypto_secretbox_KEYBYTES;
-export const crypto_secretbox_NONCEBYTES = global.crypto_secretbox_NONCEBYTES;
-export const crypto_pwhash_SALTBYTES = global.crypto_pwhash_SALTBYTES;
-export const crypto_pwhash_ALG_DEFAULT = global.crypto_pwhash_ALG_DEFAULT;
+export const crypto_secretbox_KEYBYTES = global.jsi_crypto_secretbox_KEYBYTES;
+export const crypto_secretbox_NONCEBYTES =
+  global.jsi_crypto_secretbox_NONCEBYTES;
+export const crypto_pwhash_SALTBYTES = global.jsi_crypto_pwhash_SALTBYTES;
+export const crypto_pwhash_ALG_DEFAULT = global.jsi_crypto_pwhash_ALG_DEFAULT;
 export const crypto_pwhash_OPSLIMIT_INTERACTIVE =
-  global.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+  global.jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE;
 export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
-  global.crypto_pwhash_MEMLIMIT_INTERACTIVE;
-export const crypto_box_PUBLICKEYBYTES = global.crypto_box_PUBLICKEYBYTES;
-export const crypto_box_SECRETKEYBYTES = global.crypto_box_SECRETKEYBYTES;
-export const crypto_box_NONCEBYTES = global.crypto_box_NONCEBYTES;
+  global.jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE;
+export const crypto_box_PUBLICKEYBYTES = global.jsi_crypto_box_PUBLICKEYBYTES;
+export const crypto_box_SECRETKEYBYTES = global.jsi_crypto_box_SECRETKEYBYTES;
+export const crypto_box_NONCEBYTES = global.jsi_crypto_box_NONCEBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
-  global.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+  global.jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
-  global.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
-export const crypto_kdf_KEYBYTES = global.crypto_kdf_KEYBYTES;
-export const crypto_pwhash_BYTES_MIN = global.crypto_pwhash_BYTES_MIN;
-export const crypto_pwhash_BYTES_MAX = global.crypto_pwhash_BYTES_MAX;
+  global.jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
+export const crypto_kdf_KEYBYTES = global.jsi_crypto_kdf_KEYBYTES;
+export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
+export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
 
 export const from_base64 = (
   input: string,
   variant?: base64_variants
 ): Uint8Array => {
   const variantToUse = variant || base64_variants.URLSAFE_NO_PADDING;
-  const result = global.from_base64_to_arraybuffer(input, variantToUse);
+  const result = global.jsi_from_base64_to_arraybuffer(input, variantToUse);
   return new Uint8Array(result);
 };
 

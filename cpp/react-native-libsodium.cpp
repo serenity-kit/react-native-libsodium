@@ -11,22 +11,22 @@ using namespace facebook;
 // get the runtime and create native functions
 void installLibsodium(jsi::Runtime &jsiRuntime)
 {
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_KEYBYTES", (int)crypto_secretbox_KEYBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_secretbox_NONCEBYTES", (int)crypto_secretbox_NONCEBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_SALTBYTES", (int)crypto_pwhash_SALTBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_ALG_DEFAULT", (int)crypto_pwhash_ALG_DEFAULT);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_OPSLIMIT_INTERACTIVE", (int)crypto_pwhash_OPSLIMIT_INTERACTIVE);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_MEMLIMIT_INTERACTIVE", (int)crypto_pwhash_MEMLIMIT_INTERACTIVE);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_PUBLICKEYBYTES", (int)crypto_box_PUBLICKEYBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_SECRETKEYBYTES", (int)crypto_box_SECRETKEYBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_box_NONCEBYTES", (int)crypto_box_NONCEBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_NPUBBYTES", (int)crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_BYTES_MAX", (int)crypto_pwhash_BYTES_MAX);
-  jsiRuntime.global().setProperty(jsiRuntime, "crypto_pwhash_BYTES_MIN", (int)crypto_pwhash_BYTES_MIN);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_KEYBYTES", (int)crypto_secretbox_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_NONCEBYTES", (int)crypto_secretbox_NONCEBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_SALTBYTES", (int)crypto_pwhash_SALTBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_ALG_DEFAULT", (int)crypto_pwhash_ALG_DEFAULT);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE", (int)crypto_pwhash_OPSLIMIT_INTERACTIVE);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE", (int)crypto_pwhash_MEMLIMIT_INTERACTIVE);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_PUBLICKEYBYTES", (int)crypto_box_PUBLICKEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SECRETKEYBYTES", (int)crypto_box_SECRETKEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_NONCEBYTES", (int)crypto_box_NONCEBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES", (int)crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES", (int)crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MAX", (int)crypto_pwhash_BYTES_MAX);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MIN", (int)crypto_pwhash_BYTES_MIN);
 
-  auto from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
+  auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
       2,
@@ -34,11 +34,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][from_base64_to_arraybuffer] value can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_from_base64_to_arraybuffer] value can't be null");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][from_base64_to_arraybuffer] variant can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_from_base64_to_arraybuffer] variant can't be null");
         }
 
         std::string base64String = arguments[0].asString(runtime).utf8(runtime);
@@ -63,7 +63,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         return returnBufferAsObject;
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "from_base64_to_arraybuffer", std::move(from_base64_to_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_from_base64_to_arraybuffer", std::move(jsi_from_base64_to_arraybuffer));
 
   auto jsi_to_base64_from_string = jsi::Function::createFromHostFunction(
       jsiRuntime,
