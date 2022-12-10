@@ -12,7 +12,7 @@ import type {
   StringOutputFormat,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
-import { base64_variants } from './libsodium-js-utils';
+import { base64_variants, to_string } from './libsodium-js-utils';
 import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
@@ -654,3 +654,42 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
 
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());
+
+export default {
+  crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_aead_xchacha20poly1305_ietf_encrypt,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_keygen,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
+  crypto_box_easy,
+  crypto_box_keypair,
+  crypto_box_NONCEBYTES,
+  crypto_box_open_easy,
+  crypto_box_PUBLICKEYBYTES,
+  crypto_box_SECRETKEYBYTES,
+  crypto_kdf_derive_from_key,
+  crypto_kdf_KEYBYTES,
+  crypto_kdf_keygen,
+  crypto_pwhash,
+  crypto_pwhash_ALG_DEFAULT,
+  crypto_pwhash_BYTES_MAX,
+  crypto_pwhash_BYTES_MIN,
+  crypto_pwhash_MEMLIMIT_INTERACTIVE,
+  crypto_pwhash_OPSLIMIT_INTERACTIVE,
+  crypto_pwhash_SALTBYTES,
+  crypto_secretbox_easy,
+  crypto_secretbox_KEYBYTES,
+  crypto_secretbox_keygen,
+  crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_open_easy,
+  crypto_sign_detached,
+  crypto_sign_keypair,
+  crypto_sign_verify_detached,
+  from_base64,
+  randombytes_buf,
+  randombytes_uniform,
+  ready,
+  to_base64,
+  to_hex,
+  to_string,
+};

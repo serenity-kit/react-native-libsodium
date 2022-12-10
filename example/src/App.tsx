@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
-import {
+import sodium, {
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
@@ -46,6 +46,9 @@ function LibsodiumTests() {
   const result2Base64 = to_base64(resultUint8Array);
   const resultString = to_string(resultUint8Array);
   const hex = to_hex('Hello World');
+  if (sodium.crypto_secretbox_KEYBYTES !== 32) {
+    throw new Error('export default not working');
+  }
   console.log({
     resultBase64,
     resultUint8Array,

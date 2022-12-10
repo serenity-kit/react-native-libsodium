@@ -257,6 +257,7 @@ sodium.ready.then(() => {
   crypto_pwhash_STRPREFIX = sodium.crypto_pwhash_STRPREFIX;
 });
 
+export default sodium;
 export let add = sodium.add;
 export let base64_variants = sodium.base64_variants;
 export let compare = sodium.compare;
