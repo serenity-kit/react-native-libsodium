@@ -38,6 +38,8 @@ cd ios && pod install
 
 ## Usage
 
+**Hint:** see the `example` app in the repository regarding how to use the functions
+
 ```js
 import {
   crypto_aead_xchacha20poly1305_ietf_decrypt,
@@ -89,3 +91,7 @@ The `to_string` function and `base64_variants` enum was copied from the libsodiu
 ---
 
 Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
+
+## Acknowledgment
+
+Thanks to [Donus](https://github.com/donus3) for freeing up the `react-native-libsodium` package name on npm.
