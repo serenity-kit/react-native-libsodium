@@ -51,6 +51,7 @@ import {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_kdf_CONTEXTBYTES,
   crypto_kdf_derive_from_key,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,

@@ -25,6 +25,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_KEYBYTES", (int)crypto_kdf_KEYBYTES);
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MAX", (int)crypto_pwhash_BYTES_MAX);
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MIN", (int)crypto_pwhash_BYTES_MIN);
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_CONTEXTBYTES", (int)crypto_kdf_CONTEXTBYTES);
 
   auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,

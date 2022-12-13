@@ -31,6 +31,7 @@ declare global {
   var jsi_crypto_kdf_KEYBYTES: number;
   var jsi_crypto_pwhash_BYTES_MIN: number;
   var jsi_crypto_pwhash_BYTES_MAX: number;
+  var jsi_crypto_kdf_CONTEXTBYTES: number;
 
   function jsi_from_base64_to_arraybuffer(
     input: string,
@@ -176,6 +177,7 @@ export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
 export const crypto_kdf_KEYBYTES = global.jsi_crypto_kdf_KEYBYTES;
 export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
 export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
+export const crypto_kdf_CONTEXTBYTES = global.jsi_crypto_kdf_CONTEXTBYTES;
 
 export const from_base64 = (
   input: string,
@@ -668,6 +670,7 @@ export default {
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
   crypto_kdf_derive_from_key,
+  crypto_kdf_CONTEXTBYTES,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
   crypto_pwhash,

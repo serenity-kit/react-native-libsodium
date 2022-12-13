@@ -13,6 +13,7 @@ import sodium, {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_kdf_CONTEXTBYTES,
   crypto_kdf_derive_from_key,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
@@ -69,7 +70,12 @@ function LibsodiumTests() {
     crypto_kdf_KEYBYTES,
     crypto_pwhash_BYTES_MIN,
     crypto_pwhash_BYTES_MAX,
+    crypto_kdf_CONTEXTBYTES,
   });
+
+  if (crypto_kdf_CONTEXTBYTES !== 8) {
+    throw new Error('crypto_kdf_CONTEXTBYTES not properly exported');
+  }
 
   const randombytes_buf_1 = randombytes_buf(1);
   const randombytes_buf_3 = randombytes_buf(3);
