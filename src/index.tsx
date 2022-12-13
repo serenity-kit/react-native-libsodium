@@ -150,6 +150,12 @@ declare global {
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer(
+    message: ArrayBuffer,
+    additionalData: string,
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
     ciphertext: ArrayBuffer,
     additionalData: string,
@@ -605,6 +611,17 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
       public_nonce.buffer,
       key.buffer
     );
+  } else if (
+    typeof message !== 'string' &&
+    typeof additional_data === 'string'
+  ) {
+    result =
+      global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer(
+        message.buffer,
+        additional_data,
+        public_nonce.buffer,
+        key.buffer
+      );
   } else {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
