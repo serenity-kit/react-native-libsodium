@@ -1,7 +1,7 @@
 {
   "name": "react-native-libsodium",
   "version": "0.4.0",
-  "description": "test",
+  "description": "React Native bindings to Libsodium matching the libsodium-wrappers API",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",

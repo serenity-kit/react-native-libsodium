@@ -1,6 +1,6 @@
 # react-native-libsodium
 
-React Native bindings to Libsodium aiming to be a drop-in replacement for the [libsodium-wrappers package](https://www.npmjs.com/package/libsodium-wrappers).
+React Native bindings to Libsodium matching the [libsodium-wrappers package](https://www.npmjs.com/package/libsodium-wrappers) API
 
 Supported Platforms:
 
