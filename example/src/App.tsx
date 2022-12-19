@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import sodium, {
+  base64_variants,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
@@ -40,6 +41,36 @@ import sodium, {
   to_hex,
   to_string,
 } from 'react-native-libsodium';
+import { largeContent } from './largeContent';
+
+const encryptAndDecryptImage = () => {
+  const key = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+  const publicNonce = sodium.randombytes_buf(24);
+  const additionalData = '';
+  const content = from_base64(largeContent, base64_variants.ORIGINAL);
+  const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    content,
+    additionalData,
+    null,
+    publicNonce,
+    key
+  );
+  const decryptedContent = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+    null,
+    ciphertext,
+    additionalData,
+    publicNonce,
+    key
+  );
+  if (content.length !== decryptedContent.length) {
+    throw new Error('encryptAndDecryptImage failed: length mismatch');
+  }
+  const result = to_base64(decryptedContent, base64_variants.ORIGINAL);
+  if (result !== largeContent) {
+    throw new Error('encryptAndDecryptImage failed: content mismatch');
+  }
+  return result;
+};
 
 function LibsodiumTests() {
   const resultBase64 = to_base64('Hello World');
@@ -298,70 +329,81 @@ function LibsodiumTests() {
     throw new Error('aead_xchacha20poly1305_ietf_decrypt failed');
   }
 
+  const decryptedImage = encryptAndDecryptImage();
+
   return (
-    <View style={styles.container}>
-      <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
-      <Text>secretbox_key_base64: {secretbox_key_base64}</Text>
-      <Text>secretbox_key_hex: {secretbox_key_hex}</Text>
-      <Text>
-        aead_xchacha20poly1305_ietf_key:{' '}
-        {to_base64(aead_xchacha20poly1305_ietf_key)}
-      </Text>
-      <Text>
-        aead_xchacha20poly1305_ietf_key_base64:{' '}
-        {aead_xchacha20poly1305_ietf_key_base64}
-      </Text>
-      <Text>
-        aead_xchacha20poly1305_ietf_key_hex:{' '}
-        {aead_xchacha20poly1305_ietf_key_hex}
-      </Text>
-      <Text>kdf_key:{to_base64(kdf_key)}</Text>
-      <Text>kdf_key_base64:{kdf_key_base64}</Text>
-      <Text>kdf_key_hex:{kdf_key_hex}</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
+        <Text>secretbox_key_base64: {secretbox_key_base64}</Text>
+        <Text>secretbox_key_hex: {secretbox_key_hex}</Text>
+        <Text>
+          aead_xchacha20poly1305_ietf_key:{' '}
+          {to_base64(aead_xchacha20poly1305_ietf_key)}
+        </Text>
+        <Text>
+          aead_xchacha20poly1305_ietf_key_base64:{' '}
+          {aead_xchacha20poly1305_ietf_key_base64}
+        </Text>
+        <Text>
+          aead_xchacha20poly1305_ietf_key_hex:{' '}
+          {aead_xchacha20poly1305_ietf_key_hex}
+        </Text>
+        <Text>kdf_key:{to_base64(kdf_key)}</Text>
+        <Text>kdf_key_base64:{kdf_key_base64}</Text>
+        <Text>kdf_key_hex:{kdf_key_hex}</Text>
 
-      <Text>box_keypair.privateKey: {to_base64(box_keypair.privateKey)}</Text>
-      <Text>box_keypair.publicKey: {to_base64(box_keypair.publicKey)}</Text>
-      <Text>box_keypair.keyType: {box_keypair.keyType}</Text>
+        <Text>box_keypair.privateKey: {to_base64(box_keypair.privateKey)}</Text>
+        <Text>box_keypair.publicKey: {to_base64(box_keypair.publicKey)}</Text>
+        <Text>box_keypair.keyType: {box_keypair.keyType}</Text>
 
-      <Text>sign_keypair.privateKey: {to_base64(sign_keypair.privateKey)}</Text>
-      <Text>sign_keypair.publicKey: {to_base64(sign_keypair.publicKey)}</Text>
-      <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
+        <Text>
+          sign_keypair.privateKey: {to_base64(sign_keypair.privateKey)}
+        </Text>
+        <Text>sign_keypair.publicKey: {to_base64(sign_keypair.publicKey)}</Text>
+        <Text>sign_keypair.keyType: {sign_keypair.keyType}</Text>
 
-      <Text>
-        sign_detached_from_uint8array:{' '}
-        {to_base64(sign_detached_from_uint8array)}
-      </Text>
-      <Text>
-        sign_verify_detached_from_uint8array:{' '}
-        {String(sign_verify_detached_from_uint8array)}
-      </Text>
+        <Text>
+          sign_detached_from_uint8array:{' '}
+          {to_base64(sign_detached_from_uint8array)}
+        </Text>
+        <Text>
+          sign_verify_detached_from_uint8array:{' '}
+          {String(sign_verify_detached_from_uint8array)}
+        </Text>
 
-      <Text>
-        sign_detached_from_string: {to_base64(sign_detached_from_string)}
-      </Text>
-      <Text>
-        sign_verify_detached_from_string:{' '}
-        {String(sign_verify_detached_from_string)}
-      </Text>
-      <Text>
-        sign_verify_detached_from_string_2:{' '}
-        {String(sign_verify_detached_from_string_2)}
-      </Text>
+        <Text>
+          sign_detached_from_string: {to_base64(sign_detached_from_string)}
+        </Text>
+        <Text>
+          sign_verify_detached_from_string:{' '}
+          {String(sign_verify_detached_from_string)}
+        </Text>
+        <Text>
+          sign_verify_detached_from_string_2:{' '}
+          {String(sign_verify_detached_from_string_2)}
+        </Text>
 
-      <Text>
-        secretbox_easy_from_string: {to_base64(secretbox_easy_from_string)}
-      </Text>
+        <Text>
+          secretbox_easy_from_string: {to_base64(secretbox_easy_from_string)}
+        </Text>
 
-      <Text>
-        secretbox_easy_from_uint8array:{' '}
-        {to_base64(secretbox_easy_from_uint8array)}
-      </Text>
+        <Text>
+          secretbox_easy_from_uint8array:{' '}
+          {to_base64(secretbox_easy_from_uint8array)}
+        </Text>
 
-      <Text>box_easy_from_string: {to_base64(box_easy_from_string)}</Text>
-      <Text>
-        box_easy_from_uint8array: {to_base64(box_easy_from_uint8array)}
-      </Text>
-    </View>
+        <Text>box_easy_from_string: {to_base64(box_easy_from_string)}</Text>
+        <Text>
+          box_easy_from_uint8array: {to_base64(box_easy_from_uint8array)}
+        </Text>
+
+        <Image
+          style={{ width: 120, height: 100 }}
+          source={{ uri: `data:image/jpeg;base64,${decryptedImage}` }}
+        />
+      </View>
+    </ScrollView>
   );
 }
 

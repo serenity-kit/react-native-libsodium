@@ -88,6 +88,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         base64String.resize(sodium_base64_encoded_len(utf8String.size(), variant));
         sodium_bin2base64((char *)base64String.data(), base64String.size(), (uint8_t *)utf8String.data(), utf8String.size(), variant);
 
+        // libsodium adds a nul byte (\0) terminator to the end of the string
+        if (base64String.length() && base64String[base64String.length() - 1] == '\0')
+        {
+          base64String.pop_back();
+        }
+
         return jsi::String::createFromUtf8(runtime, base64String);
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_string", std::move(jsi_to_base64_from_string));
@@ -123,6 +129,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         base64String.resize(sodium_base64_encoded_len(dataLength, variant));
         sodium_bin2base64((char *)base64String.data(), base64String.size(), data, dataLength, variant);
 
+        // libsodium adds a nul byte (\0) terminator to the end of the string
+        if (base64String.length() && base64String[base64String.length() - 1] == '\0')
+        {
+          base64String.pop_back();
+        }
+
         return jsi::String::createFromUtf8(runtime, base64String);
       });
 
@@ -143,6 +155,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string hexString;
         hexString.resize(utf8String.size() * 2 + 1);
         sodium_bin2hex((char *)hexString.data(), hexString.size(), (uint8_t *)utf8String.data(), utf8String.size());
+        // libsodium adds a nul byte (\0) terminator to the end of the string
+        if (hexString.length() && hexString[hexString.length() - 1] == '\0')
+        {
+          hexString.pop_back();
+        }
 
         return jsi::String::createFromUtf8(runtime, hexString);
       });
@@ -172,7 +189,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string hexString;
         hexString.resize(dataLength * 2 + 1);
 
-        sodium_bin2hex((char *)hexString.data(), hexString.size(), data, dataLength);
+        sodium_bin2hex((char *)hexString.data(), hexString.length(), data, dataLength);
+        // libsodium adds a nul byte (\0) terminator to the end of the string
+        if (hexString.length() && hexString[hexString.length() - 1] == '\0')
+        {
+          hexString.pop_back();
+        }
 
         return jsi::String::createFromUtf8(runtime, hexString);
       });
@@ -574,16 +596,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        int ciphertext_length = utf8String.length() + crypto_secretbox_MACBYTES;
-        unsigned char ciphertext[ciphertext_length];
+        int ciphertextLength = utf8String.length() + crypto_secretbox_MACBYTES;
+        unsigned char ciphertext[ciphertextLength];
 
         crypto_secretbox_easy(ciphertext, (uint8_t *)utf8String.data(), utf8String.length(), nonce, key);
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .callAsConstructor(runtime, (int)ciphertextLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        memcpy(arraybuffer.data(runtime), ciphertext, ciphertextLength);
         return returnBufferAsObject;
       });
 
@@ -637,17 +659,17 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        int ciphertext_length = messageDataArrayBuffer.size(runtime) + crypto_secretbox_MACBYTES;
-        unsigned char ciphertext[ciphertext_length];
+        int ciphertextLength = messageDataArrayBuffer.length(runtime) + crypto_secretbox_MACBYTES;
+        unsigned char ciphertext[ciphertextLength];
 
-        crypto_secretbox_easy(ciphertext, message, messageDataArrayBuffer.size(runtime), nonce, key);
+        crypto_secretbox_easy(ciphertext, message, messageDataArrayBuffer.length(runtime), nonce, key);
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .callAsConstructor(runtime, (int)ciphertextLength)
                                                .asObject(runtime);
 
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        memcpy(arraybuffer.data(runtime), ciphertext, ciphertextLength);
         return returnBufferAsObject;
       });
 
@@ -701,10 +723,10 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        int message_length = ciphertextDataArrayBuffer.size(runtime) - crypto_secretbox_MACBYTES;
+        int message_length = ciphertextDataArrayBuffer.length(runtime) - crypto_secretbox_MACBYTES;
         unsigned char message[message_length];
 
-        int result = crypto_secretbox_open_easy(message, ciphertext, ciphertextDataArrayBuffer.size(runtime), nonce, key);
+        int result = crypto_secretbox_open_easy(message, ciphertext, ciphertextDataArrayBuffer.length(runtime), nonce, key);
 
         if (result != 0)
         {
@@ -763,8 +785,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        int message_length = ciphertext.length() - crypto_secretbox_MACBYTES;
-        unsigned char message[message_length];
+        int messageLength = ciphertext.length() - crypto_secretbox_MACBYTES;
+        unsigned char message[messageLength];
 
         int result = crypto_secretbox_open_easy(message, (unsigned char *)ciphertext.data(), ciphertext.length(), nonce, key);
 
@@ -775,10 +797,10 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(message))
+                                               .callAsConstructor(runtime, (int)messageLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message, sizeof(message));
+        memcpy(arraybuffer.data(runtime), message, messageLength);
         return returnBufferAsObject;
       });
 
@@ -839,8 +861,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[3].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
-        int ciphertext_length = message.length() + crypto_box_MACBYTES;
-        unsigned char ciphertext[ciphertext_length];
+        int ciphertextLength = message.length() + crypto_box_MACBYTES;
+        unsigned char ciphertext[ciphertextLength];
 
         int result = crypto_box_easy(ciphertext, (unsigned char *)message.data(), message.length(), nonce, publicKey, secretKey);
 
@@ -851,10 +873,10 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .callAsConstructor(runtime, (int)ciphertextLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        memcpy(arraybuffer.data(runtime), ciphertext, ciphertextLength);
         return returnBufferAsObject;
       });
 
@@ -922,8 +944,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[3].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
-        int ciphertext_length = messageDataArrayBuffer.size(runtime) + crypto_box_MACBYTES;
-        unsigned char ciphertext[ciphertext_length];
+        int ciphertextLength = messageDataArrayBuffer.size(runtime) + crypto_box_MACBYTES;
+        unsigned char ciphertext[ciphertextLength];
 
         int result = crypto_box_easy(ciphertext, message, messageDataArrayBuffer.size(runtime), nonce, publicKey, secretKey);
 
@@ -934,10 +956,10 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(ciphertext))
+                                               .callAsConstructor(runtime, (int)ciphertextLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext, sizeof(ciphertext));
+        memcpy(arraybuffer.data(runtime), ciphertext, ciphertextLength);
         return returnBufferAsObject;
       });
 
@@ -1403,10 +1425,10 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[3].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        unsigned long long cipherTextLength = message.length() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+        unsigned long long cipherTextLength = message.size() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
         unsigned char cipherText[cipherTextLength];
 
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText, &cipherTextLength, (unsigned char *)message.data(), message.length(), (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText, &cipherTextLength, (unsigned char *)message.data(), message.length(), (unsigned char *)additionalData.data(), additionalData.size(), NULL, nonce, key);
 
         if (result != 0)
         {
