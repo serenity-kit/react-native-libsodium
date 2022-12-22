@@ -1426,9 +1426,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
         unsigned long long cipherTextLength = message.size() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        unsigned char cipherText[cipherTextLength];
+        std::vector<uint8_t> cipherText(cipherTextLength);
 
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText, &cipherTextLength, (unsigned char *)message.data(), message.length(), (unsigned char *)additionalData.data(), additionalData.size(), NULL, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText.data(), &cipherTextLength, (unsigned char *)message.data(), message.length(), (unsigned char *)additionalData.data(), additionalData.size(), NULL, nonce, key);
 
         if (result != 0)
         {
@@ -1440,7 +1440,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
                                                .callAsConstructor(runtime, (int)cipherTextLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), cipherText, cipherTextLength);
+        memcpy(arraybuffer.data(runtime), cipherText.data(), cipherTextLength);
         return returnBufferAsObject;
       });
 
@@ -1503,9 +1503,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
         unsigned long long cipherTextLength = messageDataArrayBuffer.size(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        unsigned char cipherText[cipherTextLength];
+        std::vector<uint8_t> cipherText(cipherTextLength);
 
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText, &cipherTextLength, message, messageDataArrayBuffer.size(runtime), (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText.data(), &cipherTextLength, message, messageDataArrayBuffer.size(runtime), (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
 
         if (result != 0)
         {
@@ -1517,7 +1517,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
                                                .callAsConstructor(runtime, (int)cipherTextLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), cipherText, cipherTextLength);
+        memcpy(arraybuffer.data(runtime), cipherText.data(), cipherTextLength);
         return returnBufferAsObject;
       });
 
@@ -1581,9 +1581,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
         unsigned long long messageLength = cipherTextLength - crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        unsigned char message[messageLength];
+        std::vector<uint8_t> message(messageLength);
 
-        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(message, &messageLength, NULL, cipherText, cipherTextLength, (unsigned char *)additionalData.data(), additionalData.length(), nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(message.data(), &messageLength, NULL, cipherText, cipherTextLength, (unsigned char *)additionalData.data(), additionalData.length(), nonce, key);
 
         if (result != 0)
         {
@@ -1595,7 +1595,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
                                                .callAsConstructor(runtime, (int)messageLength)
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message, messageLength);
+        memcpy(arraybuffer.data(runtime), message.data(), messageLength);
         return returnBufferAsObject;
       });
 

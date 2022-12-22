@@ -42,12 +42,13 @@ import sodium, {
   to_string,
 } from 'react-native-libsodium';
 import { largeContent } from './largeContent';
+import { threeMbImage } from './threeMbImage';
 
-const encryptAndDecryptImage = () => {
+const encryptAndDecryptImage = (contentAsBas64: string) => {
   const key = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
   const publicNonce = sodium.randombytes_buf(24);
   const additionalData = '';
-  const content = from_base64(largeContent, base64_variants.ORIGINAL);
+  const content = from_base64(contentAsBas64, base64_variants.ORIGINAL);
   const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
     content,
     additionalData,
@@ -55,6 +56,7 @@ const encryptAndDecryptImage = () => {
     publicNonce,
     key
   );
+
   const decryptedContent = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     null,
     ciphertext,
@@ -66,7 +68,7 @@ const encryptAndDecryptImage = () => {
     throw new Error('encryptAndDecryptImage failed: length mismatch');
   }
   const result = to_base64(decryptedContent, base64_variants.ORIGINAL);
-  if (result !== largeContent) {
+  if (result !== contentAsBas64) {
     throw new Error('encryptAndDecryptImage failed: content mismatch');
   }
   return result;
@@ -329,7 +331,8 @@ function LibsodiumTests() {
     throw new Error('aead_xchacha20poly1305_ietf_decrypt failed');
   }
 
-  const decryptedImage = encryptAndDecryptImage();
+  const decryptedImage = encryptAndDecryptImage(largeContent);
+  const decryptedImageThreeMb = encryptAndDecryptImage(threeMbImage);
 
   return (
     <ScrollView>
@@ -401,6 +404,10 @@ function LibsodiumTests() {
         <Image
           style={{ width: 120, height: 100 }}
           source={{ uri: `data:image/jpeg;base64,${decryptedImage}` }}
+        />
+        <Image
+          style={{ width: 120, height: 100 }}
+          source={{ uri: `data:image/jpeg;base64,${decryptedImageThreeMb}` }}
         />
       </View>
     </ScrollView>
