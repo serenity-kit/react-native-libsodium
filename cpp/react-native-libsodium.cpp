@@ -397,7 +397,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[1].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
-        unsigned int signatureLength = crypto_sign_BYTES;
+        unsigned long long signatureLength = crypto_sign_BYTES;
         std::vector<uint8_t> sig(signatureLength);
 
         crypto_sign_detached(sig.data(), NULL, (uint8_t *)utf8String.data(), utf8String.length(), secretKey);
@@ -446,7 +446,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[1].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
-        unsigned int signatureLength = crypto_sign_BYTES;
+        unsigned long long signatureLength = crypto_sign_BYTES;
         std::vector<uint8_t> sig(signatureLength);
 
         crypto_sign_detached(sig.data(), NULL, message, messageDataArrayBuffer.length(runtime), secretKey);
