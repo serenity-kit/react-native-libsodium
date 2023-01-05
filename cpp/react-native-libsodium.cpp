@@ -246,15 +246,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned char key[crypto_secretbox_KEYBYTES];
-        crypto_secretbox_keygen(key);
+        unsigned long long keyLength = crypto_secretbox_KEYBYTES;
+        std::vector<uint8_t> key(keyLength);
+        crypto_secretbox_keygen(key.data());
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                .callAsConstructor(runtime, (int)sizeof(key))
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
         return returnBufferAsObject;
       });
 
@@ -266,15 +267,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned char key[crypto_aead_xchacha20poly1305_ietf_KEYBYTES];
-        crypto_aead_xchacha20poly1305_ietf_keygen(key);
+        unsigned long long keyLength = crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+        std::vector<uint8_t> key(keyLength);
+        crypto_aead_xchacha20poly1305_ietf_keygen(key.data());
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                .callAsConstructor(runtime, (int)sizeof(key))
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
         return returnBufferAsObject;
       });
 
@@ -286,15 +288,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned char key[crypto_kdf_KEYBYTES];
-        crypto_kdf_keygen(key);
+        unsigned long long keyLength = crypto_kdf_KEYBYTES;
+        std::vector<uint8_t> key(keyLength);
+        crypto_kdf_keygen(key.data());
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                .callAsConstructor(runtime, (int)sizeof(key))
                                                .asObject(runtime);
         jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key, sizeof(key));
+        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
         return returnBufferAsObject;
       });
 
@@ -306,23 +309,25 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned char publickey[crypto_box_PUBLICKEYBYTES];
-        unsigned char secretkey[crypto_box_SECRETKEYBYTES];
-        crypto_box_keypair(publickey, secretkey);
+        unsigned long long publickeyLength = crypto_box_PUBLICKEYBYTES;
+        unsigned long long secretkeyLength = crypto_box_SECRETKEYBYTES;
+        std::vector<uint8_t> publickey(publickeyLength);
+        std::vector<uint8_t> secretkey(secretkeyLength);
+        crypto_box_keypair(publickey.data(), secretkey.data());
 
         jsi::Object returnPublicKeyBufferAsObject = runtime.global()
                                                         .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                         .callAsConstructor(runtime, (int)sizeof(publickey))
                                                         .asObject(runtime);
         jsi::ArrayBuffer publicKeyArraybuffer = returnPublicKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(publicKeyArraybuffer.data(runtime), publickey, sizeof(publickey));
+        memcpy(publicKeyArraybuffer.data(runtime), publickey.data(), publickeyLength);
 
         jsi::Object returnSecretKeyBufferAsObject = runtime.global()
                                                         .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                         .callAsConstructor(runtime, (int)sizeof(secretkey))
                                                         .asObject(runtime);
         jsi::ArrayBuffer privateKeyArraybuffer = returnSecretKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(privateKeyArraybuffer.data(runtime), secretkey, sizeof(secretkey));
+        memcpy(privateKeyArraybuffer.data(runtime), secretkey.data(), secretkeyLength);
 
         auto object = jsi::Object(runtime);
         object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
@@ -338,23 +343,25 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned char publickey[crypto_sign_PUBLICKEYBYTES];
-        unsigned char secretkey[crypto_sign_SECRETKEYBYTES];
-        crypto_sign_keypair(publickey, secretkey);
+        unsigned long long publickeyLength = crypto_sign_PUBLICKEYBYTES;
+        unsigned long long secretkeyLength = crypto_sign_SECRETKEYBYTES;
+        std::vector<uint8_t> publickey(publickeyLength);
+        std::vector<uint8_t> secretkey(secretkeyLength);
+        crypto_sign_keypair(publickey.data(), secretkey.data());
 
         jsi::Object returnPublicKeyBufferAsObject = runtime.global()
                                                         .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                         .callAsConstructor(runtime, (int)sizeof(publickey))
                                                         .asObject(runtime);
         jsi::ArrayBuffer publicKeyArraybuffer = returnPublicKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(publicKeyArraybuffer.data(runtime), publickey, sizeof(publickey));
+        memcpy(publicKeyArraybuffer.data(runtime), publickey.data(), publickeyLength);
 
         jsi::Object returnSecretKeyBufferAsObject = runtime.global()
                                                         .getPropertyAsFunction(runtime, "ArrayBuffer")
                                                         .callAsConstructor(runtime, (int)sizeof(secretkey))
                                                         .asObject(runtime);
         jsi::ArrayBuffer privateKeyArraybuffer = returnSecretKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(privateKeyArraybuffer.data(runtime), secretkey, sizeof(secretkey));
+        memcpy(privateKeyArraybuffer.data(runtime), secretkey.data(), secretkeyLength);
 
         auto object = jsi::Object(runtime);
         object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
