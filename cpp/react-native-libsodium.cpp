@@ -371,27 +371,30 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair", std::move(jsi_crypto_sign_keypair));
 
-  auto jsi_crypto_sign_detached_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_crypto_sign_detached = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_detached_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_detached"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
         if (arguments[0].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_string] message can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached] message can't be null");
+        }
+        if (!(arguments[0].isString() || (arguments[0].isObject() &&
+                                          arguments[0].asObject(runtime).isArrayBuffer(runtime))))
+        {
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached] message must be a string or an ArrayBuffer");
         }
         if (arguments[1].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_string] secretKey can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached] secretKey can't be null");
         }
         if (!arguments[1].isObject() ||
             !arguments[1].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_string] secretKey must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached] secretKey must be an ArrayBuffer");
         }
-
-        std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
 
         auto secretKeyDataArrayBuffer =
             arguments[1].asObject(runtime).getArrayBuffer(runtime);
@@ -400,7 +403,23 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned long long signatureLength = crypto_sign_BYTES;
         std::vector<uint8_t> sig(signatureLength);
 
-        crypto_sign_detached(sig.data(), NULL, (uint8_t *)utf8String.data(), utf8String.length(), secretKey);
+        unsigned char *message;
+        unsigned long long messageLength;
+        if (arguments[0].isString())
+        {
+          std::string messageString = arguments[0].asString(runtime).utf8(runtime);
+          message = (unsigned char *)messageString.data();
+          messageLength = messageString.length();
+        }
+        else
+        {
+          auto messageDataArrayBuffer =
+              arguments[0].asObject(runtime).getArrayBuffer(runtime);
+          message = messageDataArrayBuffer.data(runtime);
+          messageLength = messageDataArrayBuffer.length(runtime);
+        }
+
+        crypto_sign_detached(sig.data(), NULL, message, messageLength, secretKey);
 
         jsi::Object returnBufferAsObject = runtime.global()
                                                .getPropertyAsFunction(runtime, "ArrayBuffer")
@@ -410,56 +429,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         memcpy(arraybuffer.data(runtime), sig.data(), signatureLength);
         return returnBufferAsObject;
       });
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached_from_string", std::move(jsi_crypto_sign_detached_from_string));
-
-  auto jsi_crypto_sign_detached_from_arraybuffer = jsi::Function::createFromHostFunction(
-      jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_detached_from_arraybuffer"),
-      2,
-      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-      {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_arraybuffer] message can't be null");
-        }
-        if (!arguments[0].isObject() ||
-            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_arraybuffer] message must be an ArrayBuffer");
-        }
-
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_arraybuffer] secretKey can't be null");
-        }
-        if (!arguments[1].isObject() ||
-            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_sign_detached_from_arraybuffer] secretKey must be an ArrayBuffer");
-        }
-
-        auto messageDataArrayBuffer =
-            arguments[0].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *message = messageDataArrayBuffer.data(runtime);
-
-        auto secretKeyDataArrayBuffer =
-            arguments[1].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
-
-        unsigned long long signatureLength = crypto_sign_BYTES;
-        std::vector<uint8_t> sig(signatureLength);
-
-        crypto_sign_detached(sig.data(), NULL, message, messageDataArrayBuffer.length(runtime), secretKey);
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)signatureLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), sig.data(), signatureLength);
-        return returnBufferAsObject;
-      });
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached_from_arraybuffer", std::move(jsi_crypto_sign_detached_from_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached", std::move(jsi_crypto_sign_detached));
 
   auto jsi_crypto_sign_verify_detached_from_string = jsi::Function::createFromHostFunction(
       jsiRuntime,
