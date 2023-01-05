@@ -60,11 +60,11 @@ declare global {
     publicKey: ArrayBuffer;
     secretKey: ArrayBuffer;
   };
-  function jsi_crypto_sign_keypair_from_string(
+  function jsi_crypto_sign_detached_from_string(
     message: string,
     privateKey: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_sign_keypair_from_arraybuffer(
+  function jsi_crypto_sign_detached_from_arraybuffer(
     message: ArrayBuffer,
     privateKey: ArrayBuffer
   ): ArrayBuffer;
@@ -314,12 +314,12 @@ export function crypto_sign_detached(
 ): unknown {
   let result: ArrayBuffer;
   if (typeof message === 'string') {
-    result = global.jsi_crypto_sign_keypair_from_string(
+    result = global.jsi_crypto_sign_detached_from_string(
       message,
       privateKey.buffer
     );
   } else {
-    result = global.jsi_crypto_sign_keypair_from_arraybuffer(
+    result = global.jsi_crypto_sign_detached_from_arraybuffer(
       message.buffer,
       privateKey.buffer
     );
