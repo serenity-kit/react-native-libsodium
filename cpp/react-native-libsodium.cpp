@@ -8,6 +8,16 @@
 // syntactic sugar around the JSI objects. ex. call: jsi::Function
 using namespace facebook;
 
+jsi::Object arrayBufferAsObject (jsi::Runtime &runtime, std::vector<uint8_t> &data) {
+  jsi::Object returnBufferAsObject = runtime.global()
+   .getPropertyAsFunction(runtime, "ArrayBuffer")
+   .callAsConstructor(runtime, (int)data.size())
+   .asObject(runtime);
+  jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
+  memcpy(arraybuffer.data(runtime), data.data(), data.size());
+  return returnBufferAsObject;
+}
+
 // get the runtime and create native functions
 void installLibsodium(jsi::Runtime &jsiRuntime)
 {
@@ -53,13 +63,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         uint8Vector.resize(length);
 
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)length)
-                                               .asObject(runtime);
-
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), uint8Vector.data(), uint8Vector.size());
+        jsi::Object returnBufferAsObject = arrayBufferAsObject(runtime, uint8Vector);
 
         return returnBufferAsObject;
       });
@@ -246,17 +250,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned long long keyLength = crypto_secretbox_KEYBYTES;
-        std::vector<uint8_t> key(keyLength);
+        std::vector<uint8_t> key(crypto_secretbox_KEYBYTES);
         crypto_secretbox_keygen(key.data());
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(key))
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, key);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_keygen", std::move(jsi_crypto_secretbox_keygen));
@@ -267,17 +263,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned long long keyLength = crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
-        std::vector<uint8_t> key(keyLength);
+        std::vector<uint8_t> key(crypto_aead_xchacha20poly1305_ietf_KEYBYTES);
         crypto_aead_xchacha20poly1305_ietf_keygen(key.data());
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(key))
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, key);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_keygen", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_keygen));
@@ -288,17 +276,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        unsigned long long keyLength = crypto_kdf_KEYBYTES;
-        std::vector<uint8_t> key(keyLength);
+        std::vector<uint8_t> key(crypto_kdf_KEYBYTES);
         crypto_kdf_keygen(key.data());
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)sizeof(key))
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, key);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_keygen", std::move(jsi_crypto_kdf_keygen));
@@ -315,19 +295,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> secretkey(secretkeyLength);
         crypto_box_keypair(publickey.data(), secretkey.data());
 
-        jsi::Object returnPublicKeyBufferAsObject = runtime.global()
-                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                                        .callAsConstructor(runtime, (int)sizeof(publickey))
-                                                        .asObject(runtime);
-        jsi::ArrayBuffer publicKeyArraybuffer = returnPublicKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(publicKeyArraybuffer.data(runtime), publickey.data(), publickeyLength);
-
-        jsi::Object returnSecretKeyBufferAsObject = runtime.global()
-                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                                        .callAsConstructor(runtime, (int)sizeof(secretkey))
-                                                        .asObject(runtime);
-        jsi::ArrayBuffer privateKeyArraybuffer = returnSecretKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(privateKeyArraybuffer.data(runtime), secretkey.data(), secretkeyLength);
+        jsi::Object returnPublicKeyBufferAsObject = arrayBufferAsObject(runtime, publickey);
+        jsi::Object returnSecretKeyBufferAsObject = arrayBufferAsObject(runtime, secretkey);
 
         auto object = jsi::Object(runtime);
         object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
@@ -349,19 +318,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> secretkey(secretkeyLength);
         crypto_sign_keypair(publickey.data(), secretkey.data());
 
-        jsi::Object returnPublicKeyBufferAsObject = runtime.global()
-                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                                        .callAsConstructor(runtime, (int)sizeof(publickey))
-                                                        .asObject(runtime);
-        jsi::ArrayBuffer publicKeyArraybuffer = returnPublicKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(publicKeyArraybuffer.data(runtime), publickey.data(), publickeyLength);
-
-        jsi::Object returnSecretKeyBufferAsObject = runtime.global()
-                                                        .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                                        .callAsConstructor(runtime, (int)sizeof(secretkey))
-                                                        .asObject(runtime);
-        jsi::ArrayBuffer privateKeyArraybuffer = returnSecretKeyBufferAsObject.getArrayBuffer(runtime);
-        memcpy(privateKeyArraybuffer.data(runtime), secretkey.data(), secretkeyLength);
+        jsi::Object returnPublicKeyBufferAsObject = arrayBufferAsObject(runtime, publickey);
+        jsi::Object returnSecretKeyBufferAsObject = arrayBufferAsObject(runtime, secretkey);
 
         auto object = jsi::Object(runtime);
         object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
@@ -400,8 +358,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
             arguments[1].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
-        unsigned long long signatureLength = crypto_sign_BYTES;
-        std::vector<uint8_t> sig(signatureLength);
+        std::vector<uint8_t> sig(crypto_sign_BYTES);
 
         unsigned char *message;
         unsigned long long messageLength;
@@ -420,14 +377,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         }
 
         crypto_sign_detached(sig.data(), NULL, message, messageLength, secretKey);
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)signatureLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), sig.data(), signatureLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, sig);
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached", std::move(jsi_crypto_sign_detached));
 
@@ -579,13 +529,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> ciphertext(ciphertextLength);
 
         crypto_secretbox_easy(ciphertext.data(), (uint8_t *)utf8String.data(), utf8String.length(), nonce, key);
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)ciphertextLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext.data(), ciphertextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, ciphertext);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_easy_from_string", std::move(jsi_crypto_secretbox_easy_from_string));
@@ -642,14 +586,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> ciphertext(ciphertextLength);
 
         crypto_secretbox_easy(ciphertext.data(), message, messageDataArrayBuffer.length(runtime), nonce, key);
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)ciphertextLength)
-                                               .asObject(runtime);
-
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext.data(), ciphertextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, ciphertext);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_easy_from_arraybuffer", std::move(jsi_crypto_secretbox_easy_from_arraybuffer));
@@ -711,14 +648,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_arraybuffer] jsi_crypto_secretbox_open_easy_from_arraybuffer failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)message_length)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message.data(), message_length);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, message);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_open_easy_from_arraybuffer", std::move(jsi_crypto_secretbox_open_easy_from_arraybuffer));
@@ -773,14 +703,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_secretbox_open_easy_from_string] jsi_crypto_secretbox_open_easy_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)messageLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message.data(), messageLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, message);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_open_easy_from_string", std::move(jsi_crypto_secretbox_open_easy_from_string));
@@ -849,14 +772,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_string] jsi_crypto_box_easy_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)ciphertextLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext.data(), ciphertextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, ciphertext);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_easy_from_string", std::move(jsi_crypto_box_easy_from_string));
@@ -932,14 +848,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_easy_from_arraybuffer] jsi_crypto_box_easy_from_arraybuffer failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)ciphertextLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), ciphertext.data(), ciphertextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, ciphertext);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_easy_from_arraybuffer", std::move(jsi_crypto_box_easy_from_arraybuffer));
@@ -1015,14 +924,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_arraybuffer] jsi_crypto_box_open_easy_from_arraybuffer failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)message_length)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message.data(), message_length);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, message);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy_from_arraybuffer", std::move(jsi_crypto_box_open_easy_from_arraybuffer));
@@ -1091,14 +993,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)message_length)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message.data(), message_length);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, message);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy_from_string", std::move(jsi_crypto_box_open_easy_from_string));
@@ -1180,14 +1075,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)keyLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, key);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_string", std::move(jsi_crypto_pwhash_from_string));
@@ -1275,14 +1163,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)keyLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), key.data(), keyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, key);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer", std::move(jsi_crypto_pwhash_from_arraybuffer));
@@ -1340,14 +1221,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_kdf_derive_from_key] jsi_crypto_kdf_derive_from_key failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)subkeyLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), subkey.data(), subkeyLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, subkey);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_derive_from_key", std::move(jsi_crypto_kdf_derive_from_key));
@@ -1413,14 +1287,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)cipherTextLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), cipherText.data(), cipherTextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, cipherText);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string));
@@ -1490,14 +1357,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] crypto_aead_xchacha20poly1305_ietf_encrypt failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)cipherTextLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), cipherText.data(), cipherTextLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, cipherText);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer));
@@ -1568,14 +1428,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer failed");
         }
-
-        jsi::Object returnBufferAsObject = runtime.global()
-                                               .getPropertyAsFunction(runtime, "ArrayBuffer")
-                                               .callAsConstructor(runtime, (int)messageLength)
-                                               .asObject(runtime);
-        jsi::ArrayBuffer arraybuffer = returnBufferAsObject.getArrayBuffer(runtime);
-        memcpy(arraybuffer.data(runtime), message.data(), messageLength);
-        return returnBufferAsObject;
+        return arrayBufferAsObject(runtime, message);
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer));
