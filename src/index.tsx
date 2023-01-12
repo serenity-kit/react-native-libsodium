@@ -65,15 +65,15 @@ declare global {
     privateKey: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_sign_verify_detached_from_string(
-    signature: ArrayBuffer,
+    signature: string | ArrayBuffer,
     message: string,
-    publicKey: ArrayBuffer
+    publicKey: string | ArrayBuffer
   ): boolean;
-  function jsi_crypto_sign_verify_detached_from_arraybuffer(
-    signature: ArrayBuffer,
-    message: ArrayBuffer,
-    publicKey: ArrayBuffer
-  ): boolean;
+  // function jsi_crypto_sign_verify_detached_from_arraybuffer(
+  //   signature: ArrayBuffer,
+  //   message: ArrayBuffer,
+  //   publicKey: ArrayBuffer
+  // ): boolean;
   function jsi_crypto_secretbox_easy_from_string(
     message: string,
     nonce: ArrayBuffer,
