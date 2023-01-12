@@ -123,14 +123,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_from_base64_to_arraybuffer] value can't be null");
-        }
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_from_base64_to_arraybuffer] variant can't be null");
-        }
+        std::string functionName = "from_base64";
+
+        std::string valueArgumentName = "value";
+        unsigned int valueArgumentPosition = 0;
+        validateRequired(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition);
+
+        std::string variantArgumentName = "variant";
+        unsigned int variantArgumentPosition = 1;
+        validateRequired(functionName, runtime, arguments, count, variantArgumentName, variantArgumentPosition);
 
         std::string base64String = arguments[0].asString(runtime).utf8(runtime);
         uint8_t variant = arguments[1].asNumber();
@@ -156,14 +157,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_string] value can't be null");
-        }
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_string] variant can't be null");
-        }
+        std::string functionName = "jsi_to_base64_from_string";
+
+        std::string valueArgumentName = "value";
+        unsigned int valueArgumentPosition = 0;
+        validateRequired(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition);
+
+        std::string variantArgumentName = "variant";
+        unsigned int variantArgumentPosition = 1;
+        validateRequired(functionName, runtime, arguments, count, variantArgumentName, variantArgumentPosition);
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
         uint8_t variant = arguments[1].asNumber();
@@ -230,10 +232,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_hex_from_string] value can't be null");
-        }
+        std::string functionName = "jsi_to_hex_from_string";
+
+        std::string valueArgumentName = "value";
+        unsigned int valueArgumentPosition = 0;
+        validateRequired(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition);
 
         std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
         std::string hexString;
@@ -256,6 +259,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
         std::string functionName = "jsi_to_hex_from_arraybuffer";
+
         std::string argumentName = "value";
         unsigned int argumentPosition = 0;
         validateIsStringArrayBuffer(functionName, runtime, arguments, count, argumentName, argumentPosition, true);
@@ -286,10 +290,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       1,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_randombytes_buf] size can't be null");
-        }
+        std::string functionName = "jsi_randombytes_buf";
+
+        std::string sizeArgumentName = "size";
+        unsigned int sizeArgumentPosition = 0;
+        validateIsNumber(functionName, runtime, arguments, count, sizeArgumentName, sizeArgumentPosition, true);
 
         int size = arguments[0].asNumber();
 
@@ -309,13 +314,14 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       1,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][randombytes_uniform] upper_bound can't be null");
-        }
+        std::string functionName = "randombytes_uniform";
 
-        int upper_bound = arguments[0].asNumber();
-        return jsi::Value((int)randombytes_uniform(upper_bound));
+        std::string upperBoundArgumentName = "upper_bound";
+        unsigned int upperBoundArgumentPosition = 0;
+        validateIsNumber(functionName, runtime, arguments, count, upperBoundArgumentName, upperBoundArgumentPosition, true);
+
+        int upperBound = arguments[0].asNumber();
+        return jsi::Value((int)randombytes_uniform(upperBound));
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_randombytes_uniform", std::move(jsi_randombytes_uniform));
 
@@ -627,175 +633,85 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy", std::move(jsi_crypto_box_open_easy));
 
-  auto jsi_crypto_pwhash_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_crypto_pwhash = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash"),
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] keyLength can't be null");
-        }
-        if (!arguments[0].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] keyLength must be a number");
-        }
+        std::string functionName = "jsi_crypto_pwhash";
 
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] password can't be null");
-        }
+        std::string keyLengthArgumentName = "keyLength";
+        unsigned int keyLengthArgumentPosition = 0;
+        validateIsNumber(functionName, runtime, arguments, count, keyLengthArgumentName, keyLengthArgumentPosition, true);
+        
+        std::string passwordArgumentName = "password";
+        unsigned int passwordArgumentPosition = 1;
+        validateIsStringArrayBuffer(functionName, runtime, arguments, count, passwordArgumentName, passwordArgumentPosition, true);
 
         if (arguments[2].isNull())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] salt can't be null");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash] salt can't be null");
         }
         if (!arguments[2].isObject() ||
             !arguments[2].asObject(runtime).isArrayBuffer(runtime))
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] salt must be an ArrayBuffer");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash] salt must be an ArrayBuffer");
         }
 
-        if (arguments[3].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] outputLength can't be null");
-        }
-        if (!arguments[3].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] outputLength must be a number");
-        }
+        std::string opsLimitArgumentName = "opsLimit";
+        unsigned int opsLimitArgumentPosition = 3;
+        validateIsNumber(functionName, runtime, arguments, count, opsLimitArgumentName, opsLimitArgumentPosition, true);
+        
+        std::string memLimitArgumentName = "memLimit";
+        unsigned int memLimitArgumentPosition = 4;
+        validateIsNumber(functionName, runtime, arguments, count, memLimitArgumentName, memLimitArgumentPosition, true);
+        
+        std::string algorithmArgumentName = "algorithm";
+        unsigned int algorithmArgumentPosition = 5;
+        validateIsNumber(functionName, runtime, arguments, count, algorithmArgumentName, algorithmArgumentPosition, true);
 
-        if (arguments[4].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] opsLimit can't be null");
-        }
-        if (!arguments[4].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] opsLimit must be a number");
-        }
+        int keyLength = arguments[keyLengthArgumentPosition].asNumber();
 
-        if (arguments[5].isNull())
+        unsigned char *password;
+        unsigned long long passwordLength;
+        if (arguments[passwordArgumentPosition].isString())
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] algorithm can't be null");
+          std::string passwordString = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
+          password = (unsigned char *)passwordString.data();
+          passwordLength = passwordString.length();
+        } else {
+          auto passwordDataArrayBuffer =
+              arguments[passwordArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+           password = passwordDataArrayBuffer.data(runtime);
+           passwordLength = passwordDataArrayBuffer.length(runtime);
         }
-        if (!arguments[5].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_string] algorithm must be a number");
-        }
-
-        int keyLength = arguments[0].asNumber();
-
-        std::string password = arguments[1].asString(runtime).utf8(runtime);
+        // std::string password = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
+        // unsigned char *password = argAsString(runtime, arguments, count, passwordArgumentPosition);
+        // unsigned long long passwordLength = argLength(runtime, arguments, count, passwordArgumentPosition);
 
         auto saltDataArrayBuffer =
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *salt = saltDataArrayBuffer.data(runtime);
+        // unsigned char *salt = argAsString(runtime, arguments, count, 2);
 
-        int opsLimit = arguments[3].asNumber();
-        int memLimit = arguments[4].asNumber();
-        int algorithm = arguments[5].asNumber();
+        int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
+        int memLimit = arguments[memLimitArgumentPosition].asNumber();
+        int algorithm = arguments[algorithmArgumentPosition].asNumber();
 
         std::vector<uint8_t> key(keyLength);
 
-        int result = crypto_pwhash(key.data(), keyLength, (const char *)password.data(), password.length(), salt, opsLimit, memLimit, algorithm);
+        // int result = crypto_pwhash(key.data(), keyLength, (const char *)password.data(), password.length(), salt, opsLimit, memLimit, algorithm);
+        int result = crypto_pwhash(key.data(), keyLength, (const char *)password, passwordLength, salt, opsLimit, memLimit, algorithm);
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy] jsi_crypto_box_open_easy failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash] jsi_crypto_pwhash failed");
         }
         return arrayBufferAsObject(runtime, key);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_string", std::move(jsi_crypto_pwhash_from_string));
-
-  auto jsi_crypto_pwhash_from_arraybuffer = jsi::Function::createFromHostFunction(
-      jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer"),
-      6,
-      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-      {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength can't be null");
-        }
-        if (!arguments[0].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] keyLength must be a number");
-        }
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] password can't be null");
-        }
-        if (!arguments[1].isObject() ||
-            !arguments[1].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] password must be an ArrayBuffer");
-        }
-
-        if (arguments[2].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] salt can't be null");
-        }
-        if (!arguments[2].isObject() ||
-            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] salt must be an ArrayBuffer");
-        }
-
-        if (arguments[3].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength can't be null");
-        }
-        if (!arguments[3].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] outputLength must be a number");
-        }
-
-        if (arguments[4].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit can't be null");
-        }
-        if (!arguments[4].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] opsLimit must be a number");
-        }
-
-        if (arguments[5].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm can't be null");
-        }
-        if (!arguments[5].isNumber())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash_from_arraybuffer] algorithm must be a number");
-        }
-
-        int keyLength = arguments[0].asNumber();
-
-        auto passwordDataArrayBuffer =
-            arguments[1].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *password = passwordDataArrayBuffer.data(runtime);
-
-        auto saltDataArrayBuffer =
-            arguments[2].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *salt = saltDataArrayBuffer.data(runtime);
-
-        int opsLimit = arguments[3].asNumber();
-        int memLimit = arguments[4].asNumber();
-        int algorithm = arguments[5].asNumber();
-
-        std::vector<uint8_t> key(keyLength);
-
-        int result = crypto_pwhash(key.data(), keyLength, (char *)password, passwordDataArrayBuffer.length(runtime), salt, opsLimit, memLimit, algorithm);
-
-        if (result != 0)
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_box_open_easy_from_string] jsi_crypto_box_open_easy_from_string failed");
-        }
-        return arrayBufferAsObject(runtime, key);
-      });
-
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_from_arraybuffer", std::move(jsi_crypto_pwhash_from_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash", std::move(jsi_crypto_pwhash));
 
   auto jsi_crypto_kdf_derive_from_key = jsi::Function::createFromHostFunction(
       jsiRuntime,

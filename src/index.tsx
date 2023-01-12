@@ -91,17 +91,9 @@ declare global {
     publicKey: string | ArrayBuffer,
     secretKey: string | ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_pwhash_from_string(
+  function jsi_crypto_pwhash(
     keyLength: number,
     password: string | ArrayBuffer,
-    salt: string | ArrayBuffer,
-    opsLimit: number,
-    memLimit: number,
-    algorithm: number
-  ): ArrayBuffer;
-  function jsi_crypto_pwhash_from_arraybuffer(
-    keyLength: number,
-    password: ArrayBuffer,
     salt: ArrayBuffer,
     opsLimit: number,
     memLimit: number,
@@ -462,25 +454,15 @@ export function crypto_pwhash(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof password === 'string') {
-    result = global.jsi_crypto_pwhash_from_string(
-      keyLength,
-      password,
-      salt.buffer,
-      opsLimit,
-      memLimit,
-      algorithm
-    );
-  } else {
-    result = global.jsi_crypto_pwhash_from_arraybuffer(
-      keyLength,
-      password.buffer,
-      salt.buffer,
-      opsLimit,
-      memLimit,
-      algorithm
-    );
-  }
+  const passwordParam = typeof password === 'string' ? password : password.buffer;
+  result = global.jsi_crypto_pwhash(
+    keyLength,
+    passwordParam,
+    salt.buffer,
+    opsLimit,
+    memLimit,
+    algorithm
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 

@@ -251,6 +251,8 @@ function LibsodiumTests() {
     crypto_pwhash_MEMLIMIT_INTERACTIVE,
     crypto_pwhash_ALG_DEFAULT
   );
+  console.log(to_base64(pwhash_from_string));
+  console.log(to_base64(pwhash_from_uint8array));
   if (to_base64(pwhash_from_string) !== to_base64(pwhash_from_uint8array)) {
     throw new Error('crypto_pwhash failed');
   }
@@ -301,6 +303,8 @@ function LibsodiumTests() {
       aead_xchacha20poly1305_ietf_key
     );
 
+  // FIXME: there is a bug in the aead_xchacha20poly1305_ietf encryption
+  // that is preventing decryption:
   // const aead_xchacha20poly1305_ietf_decrypt_encrypted_from_string =
   //   crypto_aead_xchacha20poly1305_ietf_decrypt(
   //     null,
