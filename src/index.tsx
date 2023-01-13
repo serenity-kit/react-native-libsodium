@@ -60,8 +60,8 @@ declare global {
     privateKey: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_sign_verify_detached(
-    signature: string | ArrayBuffer,
-    message: ArrayBuffer,
+    signature: ArrayBuffer,
+    message: string | ArrayBuffer,
     publicKey: ArrayBuffer
   ): boolean;
   function jsi_crypto_secretbox_easy(
@@ -98,7 +98,7 @@ declare global {
     subkeyLength: number,
     subkeyId: number,
     context: string,
-    key: string | ArrayBuffer
+    key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | ArrayBuffer,
