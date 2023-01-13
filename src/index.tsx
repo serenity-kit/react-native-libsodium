@@ -37,12 +37,8 @@ declare global {
     input: string,
     variant?: base64_variants
   ): ArrayBuffer;
-  function jsi_to_base64_from_string(
-    input: string,
-    variant: base64_variants
-  ): string;
-  function jsi_to_base64_from_arraybuffer(
-    input: ArrayBuffer,
+  function jsi_to_base64(
+    input: string | ArrayBuffer,
     variant: base64_variants
   ): string;
   function jsi_to_hex(input: string | ArrayBuffer): string;
@@ -153,11 +149,8 @@ export const to_base64 = (
   variant?: base64_variants
 ): string => {
   const variantToUse = variant || base64_variants.URLSAFE_NO_PADDING;
-  if (typeof input === 'string') {
-    return global.jsi_to_base64_from_string(input, variantToUse);
-  } else {
-    return global.jsi_to_base64_from_arraybuffer(input.buffer, variantToUse);
-  }
+  const inputParam = typeof input === 'string' ? input : input.buffer;
+  return global.jsi_to_base64(inputParam, variantToUse);
 };
 
 export function to_hex(input: string | Uint8Array): string {

@@ -96,36 +96,36 @@ void validateIsNumber ( std::string &functionName, jsi::Runtime &runtime, const 
 
 // Get the string value of a function argument. Argument may be a string or Uint8Array
 unsigned char* argAsString (jsi::Runtime &runtime, const jsi::Value *arguments, size_t count, unsigned int position) {
-  unsigned char *message;
+  unsigned char *data;
   if (arguments[position].isString())
   {
-    std::string messageString = arguments[position].asString(runtime).utf8(runtime);
-    message = (unsigned char *)messageString.data();
+    std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+    data = (unsigned char *)dataString.data();
   }
   else
   {
-    auto messageDataArrayBuffer =
+    auto dataArrayBuffer =
         arguments[position].asObject(runtime).getArrayBuffer(runtime);
-    message = messageDataArrayBuffer.data(runtime);
+    data = dataArrayBuffer.data(runtime);
   }
-  return message;
+  return data;
 }
 
 // Get the char[] length of a function argument. Argument may be a string or Uint8Array
 unsigned long long argLength (jsi::Runtime &runtime, const jsi::Value *arguments, size_t count, unsigned int position) {
-  unsigned long long messageLength;
+  unsigned long long dataLength;
   if (arguments[position].isString())
   {
-    std::string messageString = arguments[position].asString(runtime).utf8(runtime);
-    messageLength = messageString.length();
+    std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+    dataLength = dataString.length();
   }
   else
   {
-    auto messageDataArrayBuffer =
+    auto dataArrayBuffer =
         arguments[position].asObject(runtime).getArrayBuffer(runtime);
-    messageLength = messageDataArrayBuffer.length(runtime);
+    dataLength = dataArrayBuffer.length(runtime);
   }
-  return messageLength;
+  return dataLength;
 }
 
 
@@ -182,61 +182,41 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_from_base64_to_arraybuffer", std::move(jsi_from_base64_to_arraybuffer));
 
-  auto jsi_to_base64_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_to_base64 = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_base64_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_base64"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        std::string functionName = "jsi_to_base64_from_string";
+        std::string functionName = "jsi_to_base64";
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateIsString(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
-
-        std::string variantArgumentName = "variant";
-        unsigned int variantArgumentPosition = 1;
-        validateRequired(functionName, runtime, arguments, count, variantArgumentName, variantArgumentPosition);
-
-        std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
-        uint8_t variant = arguments[1].asNumber();
-
-        std::string base64String;
-        base64String.resize(sodium_base64_encoded_len(utf8String.size(), variant));
-        sodium_bin2base64((char *)base64String.data(), base64String.size(), (uint8_t *)utf8String.data(), utf8String.size(), variant);
-
-        // libsodium adds a nul byte (\0) terminator to the end of the string
-        if (base64String.length() && base64String[base64String.length() - 1] == '\0')
-        {
-          base64String.pop_back();
-        }
-
-        return jsi::String::createFromUtf8(runtime, base64String);
-      });
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_string", std::move(jsi_to_base64_from_string));
-
-  auto jsi_to_base64_from_arraybuffer = jsi::Function::createFromHostFunction(
-      jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_base64_from_arraybuffer"),
-      2,
-      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-      {
-        std::string functionName = "jsi_to_base64_from_arraybuffer";
-
-        std::string valueArgumentName = "value";
-        unsigned int valueArgumentPosition = 0;
-        validateIsArrayBuffer(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
+        validateIsStringArrayBuffer(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
         
         std::string variantArgumentName = "variant";
-        unsigned int variantArgummentPosition = 1;
-        validateIsNumber(functionName, runtime, arguments, count, variantArgumentName, variantArgummentPosition, true);
+        unsigned int variantArgumentPosition = 1;
+        validateIsNumber(functionName, runtime, arguments, count, variantArgumentName, variantArgumentPosition, true);
 
-        auto dataArrayBuffer =
-            arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *data = dataArrayBuffer.data(runtime);
-        auto dataLength = dataArrayBuffer.length(runtime);
+        const unsigned int position = valueArgumentPosition;
+        unsigned char *data;
+        if (arguments[position].isString())
+        {
+          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+          data = (unsigned char *)dataString.data();
+        }
+        else
+        {
+          auto dataArrayBuffer =
+              arguments[position].asObject(runtime).getArrayBuffer(runtime);
+          data = dataArrayBuffer.data(runtime);
+        }
+        // TODO: investigate why this function doesn't work here
+        // may be related to a similar issue with jsi_crypto_pwhash
+        // unsigned char *data = argAsString(runtime, arguments, count, valueArgumentPosition);
+        unsigned long long dataLength = argLength(runtime, arguments, count, valueArgumentPosition);
 
-        uint8_t variant = arguments[variantArgummentPosition].asNumber();
+        uint8_t variant = arguments[variantArgumentPosition].asNumber();
 
         std::string base64String;
         base64String.resize(sodium_base64_encoded_len(dataLength, variant));
@@ -251,7 +231,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         return jsi::String::createFromUtf8(runtime, base64String);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_arraybuffer", std::move(jsi_to_base64_from_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64", std::move(jsi_to_base64));
 
   auto jsi_to_hex = jsi::Function::createFromHostFunction(
       jsiRuntime,
@@ -666,21 +646,26 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         int keyLength = arguments[keyLengthArgumentPosition].asNumber();
 
+        const unsigned int position = passwordArgumentPosition;
         unsigned char *password;
-        unsigned long long passwordLength;
-        if (arguments[passwordArgumentPosition].isString())
+        if (arguments[position].isString())
         {
-          std::string passwordString = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
-          password = (unsigned char *)passwordString.data();
-          passwordLength = passwordString.length();
-        } else {
-          auto passwordDataArrayBuffer =
-              arguments[passwordArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-           password = passwordDataArrayBuffer.data(runtime);
-           passwordLength = passwordDataArrayBuffer.length(runtime);
+          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+          password = (unsigned char *)dataString.data();
         }
+        else
+        {
+          auto dataArrayBuffer =
+              arguments[position].asObject(runtime).getArrayBuffer(runtime);
+          password = dataArrayBuffer.data(runtime);
+        }
+        // TODO: investigate why this function doesn't work here
+        // may be related to a similar issue with to_base64
+        // unsigned char *password = argAsString(runtime, arguments, count, passwordArgumentPosition);
+        unsigned long long passwordLength = argLength(runtime, arguments, count, passwordArgumentPosition);
+
         auto saltDataArrayBuffer =
-            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+            arguments[saltArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *salt = saltDataArrayBuffer.data(runtime);
 
         int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
