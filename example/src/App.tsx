@@ -42,6 +42,8 @@ import sodium, {
   to_string,
 } from 'react-native-libsodium';
 import { largeContent } from './largeContent';
+import { Test_from_base64 } from './Test_from_base64';
+import { Test_to_base64 } from './Test_to_base64';
 import { threeMbImage } from './threeMbImage';
 
 const encryptAndDecryptImage = (contentAsBas64: string) => {
@@ -75,19 +77,11 @@ const encryptAndDecryptImage = (contentAsBas64: string) => {
 };
 
 function LibsodiumTests() {
-  const resultBase64 = to_base64('Hello World');
-  const resultUint8Array = from_base64(resultBase64);
-  const result2Base64 = to_base64(resultUint8Array);
-  const resultString = to_string(resultUint8Array);
   const hex = to_hex('Hello World');
   if (sodium.crypto_secretbox_KEYBYTES !== 32) {
     throw new Error('export default not working');
   }
   console.log({
-    resultBase64,
-    resultUint8Array,
-    result2Base64,
-    resultString,
     hex,
   });
   console.log({
@@ -335,8 +329,10 @@ function LibsodiumTests() {
   const decryptedImageThreeMb = encryptAndDecryptImage(threeMbImage);
 
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollContainer}>
       <View style={styles.container}>
+        <Test_to_base64 />
+        <Test_from_base64 />
         <Text>secretbox_key: {to_base64(secretbox_key)}</Text>
         <Text>secretbox_key_base64: {secretbox_key_base64}</Text>
         <Text>secretbox_key_hex: {secretbox_key_hex}</Text>
@@ -431,6 +427,9 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    padding: 40,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
