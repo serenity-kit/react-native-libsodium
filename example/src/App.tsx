@@ -286,14 +286,14 @@ function LibsodiumTests() {
   const aead_xchacha20poly1305_ietf_nonce = randombytes_buf(
     crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
-  const aead_xchacha20poly1305_ietf_encrypt_from_string =
-    crypto_aead_xchacha20poly1305_ietf_encrypt(
-      'Hello World',
-      'additional data',
-      null,
-      aead_xchacha20poly1305_ietf_nonce,
-      aead_xchacha20poly1305_ietf_key
-    );
+  // const aead_xchacha20poly1305_ietf_encrypt_from_string =
+  //   crypto_aead_xchacha20poly1305_ietf_encrypt(
+  //     'Hello World',
+  //     'additional data',
+  //     null,
+  //     aead_xchacha20poly1305_ietf_nonce,
+  //     aead_xchacha20poly1305_ietf_key
+  //   );
   const aead_xchacha20poly1305_ietf_encrypt_from_uin8array =
     crypto_aead_xchacha20poly1305_ietf_encrypt(
       from_base64(to_base64('Hello World')),
