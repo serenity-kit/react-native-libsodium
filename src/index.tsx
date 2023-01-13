@@ -268,15 +268,11 @@ export function crypto_sign_verify_detached(
   publicKey: Uint8Array
 ): boolean {
   let result: boolean;
-  const signatureParam =
-    typeof signature === 'string' ? signature : signature.buffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  const publicKeyParam =
-    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
   result = global.jsi_crypto_sign_verify_detached(
-    signatureParam,
+    signature.buffer,
     messageParam,
-    publicKeyParam
+    publicKey.buffer
   );
   return result;
 }
@@ -301,9 +297,7 @@ export function crypto_secretbox_easy(
 ): unknown {
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const keyParam = typeof key === 'string' ? key : key.buffer;
-  result = global.jsi_crypto_secretbox_easy(messageParam, nonceParam, keyParam);
+  result = global.jsi_crypto_secretbox_easy(messageParam, nonce.buffer, key.buffer);
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -328,12 +322,10 @@ export function crypto_secretbox_open_easy(
   let result: ArrayBuffer;
   const ciphertextParam =
     typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
-  const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const keyParam = typeof key === 'string' ? key : key.buffer;
   result = global.jsi_crypto_secretbox_open_easy(
     ciphertextParam,
-    nonceParam,
-    keyParam
+    nonce.buffer,
+    key.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
@@ -361,16 +353,11 @@ export function crypto_box_easy(
 ) {
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const publicKeyParam =
-    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
-  const privateKeyParam =
-    typeof privateKey === 'string' ? privateKey : privateKey.buffer;
   result = global.jsi_crypto_box_easy(
     messageParam,
-    nonceParam,
-    publicKeyParam,
-    privateKeyParam
+    nonce.buffer,
+    publicKey.buffer,
+    privateKey.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
@@ -399,16 +386,11 @@ export function crypto_box_open_easy(
   let result: ArrayBuffer;
   const ciphertextParam =
     typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
-  const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const publicKeyParam =
-    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
-  const privateKeyParam =
-    typeof privateKey === 'string' ? privateKey : privateKey.buffer;
   result = global.jsi_crypto_box_open_easy(
     ciphertextParam,
-    nonceParam,
-    publicKeyParam,
-    privateKeyParam
+    nonce.buffer,
+    publicKey.buffer,
+    privateKey.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
@@ -475,12 +457,11 @@ export function crypto_kdf_derive_from_key(
   key: Uint8Array,
   outputFormat: OutputFormat
 ) {
-  const keyParam = typeof key === 'string' ? key : key.buffer;
   const result = global.jsi_crypto_kdf_derive_from_key(
     subkey_len,
     subkey_id,
     ctx,
-    keyParam
+    key.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
