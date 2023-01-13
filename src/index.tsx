@@ -61,30 +61,30 @@ declare global {
   ): ArrayBuffer;
   function jsi_crypto_sign_verify_detached(
     signature: string | ArrayBuffer,
-    message: string | ArrayBuffer,
-    publicKey: string | ArrayBuffer
+    message: ArrayBuffer,
+    publicKey: ArrayBuffer
   ): boolean;
   function jsi_crypto_secretbox_easy(
     message: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    key: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_secretbox_open_easy(
     ciphertext: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    key: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_box_easy(
     message: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    publicKey: string | ArrayBuffer,
-    secretKey: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    publicKey: ArrayBuffer,
+    secretKey: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_box_open_easy(
     ciphertext: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    publicKey: string | ArrayBuffer,
-    secretKey: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    publicKey: ArrayBuffer,
+    secretKey: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_pwhash(
     keyLength: number,
@@ -102,13 +102,13 @@ declare global {
   ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | ArrayBuffer,
-    additionalData: string | ArrayBuffer,
+    additionalData: string,
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
     ciphertext: string | ArrayBuffer,
-    additionalData: string | ArrayBuffer,
+    additionalData: string,
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
@@ -263,9 +263,9 @@ export function crypto_sign_detached(
 }
 
 export function crypto_sign_verify_detached(
-  signature: string | Uint8Array,
+  signature: Uint8Array,
   message: string | Uint8Array,
-  publicKey: string | Uint8Array
+  publicKey: Uint8Array
 ): boolean {
   let result: boolean;
   const signatureParam =
@@ -283,20 +283,20 @@ export function crypto_sign_verify_detached(
 
 export function crypto_secretbox_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_secretbox_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_secretbox_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: OutputFormat
 ): unknown {
   let result: ArrayBuffer;
@@ -309,20 +309,20 @@ export function crypto_secretbox_easy(
 
 export function crypto_secretbox_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_secretbox_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_secretbox_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  key: string | Uint8Array,
+  nonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
@@ -340,23 +340,23 @@ export function crypto_secretbox_open_easy(
 
 export function crypto_box_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_box_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_box_easy(
   message: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
@@ -377,23 +377,23 @@ export function crypto_box_easy(
 
 export function crypto_box_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_box_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_box_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string | Uint8Array,
-  publicKey: string | Uint8Array,
-  privateKey: string | Uint8Array,
+  nonce: Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
@@ -458,21 +458,21 @@ export function crypto_kdf_derive_from_key(
   subkey_len: number,
   subkey_id: number,
   ctx: string,
-  key: string | Uint8Array,
+  key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_kdf_derive_from_key(
   subkey_len: number,
   subkey_id: number,
   ctx: string,
-  key: string | Uint8Array,
+  key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_kdf_derive_from_key(
   subkey_len: number,
   subkey_id: number,
   ctx: string,
-  key: string | Uint8Array,
+  key: Uint8Array,
   outputFormat: OutputFormat
 ) {
   const keyParam = typeof key === 'string' ? key : key.buffer;
@@ -487,65 +487,65 @@ export function crypto_kdf_derive_from_key(
 
 export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  secretNonce: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  secretNonce: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  _secretNonce: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  _secret_nonce: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  if (typeof additionalData !== 'string') {
+  if (typeof additional_data !== 'string') {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
     );
   }
   result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     messageParam,
-    additionalData,
-    publicNonce.buffer,
+    additional_data,
+    public_nonce.buffer,
     key.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_aead_xchacha20poly1305_ietf_decrypt(
-  secretNonce: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_aead_xchacha20poly1305_ietf_decrypt(
-  secretNonce: string | Uint8Array | null,
+  secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_aead_xchacha20poly1305_ietf_decrypt(
-  _secretNonce: string | Uint8Array | null,
+  _secret_nonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
-  additionalData: string | Uint8Array | null,
-  publicNonce: Uint8Array,
+  additional_data: string | Uint8Array | null,
+  public_nonce: Uint8Array,
   key: Uint8Array,
   outputFormat: OutputFormat
 ) {
@@ -555,7 +555,7 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
       'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
     );
   }
-  if (typeof additionalData !== 'string') {
+  if (typeof additional_data !== 'string') {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
     );
@@ -564,8 +564,8 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
     typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
   result = global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
     ciphertextParam,
-    additionalData,
-    publicNonce.buffer,
+    additional_data,
+    public_nonce.buffer,
     key.buffer
   );
   return convertToOutputFormat(result, outputFormat);

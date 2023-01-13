@@ -251,8 +251,6 @@ function LibsodiumTests() {
     crypto_pwhash_MEMLIMIT_INTERACTIVE,
     crypto_pwhash_ALG_DEFAULT
   );
-  console.log(to_base64(pwhash_from_string));
-  console.log(to_base64(pwhash_from_uint8array));
   if (to_base64(pwhash_from_string) !== to_base64(pwhash_from_uint8array)) {
     throw new Error('crypto_pwhash failed');
   }
