@@ -268,9 +268,11 @@ export function crypto_sign_verify_detached(
   publicKey: string | Uint8Array
 ): boolean {
   let result: boolean;
-  const signatureParam = typeof signature === 'string' ? signature : signature.buffer;
+  const signatureParam =
+    typeof signature === 'string' ? signature : signature.buffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  const publicKeyParam = typeof publicKey === 'string' ? publicKey : publicKey.buffer;
+  const publicKeyParam =
+    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
   result = global.jsi_crypto_sign_verify_detached(
     signatureParam,
     messageParam,
@@ -301,11 +303,7 @@ export function crypto_secretbox_easy(
   const messageParam = typeof message === 'string' ? message : message.buffer;
   const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
   const keyParam = typeof key === 'string' ? key : key.buffer;
-  result = global.jsi_crypto_secretbox_easy(
-    messageParam,
-    nonceParam,
-    keyParam
-  );
+  result = global.jsi_crypto_secretbox_easy(messageParam, nonceParam, keyParam);
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -323,12 +321,13 @@ export function crypto_secretbox_open_easy(
 ): string;
 export function crypto_secretbox_open_easy(
   ciphertext: string | Uint8Array,
-  nonce: string |Uint8Array,
+  nonce: string | Uint8Array,
   key: string | Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  const ciphertextParam = typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
   const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
   const keyParam = typeof key === 'string' ? key : key.buffer;
   result = global.jsi_crypto_secretbox_open_easy(
@@ -363,8 +362,10 @@ export function crypto_box_easy(
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
   const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const publicKeyParam = typeof publicKey === 'string' ? publicKey : publicKey.buffer;
-  const privateKeyParam = typeof privateKey === 'string' ? privateKey : privateKey.buffer;
+  const publicKeyParam =
+    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
+  const privateKeyParam =
+    typeof privateKey === 'string' ? privateKey : privateKey.buffer;
   result = global.jsi_crypto_box_easy(
     messageParam,
     nonceParam,
@@ -396,10 +397,13 @@ export function crypto_box_open_easy(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  const ciphertextParam = typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
   const nonceParam = typeof nonce === 'string' ? nonce : nonce.buffer;
-  const publicKeyParam = typeof publicKey === 'string' ? publicKey : publicKey.buffer;
-  const privateKeyParam = typeof privateKey === 'string' ? privateKey : privateKey.buffer;
+  const publicKeyParam =
+    typeof publicKey === 'string' ? publicKey : publicKey.buffer;
+  const privateKeyParam =
+    typeof privateKey === 'string' ? privateKey : privateKey.buffer;
   result = global.jsi_crypto_box_open_easy(
     ciphertextParam,
     nonceParam,
@@ -437,7 +441,8 @@ export function crypto_pwhash(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  const passwordParam = typeof password === 'string' ? password : password.buffer;
+  const passwordParam =
+    typeof password === 'string' ? password : password.buffer;
   result = global.jsi_crypto_pwhash(
     keyLength,
     passwordParam,
@@ -555,14 +560,14 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
       'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
     );
   }
-  const ciphertextParam = typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
-  result =
-    global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
-      ciphertextParam,
-      additionalData,
-      publicNonce.buffer,
-      key.buffer
-    );
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    ciphertextParam,
+    additionalData,
+    publicNonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
