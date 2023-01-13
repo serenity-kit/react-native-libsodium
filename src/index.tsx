@@ -45,8 +45,7 @@ declare global {
     input: ArrayBuffer,
     variant: base64_variants
   ): string;
-  function jsi_to_hex_from_string(input: string): string;
-  function jsi_to_hex_from_arraybuffer(input: ArrayBuffer): string;
+  function jsi_to_hex(input: string | ArrayBuffer): string;
   function jsi_randombytes_buf(length: number): ArrayBuffer;
   function jsi_randombytes_uniform(upper_bound: number): number;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
@@ -105,23 +104,17 @@ declare global {
     context: string,
     key: string | ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
+  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | ArrayBuffer,
     additionalData: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    key: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
   ): ArrayBuffer;
-  // function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer(
-  //   message: ArrayBuffer,
-  //   additionalData: string,
-  //   nonce: ArrayBuffer,
-  //   key: ArrayBuffer
-  // ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
+  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
     ciphertext: string | ArrayBuffer,
     additionalData: string | ArrayBuffer,
-    nonce: string | ArrayBuffer,
-    key: string | ArrayBuffer
+    nonce: ArrayBuffer,
+    key: ArrayBuffer
   ): ArrayBuffer;
 }
 
@@ -168,11 +161,8 @@ export const to_base64 = (
 };
 
 export function to_hex(input: string | Uint8Array): string {
-  if (typeof input === 'string') {
-    return global.jsi_to_hex_from_string(input);
-  } else {
-    return global.jsi_to_hex_from_arraybuffer(input.buffer);
-  }
+  const inputParam = typeof input === 'string' ? input : input.buffer;
+  return global.jsi_to_hex(inputParam);
 }
 
 export function randombytes_buf(
@@ -501,39 +491,38 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additionalData: string | Uint8Array | null,
   secretNonce: string | Uint8Array | null,
-  publicNonce: string | Uint8Array,
-  key: string | Uint8Array,
+  publicNonce: Uint8Array,
+  key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additionalData: string | Uint8Array | null,
   secretNonce: string | Uint8Array | null,
-  publicNonce: string | Uint8Array,
-  key: string | Uint8Array,
+  publicNonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   message: string | Uint8Array,
   additionalData: string | Uint8Array | null,
   _secretNonce: string | Uint8Array | null,
-  publicNonce: string | Uint8Array,
-  key: string | Uint8Array,
+  publicNonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  let additionalDataParam: string | ArrayBuffer = "";
-  if (additionalData !== null) {
-    additionalDataParam = typeof additionalData === 'string' ? additionalData : additionalData.buffer;
+  if (typeof additionalData !== 'string') {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
+    );
   }
-  const publicNonceParam = typeof publicNonce === 'string' ? publicNonce : publicNonce.buffer;
-  const keyParam = typeof key === 'string' ? key : key.buffer;
-  result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
+  result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     messageParam,
-    additionalDataParam,
-    publicNonceParam,
-    keyParam
+    additionalData,
+    publicNonce.buffer,
+    key.buffer
   );
   return convertToOutputFormat(result, outputFormat);
 }
@@ -542,8 +531,8 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   secretNonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
   additionalData: string | Uint8Array | null,
-  publicNonce: string | Uint8Array,
-  key: string | Uint8Array,
+  publicNonce: Uint8Array,
+  key: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_aead_xchacha20poly1305_ietf_decrypt(
@@ -551,31 +540,35 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   ciphertext: string | Uint8Array,
   additionalData: string | Uint8Array | null,
   publicNonce: Uint8Array,
-  key: string | Uint8Array,
+  key: Uint8Array,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   _secretNonce: string | Uint8Array | null,
   ciphertext: string | Uint8Array,
   additionalData: string | Uint8Array | null,
-  publicNonce: string | Uint8Array,
-  key: string | Uint8Array,
+  publicNonce: Uint8Array,
+  key: Uint8Array,
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  const ciphertextParam = typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
-  let additionalDataParam: string | ArrayBuffer = "";
-  if (additionalData !== null) {
-    additionalDataParam = typeof additionalData === 'string' ? additionalData : additionalData.buffer;
+  if (typeof ciphertext === 'string') {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
+    );
   }
-  const publicNonceParam = typeof publicNonce === 'string' ? publicNonce : publicNonce.buffer;
-  const keyParam = typeof key === 'string' ? key : key.buffer;
+  if (typeof additionalData !== 'string') {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
+    );
+  }
+  const ciphertextParam = typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
   result =
-    global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
+    global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
       ciphertextParam,
-      additionalDataParam,
-      publicNonceParam,
-      keyParam
+      additionalData,
+      publicNonce.buffer,
+      key.buffer
     );
   return convertToOutputFormat(result, outputFormat);
 }

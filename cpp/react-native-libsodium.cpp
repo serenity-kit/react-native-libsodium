@@ -31,6 +31,37 @@ void validateRequired (std::string &functionName, jsi::Runtime &runtime, const j
   }
 }
 
+void validateIsString (std::string &functionName, jsi::Runtime &runtime, const jsi::Value *arguments, size_t count, std::string &argumentName, unsigned int position, bool required) {
+  if (position >= count) {
+    std::string errorMessage = "[react-native-libsodium][" + functionName + "] insufficient parameters passed into function";
+    throw jsi::JSError(runtime, errorMessage);
+  }
+  if (required) {
+    validateRequired(functionName, runtime, arguments, count, argumentName, position);
+  }
+  if (!arguments[position].isString())
+  {
+    std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be an ArrayBuffer";
+    throw jsi::JSError(runtime, errorMessage);
+  }
+}
+
+void validateIsArrayBuffer (std::string &functionName, jsi::Runtime &runtime, const jsi::Value *arguments, size_t count, std::string &argumentName, unsigned int position, bool required) {
+  if (position >= count) {
+    std::string errorMessage = "[react-native-libsodium][" + functionName + "] insufficient parameters passed into function";
+    throw jsi::JSError(runtime, errorMessage);
+  }
+  if (required) {
+    validateRequired(functionName, runtime, arguments, count, argumentName, position);
+  }
+  if (!arguments[position].isObject() ||
+      !arguments[position].asObject(runtime).isArrayBuffer(runtime))
+  {
+    std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be an ArrayBuffer";
+    throw jsi::JSError(runtime, errorMessage);
+  }
+}
+
 void validateIsStringArrayBuffer (std::string &functionName, jsi::Runtime &runtime, const jsi::Value *arguments, size_t count, std::string &argumentName, unsigned int position, bool required) {
   if (position >= count) {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] insufficient parameters passed into function";
@@ -161,7 +192,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateRequired(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition);
+        validateIsString(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
 
         std::string variantArgumentName = "variant";
         unsigned int variantArgumentPosition = 1;
@@ -190,26 +221,22 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        if (arguments[0].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] value can't be null");
-        }
-        if (!arguments[0].isObject() ||
-            !arguments[0].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] value must be an ArrayBuffer");
-        }
-        if (arguments[1].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_to_base64_from_arraybuffer] variant can't be null");
-        }
+        std::string functionName = "jsi_to_base64_from_arraybuffer";
+
+        std::string valueArgumentName = "value";
+        unsigned int valueArgumentPosition = 0;
+        validateIsArrayBuffer(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
+        
+        std::string variantArgumentName = "variant";
+        unsigned int variantArgummentPosition = 1;
+        validateIsNumber(functionName, runtime, arguments, count, variantArgumentName, variantArgummentPosition, true);
 
         auto dataArrayBuffer =
-            arguments[0].asObject(runtime).getArrayBuffer(runtime);
+            arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *data = dataArrayBuffer.data(runtime);
         auto dataLength = dataArrayBuffer.length(runtime);
 
-        uint8_t variant = arguments[1].asNumber();
+        uint8_t variant = arguments[variantArgummentPosition].asNumber();
 
         std::string base64String;
         base64String.resize(sodium_base64_encoded_len(dataLength, variant));
@@ -226,48 +253,20 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64_from_arraybuffer", std::move(jsi_to_base64_from_arraybuffer));
 
-  auto jsi_to_hex_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_to_hex = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex"),
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        std::string functionName = "jsi_to_hex_from_string";
+        std::string functionName = "jsi_to_hex";
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateRequired(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition);
+        validateIsStringArrayBuffer(functionName, runtime, arguments, count, valueArgumentName, valueArgumentPosition, true);
 
-        std::string utf8String = arguments[0].asString(runtime).utf8(runtime);
-        std::string hexString;
-        hexString.resize(utf8String.size() * 2 + 1);
-        sodium_bin2hex((char *)hexString.data(), hexString.size(), (uint8_t *)utf8String.data(), utf8String.size());
-        // libsodium adds a nul byte (\0) terminator to the end of the string
-        if (hexString.length() && hexString[hexString.length() - 1] == '\0')
-        {
-          hexString.pop_back();
-        }
-
-        return jsi::String::createFromUtf8(runtime, hexString);
-      });
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex_from_string", std::move(jsi_to_hex_from_string));
-
-  auto jsi_to_hex_from_arraybuffer = jsi::Function::createFromHostFunction(
-      jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex_from_arraybuffer"),
-      2,
-      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-      {
-        std::string functionName = "jsi_to_hex_from_arraybuffer";
-
-        std::string argumentName = "value";
-        unsigned int argumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, argumentName, argumentPosition, true);
-
-        auto dataArrayBuffer =
-            arguments[0].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *data = dataArrayBuffer.data(runtime);
-        auto dataLength = dataArrayBuffer.length(runtime);
+        unsigned char *data = argAsString(runtime, arguments, count, valueArgumentPosition);
+        unsigned long long dataLength = argLength(runtime, arguments, count, valueArgumentPosition);
 
         std::string hexString;
         hexString.resize(dataLength * 2 + 1);
@@ -282,7 +281,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         return jsi::String::createFromUtf8(runtime, hexString);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex_from_arraybuffer", std::move(jsi_to_hex_from_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_hex", std::move(jsi_to_hex));
 
   auto jsi_randombytes_buf = jsi::Function::createFromHostFunction(
       jsiRuntime,
@@ -649,15 +648,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int passwordArgumentPosition = 1;
         validateIsStringArrayBuffer(functionName, runtime, arguments, count, passwordArgumentName, passwordArgumentPosition, true);
 
-        if (arguments[2].isNull())
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash] salt can't be null");
-        }
-        if (!arguments[2].isObject() ||
-            !arguments[2].asObject(runtime).isArrayBuffer(runtime))
-        {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_pwhash] salt must be an ArrayBuffer");
-        }
+        std::string saltArgumentName = "salt";
+        unsigned int saltArgumentPosition = 2;
+        validateIsArrayBuffer(functionName, runtime, arguments, count, saltArgumentName, saltArgumentPosition, true);
 
         std::string opsLimitArgumentName = "opsLimit";
         unsigned int opsLimitArgumentPosition = 3;
@@ -686,14 +679,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
            password = passwordDataArrayBuffer.data(runtime);
            passwordLength = passwordDataArrayBuffer.length(runtime);
         }
-        // std::string password = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
-        // unsigned char *password = argAsString(runtime, arguments, count, passwordArgumentPosition);
-        // unsigned long long passwordLength = argLength(runtime, arguments, count, passwordArgumentPosition);
-
         auto saltDataArrayBuffer =
             arguments[2].asObject(runtime).getArrayBuffer(runtime);
         const unsigned char *salt = saltDataArrayBuffer.data(runtime);
-        // unsigned char *salt = argAsString(runtime, arguments, count, 2);
 
         int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
         int memLimit = arguments[memLimitArgumentPosition].asNumber();
@@ -701,7 +689,6 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::vector<uint8_t> key(keyLength);
 
-        // int result = crypto_pwhash(key.data(), keyLength, (const char *)password.data(), password.length(), salt, opsLimit, memLimit, algorithm);
         int result = crypto_pwhash(key.data(), keyLength, (const char *)password, passwordLength, salt, opsLimit, memLimit, algorithm);
 
         if (result != 0)
@@ -729,10 +716,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int subkeyIdArgumentPosition = 1;
         validateIsNumber(functionName, runtime, arguments, count, subkeyIdArgumentName, subkeyIdArgumentPosition, true);
 
-        // TODO: validate context is a string
         std::string contextArgumentName = "context";
         unsigned int contextArgumentPosition = 2;
-        validateRequired(functionName, runtime, arguments, count, contextArgumentName, contextArgumentPosition);
+        validateIsString(functionName, runtime, arguments, count, contextArgumentName, contextArgumentPosition, true);
 
         std::string masterKeyArgumentName = "masterKey";
         unsigned int masterKeyArgumentPosition = 3;
@@ -757,13 +743,13 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_derive_from_key", std::move(jsi_crypto_kdf_derive_from_key));
 
-  auto jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string = jsi::Function::createFromHostFunction(
+  auto jsi_crypto_aead_xchacha20poly1305_ietf_encrypt = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt"),
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string";
+        std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt";
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
@@ -771,126 +757,50 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, additionalDataArgumentName, additionalDataArgumentPosition, true);
+        validateIsString(functionName, runtime, arguments, count, additionalDataArgumentName, additionalDataArgumentPosition, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
         unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
         unsigned long long messageLength = argLength(runtime, arguments, count, messageArgumentPosition);
-        unsigned char *additionalData = argAsString(runtime, arguments, count, additionalDataArgumentPosition);
-        unsigned long long additionalDataLength = argLength(runtime, arguments, count, additionalDataArgumentPosition);
-        // std::string message = arguments[0].asString(runtime).utf8(runtime);
-        // std::string additionalData = arguments[1].asString(runtime).utf8(runtime);
 
-        const unsigned char *nonce = argAsString(runtime, arguments, count, nonceArgumentPosition);
+        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
 
-        // auto nonceDataArrayBuffer =
-        //     arguments[2].asObject(runtime).getArrayBuffer(runtime);
-        // const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
+        auto nonceDataArrayBuffer =
+            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
 
-        // auto keyDataArrayBuffer =
-        //     arguments[3].asObject(runtime).getArrayBuffer(runtime);
-        // const unsigned char *key = keyDataArrayBuffer.data(runtime);
+        auto keyDataArrayBuffer =
+            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        const unsigned char *key = argAsString(runtime, arguments, count, keyArgumentPosition);
+        unsigned long long ciphertextLength = messageLength + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+        std::vector<uint8_t> ciphertext(ciphertextLength);
 
-        unsigned long long cipherTextLength = messageLength + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        std::vector<uint8_t> cipherText(cipherTextLength);
-
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText.data(), &cipherTextLength, message, messageLength, additionalData, additionalDataLength, NULL, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(ciphertext.data(), &ciphertextLength, message, messageLength, (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string] jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt] crypto_aead_xchacha20poly1305_ietf_encrypt failed");
         }
-        return arrayBufferAsObject(runtime, cipherText);
+        return arrayBufferAsObject(runtime, ciphertext);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt));
 
-  // auto jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer = jsi::Function::createFromHostFunction(
-  //     jsiRuntime,
-  //     jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer"),
-  //     6,
-  //     [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-  //     {
-  //       if (arguments[0].isNull())
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] message can't be null");
-  //       }
-  //       if (!arguments[0].isObject() ||
-  //           !arguments[0].asObject(runtime).isArrayBuffer(runtime))
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] message must be an ArrayBuffer");
-  //       }
-  //       if (arguments[1].isNull())
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] additionalData can't be null");
-  //       }
-  //       if (!arguments[1].isString())
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] additionalData must be a string");
-  //       }
-  //       if (arguments[2].isNull())
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] nonce can't be null");
-  //       }
-  //       if (!arguments[2].isObject() ||
-  //           !arguments[2].asObject(runtime).isArrayBuffer(runtime))
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] nonce must be an ArrayBuffer");
-  //       }
-  //       if (arguments[3].isNull())
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] key can't be null");
-  //       }
-  //       if (!arguments[3].isObject() ||
-  //           !arguments[3].asObject(runtime).isArrayBuffer(runtime))
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] key must be an ArrayBuffer");
-  //       }
-
-  //       auto messageDataArrayBuffer =
-  //           arguments[0].asObject(runtime).getArrayBuffer(runtime);
-  //       const unsigned char *message = messageDataArrayBuffer.data(runtime);
-
-  //       std::string additionalData = arguments[1].asString(runtime).utf8(runtime);
-
-  //       auto nonceDataArrayBuffer =
-  //           arguments[2].asObject(runtime).getArrayBuffer(runtime);
-  //       const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-  //       auto keyDataArrayBuffer =
-  //           arguments[3].asObject(runtime).getArrayBuffer(runtime);
-  //       const unsigned char *key = keyDataArrayBuffer.data(runtime);
-
-  //       unsigned long long cipherTextLength = messageDataArrayBuffer.size(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-  //       std::vector<uint8_t> cipherText(cipherTextLength);
-
-  //       int result = crypto_aead_xchacha20poly1305_ietf_encrypt(cipherText.data(), &cipherTextLength, message, messageDataArrayBuffer.size(runtime), (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
-
-  //       if (result != 0)
-  //       {
-  //         throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer] crypto_aead_xchacha20poly1305_ietf_encrypt failed");
-  //       }
-  //       return arrayBufferAsObject(runtime, cipherText);
-  //     });
-
-  // jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer));
-
-  auto jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer = jsi::Function::createFromHostFunction(
+  auto jsi_crypto_aead_xchacha20poly1305_ietf_decrypt = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt"),
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer";
+        std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt";
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
@@ -898,51 +808,42 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, additionalDataArgumentName, additionalDataArgumentPosition, true);
+        validateIsString(functionName, runtime, arguments, count, additionalDataArgumentName, additionalDataArgumentPosition, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
-        // auto cipherTextDataArrayBuffer =
-        //     arguments[0].asObject(runtime).getArrayBuffer(runtime);
-        // const unsigned char *cipherText = cipherTextDataArrayBuffer.data(runtime);
-        // unsigned long long cipherTextLength = cipherTextDataArrayBuffer.size(runtime);
-        unsigned char *cipherText = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
-        unsigned long long cipherTextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);
+        unsigned char *ciphertext = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
+        unsigned long long ciphertextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);
 
+        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
 
-        // std::string additionalData = arguments[1].asString(runtime).utf8(runtime);
-        unsigned char *additionalData = argAsString(runtime, arguments, count, additionalDataArgumentPosition);
-        unsigned long long additionalDataLength = argLength(runtime, arguments, count, additionalDataArgumentPosition);
+        auto nonceDataArrayBuffer =
+            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
 
-        // auto nonceDataArrayBuffer =
-        //     arguments[2].asObject(runtime).getArrayBuffer(runtime);
-        // const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-        unsigned char *nonce = argAsString(runtime, arguments, count, nonceArgumentPosition);
+        auto keyDataArrayBuffer =
+            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        const unsigned char *key = keyDataArrayBuffer.data(runtime);
 
-        // auto keyDataArrayBuffer =
-        //     arguments[3].asObject(runtime).getArrayBuffer(runtime);
-        // const unsigned char *key = keyDataArrayBuffer.data(runtime);
-        unsigned char *key = argAsString(runtime, arguments, count, keyArgumentPosition);
-
-        unsigned long long messageLength = cipherTextLength - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+        unsigned long long messageLength = ciphertextLength - crypto_aead_xchacha20poly1305_ietf_ABYTES;
         std::vector<uint8_t> message(messageLength);
 
-        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(message.data(), &messageLength, NULL, cipherText, cipherTextLength, additionalData, additionalDataLength, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(message.data(), &messageLength, NULL, ciphertext, ciphertextLength, (unsigned char *)additionalData.data(), additionalData.length(), nonce, key);
 
         if (result != 0)
         {
-          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer failed");
+          throw jsi::JSError(runtime, "[react-native-libsodium][jsi_crypto_aead_xchacha20poly1305_ietf_decrypt] jsi_crypto_aead_xchacha20poly1305_ietf_decrypt failed");
         }
         return arrayBufferAsObject(runtime, message);
       });
 
-  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt));
 }
 
 void cleanUpLibsodium()

@@ -12,7 +12,7 @@ export function convertToOutputFormat(
     );
   }
   if (outputFormat === 'hex') {
-    return global.jsi_to_hex_from_arraybuffer(input);
+    return global.jsi_to_hex(input);
   }
   if (outputFormat === 'text') {
     throw new Error(
