@@ -403,7 +403,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string secretKeyArgumentName = "secretKey";
         unsigned int secretKeyArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
 
         auto secretKeyDataArrayBuffer =
             arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
@@ -429,7 +429,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string signatureArgumentName = "signature";
         unsigned int signatureArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, signatureArgumentName, signatureArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, signatureArgumentName, signatureArgumentPosition, true);
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 1;
@@ -437,7 +437,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
 
         unsigned char *signature = argAsString(runtime, arguments, count, signatureArgumentPosition);
         unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
@@ -465,11 +465,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string keyArgumentName = "nonce";
         unsigned int keyArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
         unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
         unsigned long long messageLength = argLength(runtime, arguments, count, messageArgumentPosition);
@@ -499,11 +499,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
         unsigned char *ciphertext = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
         unsigned long long ciphertextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);
@@ -538,15 +538,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
 
         std::string secretKeyArgumentName = "secretKey";
         unsigned int secretKeyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
 
         unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
         unsigned long long messageLength = argLength(runtime, arguments, count, 0);
@@ -582,15 +582,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, nonceArgumentName, nonceArgumentPosition, true);
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, publicKeyArgumentName, publicKeyArgumentPosition, true);
 
         std::string secretKeyArgumentName = "secretKey";
         unsigned int secretKeyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
+        validateIsArrayBuffer(functionName, runtime, arguments, count, secretKeyArgumentName, secretKeyArgumentPosition, true);
 
         unsigned char *ciphertext = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
         unsigned long long ciphertextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);
