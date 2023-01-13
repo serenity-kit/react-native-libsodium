@@ -297,7 +297,11 @@ export function crypto_secretbox_easy(
 ): unknown {
   let result: ArrayBuffer;
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  result = global.jsi_crypto_secretbox_easy(messageParam, nonce.buffer, key.buffer);
+  result = global.jsi_crypto_secretbox_easy(
+    messageParam,
+    nonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
