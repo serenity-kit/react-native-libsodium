@@ -752,8 +752,23 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
-        unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
-        unsigned long long messageLength = argLength(runtime, arguments, count, messageArgumentPosition);
+        const unsigned int position = messageArgumentPosition;
+        unsigned char *message;
+        if (arguments[position].isString())
+        {
+          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+          message = (unsigned char *)dataString.data();
+        }
+        else
+        {
+          auto dataArrayBuffer =
+              arguments[position].asObject(runtime).getArrayBuffer(runtime);
+          message = dataArrayBuffer.data(runtime);
+        }
+        // TODO: investigate why this function doesn't work here
+        // may be related to a similar issue with to_base64
+        // unsigned char *message = argAsString(runtime, arguments, count, messageArgumentPosition);
+        unsigned long long messageLength = argLength(runtime, arguments, count, messageArgumentPosition);      
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
 
@@ -803,8 +818,23 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments, count, keyArgumentName, keyArgumentPosition, true);
 
-        unsigned char *ciphertext = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
-        unsigned long long ciphertextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);
+        const unsigned int position = ciphertextArgumentPosition;
+        unsigned char *ciphertext;
+        if (arguments[position].isString())
+        {
+          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
+          ciphertext = (unsigned char *)dataString.data();
+        }
+        else
+        {
+          auto dataArrayBuffer =
+              arguments[position].asObject(runtime).getArrayBuffer(runtime);
+          ciphertext = dataArrayBuffer.data(runtime);
+        }
+        // TODO: investigate why this function doesn't work here
+        // may be related to a similar issue with to_base64
+        // unsigned char *ciphertext = argAsString(runtime, arguments, count, ciphertextArgumentPosition);
+        unsigned long long ciphertextLength = argLength(runtime, arguments, count, ciphertextArgumentPosition);      
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
 
