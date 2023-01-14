@@ -37,16 +37,11 @@ declare global {
     input: string,
     variant?: base64_variants
   ): ArrayBuffer;
-  function jsi_to_base64_from_string(
-    input: string,
+  function jsi_to_base64(
+    input: string | ArrayBuffer,
     variant: base64_variants
   ): string;
-  function jsi_to_base64_from_arraybuffer(
-    input: ArrayBuffer,
-    variant: base64_variants
-  ): string;
-  function jsi_to_hex_from_string(input: string): string;
-  function jsi_to_hex_from_arraybuffer(input: ArrayBuffer): string;
+  function jsi_to_hex(input: string | ArrayBuffer): string;
   function jsi_randombytes_buf(length: number): ArrayBuffer;
   function jsi_randombytes_uniform(upper_bound: number): number;
   function jsi_crypto_secretbox_keygen(): ArrayBuffer;
@@ -64,71 +59,36 @@ declare global {
     message: string | ArrayBuffer,
     privateKey: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_sign_verify_detached_from_string(
+  function jsi_crypto_sign_verify_detached(
     signature: ArrayBuffer,
-    message: string,
+    message: string | ArrayBuffer,
     publicKey: ArrayBuffer
   ): boolean;
-  function jsi_crypto_sign_verify_detached_from_arraybuffer(
-    signature: ArrayBuffer,
-    message: ArrayBuffer,
-    publicKey: ArrayBuffer
-  ): boolean;
-  function jsi_crypto_secretbox_easy_from_string(
-    message: string,
+  function jsi_crypto_secretbox_easy(
+    message: string | ArrayBuffer,
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_secretbox_easy_from_arraybuffer(
-    message: ArrayBuffer,
+  function jsi_crypto_secretbox_open_easy(
+    ciphertext: string | ArrayBuffer,
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_secretbox_open_easy_from_string(
-    ciphertext: string,
-    nonce: ArrayBuffer,
-    key: ArrayBuffer
-  ): ArrayBuffer;
-  function jsi_crypto_secretbox_open_easy_from_arraybuffer(
-    ciphertext: ArrayBuffer,
-    nonce: ArrayBuffer,
-    key: ArrayBuffer
-  ): ArrayBuffer;
-  function jsi_crypto_box_easy_from_string(
-    message: string,
+  function jsi_crypto_box_easy(
+    message: string | ArrayBuffer,
     nonce: ArrayBuffer,
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_box_easy_from_arraybuffer(
-    message: ArrayBuffer,
+  function jsi_crypto_box_open_easy(
+    ciphertext: string | ArrayBuffer,
     nonce: ArrayBuffer,
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_box_open_easy_from_string(
-    ciphertext: string,
-    nonce: ArrayBuffer,
-    publicKey: ArrayBuffer,
-    secretKey: ArrayBuffer
-  ): ArrayBuffer;
-  function jsi_crypto_box_open_easy_from_arraybuffer(
-    ciphertext: ArrayBuffer,
-    nonce: ArrayBuffer,
-    publicKey: ArrayBuffer,
-    secretKey: ArrayBuffer
-  ): ArrayBuffer;
-  function jsi_crypto_pwhash_from_string(
+  function jsi_crypto_pwhash(
     keyLength: number,
-    password: string,
-    salt: ArrayBuffer,
-    opsLimit: number,
-    memLimit: number,
-    algorithm: number
-  ): ArrayBuffer;
-  function jsi_crypto_pwhash_from_arraybuffer(
-    keyLength: number,
-    password: ArrayBuffer,
+    password: string | ArrayBuffer,
     salt: ArrayBuffer,
     opsLimit: number,
     memLimit: number,
@@ -140,20 +100,14 @@ declare global {
     context: string,
     key: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
-    message: string,
+  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
+    message: string | ArrayBuffer,
     additionalData: string,
     nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer(
-    message: ArrayBuffer,
-    additionalData: string,
-    nonce: ArrayBuffer,
-    key: ArrayBuffer
-  ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
-    ciphertext: ArrayBuffer,
+  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    ciphertext: string | ArrayBuffer,
     additionalData: string,
     nonce: ArrayBuffer,
     key: ArrayBuffer
@@ -195,19 +149,13 @@ export const to_base64 = (
   variant?: base64_variants
 ): string => {
   const variantToUse = variant || base64_variants.URLSAFE_NO_PADDING;
-  if (typeof input === 'string') {
-    return global.jsi_to_base64_from_string(input, variantToUse);
-  } else {
-    return global.jsi_to_base64_from_arraybuffer(input.buffer, variantToUse);
-  }
+  const inputParam = typeof input === 'string' ? input : input.buffer;
+  return global.jsi_to_base64(inputParam, variantToUse);
 };
 
 export function to_hex(input: string | Uint8Array): string {
-  if (typeof input === 'string') {
-    return global.jsi_to_hex_from_string(input);
-  } else {
-    return global.jsi_to_hex_from_arraybuffer(input.buffer);
-  }
+  const inputParam = typeof input === 'string' ? input : input.buffer;
+  return global.jsi_to_hex(inputParam);
 }
 
 export function randombytes_buf(
@@ -320,19 +268,12 @@ export function crypto_sign_verify_detached(
   publicKey: Uint8Array
 ): boolean {
   let result: boolean;
-  if (typeof message === 'string') {
-    result = global.jsi_crypto_sign_verify_detached_from_string(
-      signature.buffer,
-      message,
-      publicKey.buffer
-    );
-  } else {
-    result = global.jsi_crypto_sign_verify_detached_from_arraybuffer(
-      signature.buffer,
-      message.buffer,
-      publicKey.buffer
-    );
-  }
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  result = global.jsi_crypto_sign_verify_detached(
+    signature.buffer,
+    messageParam,
+    publicKey.buffer
+  );
   return result;
 }
 
@@ -355,19 +296,12 @@ export function crypto_secretbox_easy(
   outputFormat: OutputFormat
 ): unknown {
   let result: ArrayBuffer;
-  if (typeof message === 'string') {
-    result = global.jsi_crypto_secretbox_easy_from_string(
-      message,
-      nonce.buffer,
-      key.buffer
-    );
-  } else {
-    result = global.jsi_crypto_secretbox_easy_from_arraybuffer(
-      message.buffer,
-      nonce.buffer,
-      key.buffer
-    );
-  }
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  result = global.jsi_crypto_secretbox_easy(
+    messageParam,
+    nonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -390,19 +324,13 @@ export function crypto_secretbox_open_easy(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof ciphertext === 'string') {
-    result = global.jsi_crypto_secretbox_open_easy_from_string(
-      ciphertext,
-      nonce.buffer,
-      key.buffer
-    );
-  } else {
-    result = global.jsi_crypto_secretbox_open_easy_from_arraybuffer(
-      ciphertext.buffer,
-      nonce.buffer,
-      key.buffer
-    );
-  }
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_secretbox_open_easy(
+    ciphertextParam,
+    nonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -428,21 +356,13 @@ export function crypto_box_easy(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof message === 'string') {
-    result = global.jsi_crypto_box_easy_from_string(
-      message,
-      nonce.buffer,
-      publicKey.buffer,
-      privateKey.buffer
-    );
-  } else {
-    result = global.jsi_crypto_box_easy_from_arraybuffer(
-      message.buffer,
-      nonce.buffer,
-      publicKey.buffer,
-      privateKey.buffer
-    );
-  }
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  result = global.jsi_crypto_box_easy(
+    messageParam,
+    nonce.buffer,
+    publicKey.buffer,
+    privateKey.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -468,21 +388,14 @@ export function crypto_box_open_easy(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof ciphertext === 'string') {
-    result = global.jsi_crypto_box_open_easy_from_string(
-      ciphertext,
-      nonce.buffer,
-      publicKey.buffer,
-      privateKey.buffer
-    );
-  } else {
-    result = global.jsi_crypto_box_open_easy_from_arraybuffer(
-      ciphertext.buffer,
-      nonce.buffer,
-      publicKey.buffer,
-      privateKey.buffer
-    );
-  }
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_box_open_easy(
+    ciphertextParam,
+    nonce.buffer,
+    publicKey.buffer,
+    privateKey.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -514,25 +427,16 @@ export function crypto_pwhash(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof password === 'string') {
-    result = global.jsi_crypto_pwhash_from_string(
-      keyLength,
-      password,
-      salt.buffer,
-      opsLimit,
-      memLimit,
-      algorithm
-    );
-  } else {
-    result = global.jsi_crypto_pwhash_from_arraybuffer(
-      keyLength,
-      password.buffer,
-      salt.buffer,
-      opsLimit,
-      memLimit,
-      algorithm
-    );
-  }
+  const passwordParam =
+    typeof password === 'string' ? password : password.buffer;
+  result = global.jsi_crypto_pwhash(
+    keyLength,
+    passwordParam,
+    salt.buffer,
+    opsLimit,
+    memLimit,
+    algorithm
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -591,29 +495,18 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof message === 'string' && typeof additional_data === 'string') {
-    result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_string(
-      message,
-      additional_data,
-      public_nonce.buffer,
-      key.buffer
-    );
-  } else if (
-    typeof message !== 'string' &&
-    typeof additional_data === 'string'
-  ) {
-    result =
-      global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt_from_arraybuffer(
-        message.buffer,
-        additional_data,
-        public_nonce.buffer,
-        key.buffer
-      );
-  } else {
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  if (typeof additional_data !== 'string') {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_encrypt: input type not yet implemented'
     );
   }
+  result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
+    messageParam,
+    additional_data,
+    public_nonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
@@ -642,19 +535,24 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   outputFormat: OutputFormat
 ) {
   let result: ArrayBuffer;
-  if (typeof ciphertext !== 'string' && typeof additional_data === 'string') {
-    result =
-      global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt_from_arraybuffer(
-        ciphertext.buffer,
-        additional_data,
-        public_nonce.buffer,
-        key.buffer
-      );
-  } else {
+  if (typeof ciphertext === 'string') {
     throw new Error(
       'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
     );
   }
+  if (typeof additional_data !== 'string') {
+    throw new Error(
+      'crypto_aead_xchacha20poly1305_ietf_decrypt: input type not yet implemented'
+    );
+  }
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    ciphertextParam,
+    additional_data,
+    public_nonce.buffer,
+    key.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 

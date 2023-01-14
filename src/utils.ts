@@ -6,13 +6,10 @@ export function convertToOutputFormat(
   outputFormat: OutputFormat
 ) {
   if (outputFormat === 'base64') {
-    return global.jsi_to_base64_from_arraybuffer(
-      input,
-      base64_variants.URLSAFE_NO_PADDING
-    );
+    return global.jsi_to_base64(input, base64_variants.URLSAFE_NO_PADDING);
   }
   if (outputFormat === 'hex') {
-    return global.jsi_to_hex_from_arraybuffer(input);
+    return global.jsi_to_hex(input);
   }
   if (outputFormat === 'text') {
     throw new Error(
