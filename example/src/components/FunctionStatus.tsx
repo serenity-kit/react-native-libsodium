@@ -7,7 +7,11 @@ type Props = {
   children?: React.ReactNode;
 };
 
-export const Row: React.FC<Props> = ({ name, success, children }) => {
+export const FunctionStatus: React.FC<Props> = ({
+  name,
+  success,
+  children,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.result}>
@@ -18,7 +22,7 @@ export const Row: React.FC<Props> = ({ name, success, children }) => {
           <Text>{name}</Text>
         </View>
       </View>
-      <View>
+      <View style={styles.children}>
         <Text>{children}</Text>
       </View>
     </View>
@@ -30,9 +34,14 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderBottomWidth: 1,
     width: '100%',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
   result: {
     display: 'flex',
     flexDirection: 'row',
+  },
+  children: {
+    paddingTop: 5,
   },
 });

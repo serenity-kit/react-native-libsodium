@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { from_base64, to_base64 } from 'react-native-libsodium';
-import { Row } from './Row';
+import { FunctionStatus } from '../FunctionStatus';
 
 const expected = 'SGVsbG8gV29ybGQ';
 
@@ -12,12 +12,12 @@ export const Test_to_base64: React.FC = () => {
 
   return (
     <>
-      <Row
+      <FunctionStatus
         name="to_base64"
         success={resultBase64 === expected && result2Base64 === expected}
       >
         <Text>{resultBase64}</Text>
-      </Row>
+      </FunctionStatus>
     </>
   );
 };
