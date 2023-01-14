@@ -80,6 +80,7 @@ function LibsodiumTests() {
   const result2Base64 = to_base64(resultUint8Array);
   const resultString = to_string(resultUint8Array);
   const hex = to_hex('Hello World');
+
   if (sodium.crypto_secretbox_KEYBYTES !== 32) {
     throw new Error('export default not working');
   }
@@ -205,6 +206,7 @@ function LibsodiumTests() {
     box_easy_keypair_alice.publicKey,
     box_easy_keypair_bob.privateKey
   );
+
   // TODO is this a bug? or how should it be used?
   // const box_open_easy_from_string = crypto_box_open_easy(
   //   to_string(box_easy_from_string),
@@ -222,6 +224,7 @@ function LibsodiumTests() {
     box_easy_keypair_alice.publicKey,
     box_easy_keypair_bob.privateKey
   );
+
   const box_open_easy_from_uint8array = crypto_box_open_easy(
     box_easy_from_uint8array,
     box_easy_nonce,
