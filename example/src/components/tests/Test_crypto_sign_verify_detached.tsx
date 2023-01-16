@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { crypto_sign_verify_detached } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
@@ -18,9 +17,16 @@ export const Test_crypto_sign_verify_detached: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus name="crypto_sign_verify_detached" success={true}>
-        <Text>{verifies ? '(verifies)' : '(fails)'}</Text>
-      </FunctionStatus>
+      <FunctionStatus
+        name="crypto_sign_verify_detached"
+        success={true}
+        output={verifies}
+        inputs={{
+          signature,
+          message,
+          publicKey,
+        }}
+      />
     </>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
-import sodium, { to_base64 } from 'react-native-libsodium';
+import { randombytes_buf } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
 type Props = {
@@ -8,16 +7,18 @@ type Props = {
 };
 
 export const Test_randombytes_buf: React.FC<Props> = ({ length }) => {
-  const randomData = sodium.randombytes_buf(length);
+  const randomData = randombytes_buf(length);
 
   return (
     <>
       <FunctionStatus
         name="randombytes_buf"
         success={randomData.length === length}
-      >
-        <Text>{to_base64(randomData)}</Text>
-      </FunctionStatus>
+        output={randomData}
+        inputs={{
+          length,
+        }}
+      />
     </>
   );
 };

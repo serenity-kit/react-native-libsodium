@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
-import sodium from 'react-native-libsodium';
+import { randombytes_uniform } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
 type Props = {
@@ -8,13 +7,19 @@ type Props = {
 };
 
 export const Test_randombytes_uniform: React.FC<Props> = ({ max }) => {
-  const randomData = sodium.randombytes_uniform(max);
+  const randomData = randombytes_uniform(max);
+  console.log('randomData', randomData);
 
   return (
     <>
-      <FunctionStatus name="randombytes_uniform" success={randomData <= max}>
-        <Text>{randomData}</Text>
-      </FunctionStatus>
+      <FunctionStatus
+        name="randombytes_uniform"
+        success={randomData <= max}
+        output={randomData}
+        inputs={{
+          max,
+        }}
+      />
     </>
   );
 };

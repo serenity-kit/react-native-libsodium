@@ -1,22 +1,26 @@
 import React from 'react';
-import { Text } from 'react-native';
-import sodium from 'react-native-libsodium';
+import { crypto_secretbox_keygen } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
 type Props = {
-  outputFormat?: 'uint8array' | 'base64' | 'hex' | null;
+  outputFormat?: any;
 };
 
 export const Test_crypto_secretbox_keygen: React.FC<Props> = ({
   outputFormat,
 }) => {
-  const key = sodium.crypto_secretbox_keygen(outputFormat);
+  const key = crypto_secretbox_keygen(outputFormat);
 
   return (
     <>
-      <FunctionStatus name="crypto_secretbox_keygen" success={true}>
-        <Text>{key}</Text>
-      </FunctionStatus>
+      <FunctionStatus
+        name="crypto_secretbox_keygen"
+        success={true}
+        output={key}
+        inputs={{
+          outputFormat,
+        }}
+      />
     </>
   );
 };

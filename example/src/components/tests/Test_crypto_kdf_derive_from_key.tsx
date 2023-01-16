@@ -1,6 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { to_base64, crypto_kdf_derive_from_key } from 'react-native-libsodium';
+import { crypto_kdf_derive_from_key } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
 type Props = {
@@ -25,9 +24,17 @@ export const Test_crypto_kdf_derive_from_key: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus name="crypto_kdf_derive_from_key" success={true}>
-        <Text>{to_base64(key)}</Text>
-      </FunctionStatus>
+      <FunctionStatus
+        name="crypto_kdf_derive_from_key"
+        success={true}
+        output={key}
+        inputs={{
+          length: subkeyLength,
+          subkeyId,
+          context,
+          masterKey,
+        }}
+      />
     </>
   );
 };

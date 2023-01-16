@@ -1,7 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
 import {
-  to_base64,
   crypto_pwhash,
   crypto_pwhash_BYTES_MIN,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
@@ -46,9 +44,19 @@ export const Test_crypto_pwhash: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus name="crypto_pwhash" success={true}>
-        <Text>{to_base64(pwhash)}</Text>
-      </FunctionStatus>
+      <FunctionStatus
+        name="crypto_pwhash"
+        success={true}
+        output={pwhash}
+        inputs={{
+          length: pwhashLength,
+          password,
+          salt,
+          opsLimit: pwhashOpsLimit,
+          memLimit: pwhashMemLimit,
+          algorithm: pwhashAlgorithm,
+        }}
+      />
     </>
   );
 };

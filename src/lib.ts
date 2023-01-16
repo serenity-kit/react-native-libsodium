@@ -1,4 +1,20 @@
 import sodium from 'libsodium-wrappers';
+export type {
+  CryptoBox,
+  CryptoKX,
+  KeyPair,
+  KeyType,
+  MessageTag,
+  SecretBox,
+  StateAddress,
+  StringCryptoBox,
+  StringCryptoKX,
+  StringKeyPair,
+  StringMessageTag,
+  StringOutputFormat,
+  StringSecretBox,
+  Uint8ArrayOutputFormat,
+} from 'libsodium-wrappers';
 
 sodium.ready.then(() => {
   // get all keys
