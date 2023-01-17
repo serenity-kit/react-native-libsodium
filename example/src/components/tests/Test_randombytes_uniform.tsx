@@ -8,14 +8,15 @@ type Props = {
 
 export const Test_randombytes_uniform: React.FC<Props> = ({ max }) => {
   const randomData = randombytes_uniform(max);
-  console.log('randomData', randomData);
 
   return (
     <>
       <FunctionStatus
         name="randombytes_uniform"
         success={randomData <= max}
-        output={randomData}
+        // NOTE: this is a way to fix a bug with
+        // randombytes_buf() == 0 not showing up
+        output={randomData || '0'}
       />
     </>
   );

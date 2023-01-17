@@ -8,7 +8,6 @@ type Props = {
 
 export const Test_randombytes_buf: React.FC<Props> = ({ length }) => {
   const randomData = randombytes_buf(length);
-
   return (
     <>
       <FunctionStatus

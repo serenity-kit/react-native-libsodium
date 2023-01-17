@@ -17,6 +17,11 @@ export const FunctionStatus: React.FC<Props> = ({
 }) => {
   const getType = (data: any) => {
     const dataType = typeof data;
+    // NOTE: this is a way to fix a bug with
+    // randombytes_buf() == 0
+    if (data === '0') {
+      return 'number';
+    }
     if (dataType === 'object') {
       return 'Utf8Array';
     }
@@ -32,6 +37,7 @@ export const FunctionStatus: React.FC<Props> = ({
       return 'null';
     }
     if (dataType === 'number' || dataType === 'boolean') {
+      console.log('data', data);
       return data.toString();
     }
     if (dataType === 'object') {
