@@ -16,9 +16,6 @@ export const Test_randombytes_uniform: React.FC<Props> = ({ max }) => {
         name="randombytes_uniform"
         success={randomData <= max}
         output={randomData}
-        inputs={{
-          max,
-        }}
       />
     </>
   );

@@ -14,7 +14,7 @@ type Props = {
   message: string | Uint8Array;
 };
 
-export const Test_crypto_box_open_easy: React.FC<Props> = ({ message }) => {
+export const Test_crypto_box_easy: React.FC<Props> = ({ message }) => {
   const senderKeyPair = crypto_box_keypair();
   const receiverKeyPair = crypto_box_keypair();
   const nonce = randombytes_buf(crypto_box_NONCEBYTES);
@@ -45,9 +45,9 @@ export const Test_crypto_box_open_easy: React.FC<Props> = ({ message }) => {
   return (
     <>
       <FunctionStatus
-        name="crypto_box_open_easy"
-        success={verifies()}
-        output={decryptedMessage}
+        name="crypto_box_easy"
+        success={typeof ciphertext === 'object' && verifies()}
+        output={ciphertext}
       />
     </>
   );

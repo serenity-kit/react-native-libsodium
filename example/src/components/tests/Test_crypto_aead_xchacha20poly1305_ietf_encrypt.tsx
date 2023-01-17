@@ -15,7 +15,7 @@ type Props = {
   message: string | Uint8Array;
 };
 
-export const Test_crypto_aead_xchacha20poly1305_ietf_decrypt: React.FC<
+export const Test_crypto_aead_xchacha20poly1305_ietf_encrypt: React.FC<
   Props
 > = ({ additionalData, message }) => {
   const key = crypto_aead_xchacha20poly1305_ietf_keygen();
@@ -51,9 +51,9 @@ export const Test_crypto_aead_xchacha20poly1305_ietf_decrypt: React.FC<
   return (
     <>
       <FunctionStatus
-        name="crypto_aead_xchacha20poly1305_ietf_decrypt"
+        name="crypto_aead_xchacha20poly1305_ietf_encrypt"
         success={verifies()}
-        output={decryptedMessage}
+        output={ciphertext}
       />
     </>
   );

@@ -29,9 +29,6 @@ export const Test_from_base64: React.FC = () => {
         name="from_base64"
         success={verifyExpected()}
         output={resultUint8Array}
-        inputs={{
-          input,
-        }}
       />
     </>
   );

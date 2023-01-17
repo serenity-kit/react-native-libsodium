@@ -5,7 +5,6 @@ import { to_base64 } from 'react-native-libsodium';
 type Props = {
   name: string;
   success: boolean;
-  inputs?: any;
   output?: any;
   children?: React.ReactNode;
 };
@@ -14,7 +13,6 @@ export const FunctionStatus: React.FC<Props> = ({
   name,
   success,
   children,
-  inputs,
   output,
 }) => {
   const getType = (data: any) => {
@@ -55,24 +53,12 @@ export const FunctionStatus: React.FC<Props> = ({
       {output ? (
         <View style={styles.children}>
           <View style={styles.output}>
-            <Text style={styles.outputType}>⬅ ({getType(output)})</Text>
+            <Text style={styles.outputType}>({getType(output)})</Text>
             <Text>{formatOutput(output)}</Text>
           </View>
         </View>
       ) : (
         <View>{children}</View>
-      )}
-      {Object.keys(inputs ? inputs : {}).map(
-        (parameter: any, index: number) => (
-          <View style={styles.children} key={index}>
-            <View style={styles.output}>
-              <Text style={styles.outputType}>
-                ➡ {parameter} ({getType(inputs[parameter])})
-              </Text>
-              <Text>{formatOutput(inputs[parameter])}</Text>
-            </View>
-          </View>
-        )
       )}
     </View>
   );

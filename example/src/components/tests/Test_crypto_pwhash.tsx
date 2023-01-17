@@ -1,10 +1,10 @@
 import React from 'react';
 import {
   crypto_pwhash,
-  crypto_pwhash_BYTES_MIN,
-  crypto_pwhash_OPSLIMIT_INTERACTIVE,
-  crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_ALG_DEFAULT,
+  crypto_pwhash_BYTES_MIN,
+  crypto_pwhash_MEMLIMIT_INTERACTIVE,
+  crypto_pwhash_OPSLIMIT_INTERACTIVE,
 } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
@@ -46,16 +46,8 @@ export const Test_crypto_pwhash: React.FC<Props> = ({
     <>
       <FunctionStatus
         name="crypto_pwhash"
-        success={true}
+        success={pwhash.length === pwhashLength}
         output={pwhash}
-        inputs={{
-          length: pwhashLength,
-          password,
-          salt,
-          opsLimit: pwhashOpsLimit,
-          memLimit: pwhashMemLimit,
-          algorithm: pwhashAlgorithm,
-        }}
       />
     </>
   );

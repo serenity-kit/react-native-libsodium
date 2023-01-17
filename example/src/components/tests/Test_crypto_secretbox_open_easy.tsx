@@ -1,38 +1,44 @@
+import { Buffer } from 'buffer';
 import React from 'react';
-import { crypto_secretbox_open_easy } from 'react-native-libsodium';
-import { FunctionStatus } from '../FunctionStatus';
+import {
+  crypto_secretbox_easy,
+  crypto_secretbox_keygen,
+  crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_open_easy,
+  randombytes_buf,
+} from 'react-native-libsodium';
 import { isStringUtf8ArrayEquivalent } from '../../utils/isStringUtf8ArrayEquivalent';
+import { FunctionStatus } from '../FunctionStatus';
 
 type Props = {
-  ciphertext: Uint8Array;
-  nonce: Uint8Array;
-  symmetricKey: Uint8Array;
   message: string | Uint8Array;
 };
 
 export const Test_crypto_secretbox_open_easy: React.FC<Props> = ({
-  ciphertext,
-  nonce,
-  symmetricKey,
   message,
 }) => {
-  const decryptedMessage = crypto_secretbox_open_easy(
-    ciphertext,
-    nonce,
-    symmetricKey
-  );
+  const key = crypto_secretbox_keygen();
+  const nonce = randombytes_buf(crypto_secretbox_NONCEBYTES);
+  const ciphertext = crypto_secretbox_easy(message, nonce, key);
+  const decryptedMessage = crypto_secretbox_open_easy(ciphertext, nonce, key);
+
+  const verifies = () => {
+    if (typeof message === 'string') {
+      const decryptedMessageString = Buffer.from(
+        decryptedMessage.buffer
+      ).toString();
+      return decryptedMessageString === message;
+    } else {
+      return isStringUtf8ArrayEquivalent(decryptedMessage, message);
+    }
+  };
 
   return (
     <>
       <FunctionStatus
-        name="crypto_box_open_easy"
-        success={isStringUtf8ArrayEquivalent(decryptedMessage, message)}
+        name="crypto_secretbox_open_easy"
+        success={verifies()}
         output={decryptedMessage}
-        inputs={{
-          ciphertext,
-          nonce,
-          key: symmetricKey,
-        }}
       />
     </>
   );

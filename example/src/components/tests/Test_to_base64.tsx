@@ -16,9 +16,6 @@ export const Test_to_base64: React.FC = () => {
         name="to_base64"
         success={resultBase64 === expected && result2Base64 === expected}
         output={resultBase64}
-        inputs={{
-          input,
-        }}
       />
     </>
   );

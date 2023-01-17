@@ -15,9 +15,6 @@ export const Test_randombytes_buf: React.FC<Props> = ({ length }) => {
         name="randombytes_buf"
         success={randomData.length === length}
         output={randomData}
-        inputs={{
-          length,
-        }}
       />
     </>
   );

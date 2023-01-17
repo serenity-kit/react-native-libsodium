@@ -1,31 +1,35 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import {
+  crypto_box_keypair,
+  crypto_box_PUBLICKEYBYTES,
+  crypto_box_SECRETKEYBYTES,
+  to_base64,
+} from 'react-native-libsodium';
 import { getType } from '../../utils/getType';
 import { FunctionStatus } from '../FunctionStatus';
-import { Header } from '../Header';
-import {
-  to_base64,
-  crypto_sign_keypair,
-  crypto_sign_detached,
-} from 'react-native-libsodium';
-import { Test_crypto_sign_verify_detached } from '../tests/Test_crypto_sign_verify_detached';
 
-const message = 'Hello World';
+type Props = {
+  outputFormat?: any;
+};
 
-export const Test_crypto_signing: React.FC = () => {
-  const keyPair = crypto_sign_keypair();
-  const signature = crypto_sign_detached(message, keyPair.privateKey);
+export const Test_crypto_box_keypair: React.FC<Props> = ({ outputFormat }) => {
+  const keyPair = crypto_box_keypair(outputFormat);
+
+  const verifies = () => {
+    return (
+      keyPair.keyType === 'curve25519' &&
+      keyPair.publicKey.length === crypto_box_PUBLICKEYBYTES &&
+      keyPair.privateKey.length === crypto_box_SECRETKEYBYTES
+    );
+  };
 
   return (
     <>
-      <Header>Signing</Header>
-      <FunctionStatus
-        name="crypto_sign_keypair"
-        success={keyPair.keyType === 'ed25519'}
-      >
+      <FunctionStatus name="crypto_box_keypair" success={verifies()}>
         <View style={styles.children}>
           <View style={styles.output}>
-            <Text style={styles.outputType}>⬅ (object)</Text>
+            <Text style={styles.outputType}>(object)</Text>
           </View>
           <View style={styles.output}>
             <Text style={styles.partialOutputType}>
@@ -47,20 +51,6 @@ export const Test_crypto_signing: React.FC = () => {
           </View>
         </View>
       </FunctionStatus>
-      <FunctionStatus
-        name="crypto_sign_detached"
-        success={true}
-        output={signature}
-        inputs={{
-          message,
-          privateKey: keyPair.privateKey,
-        }}
-      />
-      <Test_crypto_sign_verify_detached
-        signature={signature}
-        message={message}
-        publicKey={keyPair.publicKey}
-      />
     </>
   );
 };
