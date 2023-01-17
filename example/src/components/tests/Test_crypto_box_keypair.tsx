@@ -4,6 +4,7 @@ import {
   crypto_box_keypair,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  from_base64,
   to_base64,
 } from 'react-native-libsodium';
 import { getType } from '../../utils/getType';
@@ -16,11 +17,24 @@ type Props = {
 export const Test_crypto_box_keypair: React.FC<Props> = ({ outputFormat }) => {
   const keyPair = crypto_box_keypair(outputFormat);
 
+  const lengthVerifies = (key: any, expectedLength: number) => {
+    const keyLength = key.length;
+    if (outputFormat === 'base64') {
+      return (
+        typeof key === 'string' && from_base64(key).length === expectedLength
+      );
+    } else if (outputFormat === 'hex') {
+      return typeof key === 'string' && keyLength === expectedLength * 2;
+    } else {
+      return typeof key === 'object' && keyLength === expectedLength;
+    }
+  };
+
   const verifies = () => {
     return (
       keyPair.keyType === 'curve25519' &&
-      keyPair.publicKey.length === crypto_box_PUBLICKEYBYTES &&
-      keyPair.privateKey.length === crypto_box_SECRETKEYBYTES
+      lengthVerifies(keyPair.publicKey, crypto_box_PUBLICKEYBYTES) &&
+      lengthVerifies(keyPair.privateKey, crypto_box_SECRETKEYBYTES)
     );
   };
 

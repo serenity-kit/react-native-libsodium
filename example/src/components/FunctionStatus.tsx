@@ -37,7 +37,6 @@ export const FunctionStatus: React.FC<Props> = ({
       return 'null';
     }
     if (dataType === 'number' || dataType === 'boolean') {
-      console.log('data', data);
       return data.toString();
     }
     if (dataType === 'object') {
