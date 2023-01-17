@@ -1,5 +1,5 @@
 import sodium from 'libsodium-wrappers';
-export type {
+export {
   CryptoBox,
   CryptoKX,
   KeyPair,
