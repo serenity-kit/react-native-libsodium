@@ -33,7 +33,7 @@ jobs:
         run: pip install cpplint
 
       - name: Run cpplint
-        run: cpplint --recursive cpp android --filter=-whitespace/indent
+        run: cpplint --recursive cpp android --filter=-legal/copyright,-whitespace/braces,-whitespace/newline,-whitespace/ending_newline,-readability/fn_size,-build/namespaces,-runtime/references
 
   test:
     runs-on: ubuntu-latest

@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "react-native-libsodium.h"
+#include "include/react-native-libsodium.h"
 
 extern "C"
 JNIEXPORT jint JNICALL
