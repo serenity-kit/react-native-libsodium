@@ -1,12 +1,12 @@
 // import our header file to implement the `installLibsodium` and `cleanUpLibsodium` functions
 #include "./react-native-libsodium.h"
+// libsodium
+#include <sodium.h>
 // useful functions manipulate strings in C++
 #include <sstream>
 #include <utility>
 #include <string>
 #include <vector>
-// libsodium
-#include "sodium.h"
 
 // syntactic sugar around the JSI objects. ex. call: jsi::Function
 using namespace facebook;
