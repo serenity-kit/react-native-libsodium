@@ -137,7 +137,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         uint8Vector.resize(base64String.size());
 
         size_t length = 0;
-        sodium_base642bin((uint8_t *)uint8Vector.data(), uint8Vector.size(), (char *)base64String.data(), base64String.size(), nullptr, &length, nullptr, variant);
+        sodium_base642bin(
+          reinterpret_cast<uint8_t *>(uint8Vector.data()),
+          uint8Vector.size(),
+          const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+          base64String.size(),
+          nullptr,
+          &length,
+          nullptr,
+          variant);
 
         uint8Vector.resize(length);
 
@@ -183,7 +191,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string base64String;
         base64String.resize(sodium_base64_encoded_len(dataLength, variant));
-        sodium_bin2base64((char *)base64String.data(), base64String.size(), data, dataLength, variant);
+        sodium_bin2base64(const_cast<char *>(reinterpret_cast<const char *>(base64String.data())), base64String.size(), data, dataLength, variant);
 
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (base64String.length() && base64String[base64String.length() - 1] == '\0')
@@ -225,7 +233,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string hexString;
         hexString.resize(dataLength * 2 + 1);
 
-        sodium_bin2hex((char *)hexString.data(), hexString.length(), data, dataLength);
+        sodium_bin2hex(const_cast<char *>(reinterpret_cast<const char *>(hexString.data())), hexString.length(), data, dataLength);
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (hexString.length() && hexString[hexString.length() - 1] == '\0')
         {
@@ -777,7 +785,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::vector<uint8_t> subkey(subkeyLength);
 
-        int result = crypto_kdf_derive_from_key(subkey.data(), subkeyLength, subkeyId, (char *)context.data(), masterKey);
+        int result = crypto_kdf_derive_from_key(subkey.data(), subkeyLength, subkeyId, const_cast<char *>(reinterpret_cast<const char *>(context.data())), masterKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, subkey);
@@ -839,7 +847,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         uint64_t ciphertextLength = messageLength + crypto_aead_xchacha20poly1305_ietf_ABYTES;
         std::vector<uint8_t> ciphertext(ciphertextLength);
 
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(ciphertext.data(), &ciphertextLength, message, messageLength, (unsigned char *)additionalData.data(), additionalData.length(), NULL, nonce, key);
+        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(
+          ciphertext.data(),
+          &ciphertextLength,
+          message,
+          messageLength,
+          const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(additionalData.data())),
+          additionalData.length(),
+          NULL,
+          nonce,
+          key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, ciphertext);
