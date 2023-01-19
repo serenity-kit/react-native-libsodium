@@ -1,5 +1,5 @@
 // import our header file to implement the `installLibsodium` and `cleanUpLibsodium` functions
-#include "./react-native-libsodium.h"
+#include "include/react-native-libsodium.h"
 // libsodium
 #include <sodium.h>
 // useful functions manipulate strings in C++
