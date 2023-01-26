@@ -73,7 +73,7 @@ function LibsodiumTests() {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeAreaContainer}>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
           <Header>Base64</Header>
@@ -187,6 +187,9 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+  },
   scrollContainer: {
     padding: 0,
   },
