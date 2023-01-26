@@ -45,6 +45,7 @@ import {
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_box_easy,
   crypto_box_keypair,
