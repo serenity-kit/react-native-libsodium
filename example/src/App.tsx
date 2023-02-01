@@ -1,12 +1,6 @@
 import * as React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import sodium, {
-  crypto_pwhash_SALTBYTES,
-  from_base64,
-  randombytes_buf,
-  ready,
-  to_base64,
-} from 'react-native-libsodium';
+import sodium, { from_base64, ready, to_base64 } from 'react-native-libsodium';
 import { Header } from './components/Header';
 import { Test_constants } from './components/tests/Test_constants';
 import { Test_crypto_aead_xchacha20poly1305_ietf_decrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_decrypt';
@@ -55,15 +49,8 @@ function LibsodiumTests() {
           <Test_randombytes_buf />
           <Test_randombytes_uniform />
 
-          <Header>Password Hashing</Header>
-          <Test_crypto_pwhash
-            password={'password123'}
-            salt={randombytes_buf(crypto_pwhash_SALTBYTES)}
-          />
-          <Test_crypto_pwhash
-            password={from_base64(to_base64('password123'))}
-            salt={randombytes_buf(crypto_pwhash_SALTBYTES)}
-          />
+          <Header>password hashing</Header>
+          <Test_crypto_pwhash />
 
           <Header>Key Derivations</Header>
           <Test_crypto_kdf_keygen />
