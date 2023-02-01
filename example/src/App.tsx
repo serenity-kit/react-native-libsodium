@@ -51,12 +51,9 @@ function LibsodiumTests() {
           <Header>hex</Header>
           <Test_to_hex />
 
-          <Header>Random Numbers</Header>
-          <Test_randombytes_buf length={1} />
-          <Test_randombytes_buf length={3} />
-          <Test_randombytes_buf length={9} />
-          <Test_randombytes_uniform max={1} />
-          <Test_randombytes_uniform max={10} />
+          <Header>random</Header>
+          <Test_randombytes_buf />
+          <Test_randombytes_uniform />
 
           <Header>Password Hashing</Header>
           <Test_crypto_pwhash
