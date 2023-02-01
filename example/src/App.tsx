@@ -55,10 +55,9 @@ function LibsodiumTests() {
           <Header>key derivation</Header>
           <Test_crypto_kdf_keygen />
           <Test_crypto_kdf_derive_from_key />
-          <Header>Signatures (Asymmetric Key)</Header>
+
+          <Header>signing</Header>
           <Test_crypto_sign_keypair />
-          <Test_crypto_sign_keypair outputFormat={'base64'} />
-          <Test_crypto_sign_keypair outputFormat={'hex'} />
           <Test_crypto_sign_detached message={'Hello World'} />
           <Test_crypto_sign_detached
             message={from_base64(to_base64('Hello World'))}
