@@ -86,8 +86,6 @@ function LibsodiumTests() {
 
           <Header>Box Encryption (Asymmetric Key)</Header>
           <Test_crypto_box_keypair />
-          <Test_crypto_box_keypair outputFormat={'base64'} />
-          <Test_crypto_box_keypair outputFormat={'hex'} />
           <Test_crypto_box_easy message={'Hello World'} />
           <Test_crypto_box_easy
             message={from_base64(to_base64('Hello World'))}
