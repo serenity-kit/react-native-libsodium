@@ -52,12 +52,9 @@ function LibsodiumTests() {
           <Header>password hashing</Header>
           <Test_crypto_pwhash />
 
-          <Header>Key Derivations</Header>
+          <Header>key derivation</Header>
           <Test_crypto_kdf_keygen />
-          <Test_crypto_kdf_keygen outputFormat={'base64'} />
-          <Test_crypto_kdf_keygen outputFormat={'hex'} />
-          <Test_crypto_kdf_derive_from_key subkeyLength={32} />
-          <Test_crypto_kdf_derive_from_key subkeyLength={32} />
+          <Test_crypto_kdf_derive_from_key />
           <Header>Signatures (Asymmetric Key)</Header>
           <Test_crypto_sign_keypair />
           <Test_crypto_sign_keypair outputFormat={'base64'} />

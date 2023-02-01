@@ -1,4 +1,4 @@
-import { isArrayEqual } from './isArrayEqual';
+import { isEqualUint8Array } from './isEqualUint8Array';
 
 export const isStringUtf8ArrayEquivalent = (
   decryptedMessage: Uint8Array,
@@ -8,6 +8,6 @@ export const isStringUtf8ArrayEquivalent = (
     // TODO: fix this when we implement string decryption support;
     return false;
   } else {
-    return isArrayEqual(decryptedMessage, message);
+    return isEqualUint8Array(decryptedMessage, message);
   }
 };
