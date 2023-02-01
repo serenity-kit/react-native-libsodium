@@ -77,8 +77,8 @@ function LibsodiumTests() {
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
           <Header>Base64</Header>
-          <Test_from_base64 />
           <Test_to_base64 />
+          <Test_from_base64 />
           <Header>Random Numbers</Header>
           <Test_randombytes_buf length={1} />
           <Test_randombytes_buf length={3} />

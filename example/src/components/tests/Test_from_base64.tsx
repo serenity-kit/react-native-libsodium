@@ -1,34 +1,48 @@
 import React from 'react';
-import { from_base64 } from 'react-native-libsodium';
+import { base64_variants, from_base64 } from 'react-native-libsodium';
+import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';
 
-const expected = new Uint8Array([
-  72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100,
-]);
-
 export const Test_from_base64: React.FC = () => {
-  const input = 'SGVsbG8gV29ybGQ';
-  const resultUint8Array = from_base64(input);
+  const expectedForVariants = new Uint8Array([
+    179, 235, 62, 250, 207, 236, 255, 255, 218, 109,
+  ]);
 
-  const verifyExpected = () => {
-    if (resultUint8Array.length !== expected.length) {
-      return false;
-    }
-
-    for (var index = 0; index < resultUint8Array.length; index++) {
-      if (expected[index] !== resultUint8Array[index]) {
-        return false;
-      }
-    }
-    return true;
-  };
+  let throwErrorForInvalidInput = false;
+  try {
+    from_base64('111');
+  } catch (e) {
+    throwErrorForInvalidInput = true;
+  }
 
   return (
     <>
       <FunctionStatus
         name="from_base64"
-        success={verifyExpected()}
-        output={resultUint8Array}
+        success={
+          isEqualUint8Array(
+            from_base64('SGVsbG8gV29ybGQ'),
+            new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100])
+          ) &&
+          isEqualUint8Array(from_base64(''), new Uint8Array([])) &&
+          isEqualUint8Array(
+            from_base64('s+s++s/s///abQ==', base64_variants.ORIGINAL),
+            expectedForVariants
+          ) &&
+          isEqualUint8Array(
+            from_base64('s+s++s/s///abQ', base64_variants.ORIGINAL_NO_PADDING),
+            expectedForVariants
+          ) &&
+          isEqualUint8Array(
+            from_base64('s-s--s_s___abQ==', base64_variants.URLSAFE),
+            expectedForVariants
+          ) &&
+          isEqualUint8Array(
+            from_base64('s-s--s_s___abQ', base64_variants.URLSAFE_NO_PADDING),
+            expectedForVariants
+          ) &&
+          throwErrorForInvalidInput
+        }
       />
     </>
   );
