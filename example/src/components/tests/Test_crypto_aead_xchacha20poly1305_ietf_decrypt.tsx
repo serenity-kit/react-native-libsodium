@@ -53,7 +53,6 @@ export const Test_crypto_aead_xchacha20poly1305_ietf_decrypt: React.FC<
       <FunctionStatus
         name="crypto_aead_xchacha20poly1305_ietf_decrypt"
         success={verifies()}
-        output={decryptedMessage}
       />
     </>
   );

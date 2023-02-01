@@ -44,11 +44,7 @@ export const Test_crypto_kdf_derive_from_key: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus
-        name="crypto_kdf_derive_from_key"
-        success={verifies()}
-        output={key1}
-      />
+      <FunctionStatus name="crypto_kdf_derive_from_key" success={verifies()} />
     </>
   );
 };

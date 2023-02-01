@@ -35,11 +35,7 @@ export const Test_crypto_secretbox_open_easy: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus
-        name="crypto_secretbox_open_easy"
-        success={verifies()}
-        output={decryptedMessage}
-      />
+      <FunctionStatus name="crypto_secretbox_open_easy" success={verifies()} />
     </>
   );
 };

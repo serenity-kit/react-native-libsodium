@@ -47,7 +47,6 @@ export const Test_crypto_pwhash: React.FC<Props> = ({
       <FunctionStatus
         name="crypto_pwhash"
         success={pwhash.length === pwhashLength}
-        output={pwhash}
       />
     </>
   );

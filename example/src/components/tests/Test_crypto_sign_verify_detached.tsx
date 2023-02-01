@@ -26,7 +26,6 @@ export const Test_crypto_sign_verify_detached: React.FC<Props> = ({
       <FunctionStatus
         name="crypto_sign_verify_detached"
         success={signatureVerifies === true}
-        output={signatureVerifies}
       />
     </>
   );

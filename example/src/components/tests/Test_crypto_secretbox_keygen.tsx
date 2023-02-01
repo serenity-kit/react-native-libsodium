@@ -33,11 +33,7 @@ export const Test_crypto_secretbox_keygen: React.FC<Props> = ({
 
   return (
     <>
-      <FunctionStatus
-        name="crypto_secretbox_keygen"
-        success={verifies()}
-        output={key}
-      />
+      <FunctionStatus name="crypto_secretbox_keygen" success={verifies()} />
     </>
   );
 };

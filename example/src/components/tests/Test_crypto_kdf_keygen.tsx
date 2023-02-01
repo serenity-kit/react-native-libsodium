@@ -29,11 +29,7 @@ export const Test_crypto_kdf_keygen: React.FC<Props> = ({ outputFormat }) => {
 
   return (
     <>
-      <FunctionStatus
-        name="crypto_kdf_keygen"
-        success={verifies()}
-        output={key}
-      />
+      <FunctionStatus name="crypto_kdf_keygen" success={verifies()} />
     </>
   );
 };
