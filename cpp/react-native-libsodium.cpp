@@ -137,15 +137,17 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         uint8Vector.resize(base64String.size());
 
         size_t length = 0;
-        sodium_base642bin(
-          reinterpret_cast<uint8_t *>(uint8Vector.data()),
-          uint8Vector.size(),
-          const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
-          base64String.size(),
-          nullptr,
-          &length,
-          nullptr,
-          variant);
+        int result = sodium_base642bin(
+            reinterpret_cast<uint8_t *>(uint8Vector.data()),
+            uint8Vector.size(),
+            const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+            base64String.size(),
+            nullptr,
+            &length,
+            nullptr,
+            variant);
+
+        throwOnBadResult(functionName, runtime, result);
 
         uint8Vector.resize(length);
 
@@ -848,15 +850,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> ciphertext(ciphertextLength);
 
         int result = crypto_aead_xchacha20poly1305_ietf_encrypt(
-          ciphertext.data(),
-          &ciphertextLength,
-          message,
-          messageLength,
-          const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(additionalData.data())),
-          additionalData.length(),
-          NULL,
-          nonce,
-          key);
+            ciphertext.data(),
+            &ciphertextLength,
+            message,
+            messageLength,
+            const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(additionalData.data())),
+            additionalData.length(),
+            NULL,
+            nonce,
+            key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, ciphertext);
@@ -919,15 +921,15 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> message(messageLength);
 
         int result = crypto_aead_xchacha20poly1305_ietf_decrypt(
-          message.data(),
-          &messageLength,
-          NULL,
-          ciphertext,
-          ciphertextLength,
-          (unsigned char *)additionalData.data(),
-          additionalData.length(),
-          nonce,
-          key);
+            message.data(),
+            &messageLength,
+            NULL,
+            ciphertext,
+            ciphertextLength,
+            (unsigned char *)additionalData.data(),
+            additionalData.length(),
+            nonce,
+            key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);
