@@ -213,7 +213,7 @@ export function crypto_box_keypair(
 export function crypto_box_keypair(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_box_keypair();
   return {
-    keyType: 'curve25519',
+    keyType: 'x25519',
     publicKey: convertToOutputFormat(result.publicKey, outputFormat),
     privateKey: convertToOutputFormat(result.secretKey, outputFormat),
   };

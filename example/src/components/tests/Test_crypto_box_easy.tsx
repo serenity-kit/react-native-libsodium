@@ -47,7 +47,6 @@ export const Test_crypto_box_easy: React.FC<Props> = ({ message }) => {
       <FunctionStatus
         name="crypto_box_easy"
         success={typeof ciphertext === 'object' && verifies()}
-        output={ciphertext}
       />
     </>
   );

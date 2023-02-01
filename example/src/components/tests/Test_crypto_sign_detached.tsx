@@ -24,7 +24,6 @@ export const Test_crypto_sign_detached: React.FC<Props> = ({ message }) => {
       <FunctionStatus
         name="crypto_sign_detached"
         success={signature.length === 64 && signatureVerifies === true}
-        output={signature}
       />
     </>
   );

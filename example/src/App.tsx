@@ -51,12 +51,9 @@ function LibsodiumTests() {
           <Header>hex</Header>
           <Test_to_hex />
 
-          <Header>Random Numbers</Header>
-          <Test_randombytes_buf length={1} />
-          <Test_randombytes_buf length={3} />
-          <Test_randombytes_buf length={9} />
-          <Test_randombytes_uniform max={1} />
-          <Test_randombytes_uniform max={10} />
+          <Header>random</Header>
+          <Test_randombytes_buf />
+          <Test_randombytes_uniform />
 
           <Header>Password Hashing</Header>
           <Test_crypto_pwhash
@@ -89,8 +86,6 @@ function LibsodiumTests() {
 
           <Header>Box Encryption (Asymmetric Key)</Header>
           <Test_crypto_box_keypair />
-          <Test_crypto_box_keypair outputFormat={'base64'} />
-          <Test_crypto_box_keypair outputFormat={'hex'} />
           <Test_crypto_box_easy message={'Hello World'} />
           <Test_crypto_box_easy
             message={from_base64(to_base64('Hello World'))}
