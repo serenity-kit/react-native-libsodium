@@ -699,7 +699,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string passwordArgumentName = "password";
         unsigned int passwordArgumentPosition = 1;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
+        JsiArgType passwordArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
 
         std::string saltArgumentName = "salt";
         unsigned int saltArgumentPosition = 2;
@@ -718,35 +718,41 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         validateIsNumber(functionName, runtime, arguments[algorithmArgumentPosition], algorithmArgumentName, true);
 
         int keyLength = arguments[keyLengthArgumentPosition].asNumber();
-
-        const unsigned int position = passwordArgumentPosition;
-        unsigned char *password;
-        uint64_t passwordLength;
-        if (arguments[position].isString())
-        {
-          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
-          password = (unsigned char *)dataString.data();
-          passwordLength = dataString.length();
-        }
-        else
-        {
-          auto dataArrayBuffer =
-              arguments[position].asObject(runtime).getArrayBuffer(runtime);
-          password = dataArrayBuffer.data(runtime);
-          passwordLength = dataArrayBuffer.length(runtime);
-        }
-
         auto saltDataArrayBuffer =
             arguments[saltArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *salt = saltDataArrayBuffer.data(runtime);
-
         int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
         int memLimit = arguments[memLimitArgumentPosition].asNumber();
         int algorithm = arguments[algorithmArgumentPosition].asNumber();
-
         std::vector<uint8_t> key(keyLength);
 
-        int result = crypto_pwhash(key.data(), keyLength, (const char *)password, passwordLength, salt, opsLimit, memLimit, algorithm);
+        int result = -1;
+        if (passwordArgType == JsiArgType::string)
+        {
+          std::string passwordString = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
+          result = crypto_pwhash(
+              key.data(),
+              keyLength,
+              reinterpret_cast<const char *>(passwordString.data()),
+              passwordString.length(),
+              saltDataArrayBuffer.data(runtime),
+              opsLimit,
+              memLimit,
+              algorithm);
+        }
+        else
+        {
+          auto passwordArrayBuffer =
+              arguments[passwordArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          result = crypto_pwhash(
+              key.data(),
+              keyLength,
+              reinterpret_cast<const char *>(passwordArrayBuffer.data(runtime)),
+              passwordArrayBuffer.length(runtime),
+              saltDataArrayBuffer.data(runtime),
+              opsLimit,
+              memLimit,
+              algorithm);
+        }
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, key);
@@ -854,7 +860,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               &ciphertextLength,
               reinterpret_cast<const unsigned char *>(messageString.data()),
               messageString.length(),
-              const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(additionalData.data())),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
               NULL,
               nonceArrayBuffer.data(runtime),
@@ -871,7 +877,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               &ciphertextLength,
               messageArrayBuffer.data(runtime),
               messageArrayBuffer.length(runtime),
-              const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(additionalData.data())),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
               NULL,
               nonceArrayBuffer.data(runtime),
