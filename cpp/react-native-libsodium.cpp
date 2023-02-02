@@ -776,27 +776,34 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string masterKeyArgumentName = "masterKey";
         unsigned int masterKeyArgumentPosition = 3;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
+        JsiArgType masterKeyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
 
+        std::string context = arguments[contextArgumentPosition].asString(runtime).utf8(runtime);
         int subkeyLength = arguments[subkeyLengthArgumentPosition].asNumber();
         int subkeyId = arguments[subkeyIdArgumentPosition].asNumber();
-        std::string context = arguments[contextArgumentPosition].asString(runtime).utf8(runtime);
+        std::vector<uint8_t> subkey(subkeyLength);
 
-        unsigned char *masterKey;
-        if (arguments[masterKeyArgumentPosition].isString())
+        int result = -1;
+        if (masterKeyArgType == JsiArgType::string)
         {
           std::string masterKeyString = arguments[masterKeyArgumentPosition].asString(runtime).utf8(runtime);
-          masterKey = (unsigned char *)masterKeyString.data();
+          result = crypto_kdf_derive_from_key(
+              subkey.data(),
+              subkeyLength,
+              subkeyId,
+              reinterpret_cast<const char *>(context.data()),
+              reinterpret_cast<const unsigned char *>(masterKeyString.data()));
         }
         else
         {
           auto masterKeyArrayBuffer = arguments[masterKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          masterKey = masterKeyArrayBuffer.data(runtime);
+          result = crypto_kdf_derive_from_key(
+              subkey.data(),
+              subkeyLength,
+              subkeyId,
+              reinterpret_cast<const char *>(context.data()),
+              masterKeyArrayBuffer.data(runtime));
         }
-
-        std::vector<uint8_t> subkey(subkeyLength);
-
-        int result = crypto_kdf_derive_from_key(subkey.data(), subkeyLength, subkeyId, const_cast<char *>(reinterpret_cast<const char *>(context.data())), masterKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, subkey);
@@ -887,7 +894,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -909,7 +916,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> message;
 
         int result = -1;
-        if (messageArgType == JsiArgType::string)
+        if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
           uint64_t messageLength = ciphertextString.length() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
