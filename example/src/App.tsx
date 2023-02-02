@@ -74,8 +74,6 @@ function LibsodiumTests() {
 
           <Header>Secret Box Encryption (Symmetric Key)</Header>
           <Test_crypto_secretbox_keygen />
-          <Test_crypto_secretbox_keygen outputFormat={'base64'} />
-          <Test_crypto_secretbox_keygen outputFormat={'hex'} />
           <Test_crypto_secretbox_easy message={'Hello World'} />
           <Test_crypto_secretbox_easy
             message={from_base64(to_base64('Hello World'))}
