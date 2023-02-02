@@ -520,7 +520,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -529,27 +529,37 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
-        unsigned char *ciphertext;
-        uint64_t ciphertextLength;
-        if (arguments[ciphertextArgumentPosition].isString())
+
+        auto nonceArrayBuffer = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        std::vector<uint8_t> message;
+        int result = -1;
+
+        if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          ciphertext = (unsigned char *)ciphertextString.data();
-          ciphertextLength = ciphertextString.length();
+          uint64_t messageLength = ciphertextString.length() - crypto_secretbox_MACBYTES;
+          message.resize(messageLength);
+          result = crypto_secretbox_open_easy(
+              message.data(),
+              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
+              ciphertextString.length(),
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
         else
         {
           auto ciphertextArrayBuffer = arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          ciphertext = ciphertextArrayBuffer.data(runtime);
-          ciphertextLength = ciphertextArrayBuffer.length(runtime);
+
+          uint64_t messageLength = ciphertextArrayBuffer.length(runtime) - crypto_secretbox_MACBYTES;
+          message.resize(messageLength);
+          result = crypto_secretbox_open_easy(
+              message.data(),
+              ciphertextArrayBuffer.data(runtime),
+              ciphertextArrayBuffer.length(runtime),
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
-        unsigned char *nonce = (unsigned char *)arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-        unsigned char *key = (unsigned char *)arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-
-        uint64_t messageLength = ciphertextLength - crypto_secretbox_MACBYTES;
-        std::vector<uint8_t> message(messageLength);
-
-        int result = crypto_secretbox_open_easy(message.data(), ciphertext, ciphertextLength, nonce, key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);
@@ -628,7 +638,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -654,7 +664,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> message;
         int result = -1;
 
-        if (messageArgType == JsiArgType::string)
+        if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
           message.resize(ciphertextString.length() - crypto_box_MACBYTES);
