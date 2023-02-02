@@ -1,11 +1,11 @@
 import {
   base64_variants,
-  from_base64,
-  to_base64,
-  randombytes_buf,
-  crypto_aead_xchacha20poly1305_ietf_keygen,
-  crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_aead_xchacha20poly1305_ietf_encrypt,
+  crypto_aead_xchacha20poly1305_ietf_keygen,
+  from_base64,
+  randombytes_buf,
+  to_base64,
 } from 'react-native-libsodium';
 
 export const encryptAndDecryptImage = (contentAsBas64: string) => {

@@ -11,6 +11,12 @@
 // syntactic sugar around the JSI objects. ex. call: jsi::Function
 using namespace facebook;
 
+enum class JsiArgType
+{
+  string,
+  arrayBuffer
+};
+
 // Convert an array buffer to a JavaScript object
 jsi::Object arrayBufferAsObject(jsi::Runtime &runtime, std::vector<uint8_t> &data)
 {
@@ -59,14 +65,22 @@ void validateIsArrayBuffer(const std::string &functionName, jsi::Runtime &runtim
   }
 }
 
-void validateIsStringArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
+JsiArgType validateIsStringOrArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
 {
   if (required)
   {
     validateRequired(functionName, runtime, argument, argumentName);
   }
-  if (!(argument.isString() || (argument.isObject() &&
-                                argument.asObject(runtime).isArrayBuffer(runtime))))
+  if (argument.isString())
+  {
+    return JsiArgType::string;
+  }
+  else if (argument.isObject() &&
+           argument.asObject(runtime).isArrayBuffer(runtime))
+  {
+    return JsiArgType::arrayBuffer;
+  }
+  else
   {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be a string or an ArrayBuffer";
     throw jsi::JSError(runtime, errorMessage);
@@ -138,9 +152,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         size_t length = 0;
         int result = sodium_base642bin(
-            reinterpret_cast<uint8_t *>(uint8Vector.data()),
+            reinterpret_cast<unsigned char *>(uint8Vector.data()),
             uint8Vector.size(),
-            const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+            reinterpret_cast<const char *>(base64String.data()),
             base64String.size(),
             nullptr,
             &length,
@@ -150,9 +164,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         throwOnBadResult(functionName, runtime, result);
 
         uint8Vector.resize(length);
-
         jsi::Object returnBufferAsObject = arrayBufferAsObject(runtime, uint8Vector);
-
         return returnBufferAsObject;
       });
 
@@ -168,32 +180,36 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+        JsiArgType valueArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
 
         std::string variantArgumentName = "variant";
         unsigned int variantArgumentPosition = 1;
         validateIsNumber(functionName, runtime, arguments[variantArgumentPosition], variantArgumentName, true);
 
-        unsigned char *data;
-        uint64_t dataLength;
-        if (arguments[valueArgumentPosition].isString())
+        std::string base64String;
+        uint8_t variant = arguments[variantArgumentPosition].asNumber();
+
+        if (valueArgType == JsiArgType::string)
         {
           std::string dataString = arguments[valueArgumentPosition].asString(runtime).utf8(runtime);
-          data = (unsigned char *)dataString.data();
-          dataLength = dataString.length();
+          base64String.resize(sodium_base64_encoded_len(dataString.length(), variant));
+          sodium_bin2base64(
+              const_cast<char *>(reinterpret_cast<const char *>(base64String.data())), base64String.size(),
+              reinterpret_cast<const unsigned char *>(dataString.data()),
+              dataString.length(),
+              variant);
         }
         else
         {
           auto dataArrayBuffer = arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          data = dataArrayBuffer.data(runtime);
-          dataLength = dataArrayBuffer.length(runtime);
+          base64String.resize(sodium_base64_encoded_len(dataArrayBuffer.length(runtime), variant));
+          sodium_bin2base64(
+              const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+              base64String.size(),
+              dataArrayBuffer.data(runtime),
+              dataArrayBuffer.length(runtime),
+              variant);
         }
-
-        uint8_t variant = arguments[variantArgumentPosition].asNumber();
-
-        std::string base64String;
-        base64String.resize(sodium_base64_encoded_len(dataLength, variant));
-        sodium_bin2base64(const_cast<char *>(reinterpret_cast<const char *>(base64String.data())), base64String.size(), data, dataLength, variant);
 
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (base64String.length() && base64String[base64String.length() - 1] == '\0')
@@ -216,26 +232,31 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
-        unsigned char *data;
-        uint64_t dataLength;
-        if (arguments[valueArgumentPosition].isString())
+        JsiArgType valueArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+
+        std::string hexString;
+
+        if (valueArgType == JsiArgType::string)
         {
           std::string dataString = arguments[valueArgumentPosition].asString(runtime).utf8(runtime);
-          data = (unsigned char *)dataString.data();
-          dataLength = dataString.length();
+          hexString.resize(dataString.length() * 2 + 1);
+          sodium_bin2hex(
+              const_cast<char *>(reinterpret_cast<const char *>(hexString.data())),
+              hexString.length(),
+              reinterpret_cast<const unsigned char *>(dataString.data()),
+              dataString.length());
         }
         else
         {
           auto dataArrayBuffer = arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          data = dataArrayBuffer.data(runtime);
-          dataLength = dataArrayBuffer.length(runtime);
+          hexString.resize(dataArrayBuffer.length(runtime) * 2 + 1);
+          sodium_bin2hex(
+              const_cast<char *>(reinterpret_cast<const char *>(hexString.data())),
+              hexString.length(),
+              dataArrayBuffer.data(runtime),
+              dataArrayBuffer.length(runtime));
         }
 
-        std::string hexString;
-        hexString.resize(dataLength * 2 + 1);
-
-        sodium_bin2hex(const_cast<char *>(reinterpret_cast<const char *>(hexString.data())), hexString.length(), data, dataLength);
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (hexString.length() && hexString[hexString.length() - 1] == '\0')
         {
@@ -383,7 +404,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string secretKeyArgumentName = "secretKey";
         unsigned int secretKeyArgumentPosition = 1;
@@ -391,25 +412,19 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         auto secretKeyDataArrayBuffer =
             arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
         std::vector<uint8_t> sig(crypto_sign_BYTES);
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          crypto_sign_detached(sig.data(), NULL, reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), secretKeyDataArrayBuffer.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          crypto_sign_detached(sig.data(), NULL, messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), secretKeyDataArrayBuffer.data(runtime));
         }
 
-        crypto_sign_detached(sig.data(), NULL, message, messageLength, secretKey);
         return arrayBufferAsObject(runtime, sig);
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached", std::move(jsi_crypto_sign_detached));
@@ -428,40 +443,31 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
-        unsigned char *signature;
-        if (arguments[signatureArgumentPosition].isString())
-        {
-          std::string signatureString = arguments[signatureArgumentPosition].asString(runtime).utf8(runtime);
-          signature = (unsigned char *)signatureString.data();
-        }
-        else
-        {
-          auto signatureArrayBuffer = arguments[signatureArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          signature = signatureArrayBuffer.data(runtime);
-        }
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+
+        auto signatureArrayBuffer = arguments[signatureArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        auto publicKeyArrayBuffer = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        int result = -1;
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          result = crypto_sign_verify_detached(
+              signatureArrayBuffer.data(runtime),
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              publicKeyArrayBuffer.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          result = crypto_sign_verify_detached(signatureArrayBuffer.data(runtime), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), publicKeyArrayBuffer.data(runtime));
         }
-
-        unsigned char *publicKey = (unsigned char *)arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-
-        int result = crypto_sign_verify_detached(signature, message, messageLength, publicKey);
 
         return jsi::Value(static_cast<bool>(result == 0));
       });
@@ -478,7 +484,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -488,27 +494,23 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+        auto nonce = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto key = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        std::vector<uint8_t> ciphertext;
+
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          ciphertext.resize(messageString.length() + crypto_secretbox_MACBYTES);
+          crypto_secretbox_easy(ciphertext.data(), reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), nonce.data(runtime), key.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          ciphertext.resize(messageArrayBuffer.length(runtime) + crypto_secretbox_MACBYTES);
+          crypto_secretbox_easy(ciphertext.data(), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), nonce.data(runtime), key.data(runtime));
         }
-        unsigned char *nonce = (unsigned char *)arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-        unsigned char *key = (unsigned char *)arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
 
-        uint64_t ciphertextLength = messageLength + crypto_secretbox_MACBYTES;
-        std::vector<uint8_t> ciphertext(ciphertextLength);
-
-        crypto_secretbox_easy(ciphertext.data(), message, messageLength, nonce, key);
         return arrayBufferAsObject(runtime, ciphertext);
       });
 
@@ -524,7 +526,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -533,27 +535,37 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
-        unsigned char *ciphertext;
-        uint64_t ciphertextLength;
-        if (arguments[ciphertextArgumentPosition].isString())
+
+        auto nonceArrayBuffer = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        std::vector<uint8_t> message;
+        int result = -1;
+
+        if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          ciphertext = (unsigned char *)ciphertextString.data();
-          ciphertextLength = ciphertextString.length();
+          uint64_t messageLength = ciphertextString.length() - crypto_secretbox_MACBYTES;
+          message.resize(messageLength);
+          result = crypto_secretbox_open_easy(
+              message.data(),
+              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
+              ciphertextString.length(),
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
         else
         {
           auto ciphertextArrayBuffer = arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          ciphertext = ciphertextArrayBuffer.data(runtime);
-          ciphertextLength = ciphertextArrayBuffer.length(runtime);
+
+          uint64_t messageLength = ciphertextArrayBuffer.length(runtime) - crypto_secretbox_MACBYTES;
+          message.resize(messageLength);
+          result = crypto_secretbox_open_easy(
+              message.data(),
+              ciphertextArrayBuffer.data(runtime),
+              ciphertextArrayBuffer.length(runtime),
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
-        unsigned char *nonce = (unsigned char *)arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-        unsigned char *key = (unsigned char *)arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-
-        uint64_t messageLength = ciphertextLength - crypto_secretbox_MACBYTES;
-        std::vector<uint8_t> message(messageLength);
-
-        int result = crypto_secretbox_open_easy(message.data(), ciphertext, ciphertextLength, nonce, key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);
@@ -571,7 +583,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -585,29 +597,36 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int secretKeyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[secretKeyArgumentPosition], secretKeyArgumentName, true);
 
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+        auto nonce = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto secretKey = arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        std::vector<uint8_t> ciphertext;
+        int result = -1;
+
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          ciphertext.resize(messageString.length() + crypto_box_MACBYTES);
+          result = crypto_box_easy(
+              ciphertext.data(),
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              nonce.data(runtime),
+              publicKey.data(runtime),
+              secretKey.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          ciphertext.resize(messageArrayBuffer.length(runtime) + crypto_box_MACBYTES);
+          result = crypto_box_easy(
+              ciphertext.data(),
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              nonce.data(runtime),
+              publicKey.data(runtime),
+              secretKey.data(runtime));
         }
-
-        unsigned char *nonce = (unsigned char *)arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-        unsigned char *publicKey = (unsigned char *)arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-        unsigned char *secretKey = (unsigned char *)arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-
-        uint64_t ciphertextLength = messageLength + crypto_box_MACBYTES;
-        std::vector<uint8_t> ciphertext(ciphertextLength);
-
-        int result = crypto_box_easy(ciphertext.data(), message, messageLength, nonce, publicKey, secretKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, ciphertext);
@@ -625,7 +644,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -639,36 +658,42 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int secretKeyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[secretKeyArgumentPosition], secretKeyArgumentName, true);
 
-        unsigned char *ciphertext;
-        uint64_t ciphertextLength;
-        if (arguments[ciphertextArgumentPosition].isString())
+        auto nonceArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+
+        auto publicKeyArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+
+        auto secretKeyArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+
+        std::vector<uint8_t> message;
+        int result = -1;
+
+        if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          ciphertext = (unsigned char *)ciphertextString.data();
-          ciphertextLength = ciphertextString.length();
+          message.resize(ciphertextString.length() - crypto_box_MACBYTES);
+          result = crypto_box_open_easy(
+              message.data(),
+              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
+              ciphertextString.length(),
+              nonceArrayBuffer.data(runtime),
+              publicKeyArrayBuffer.data(runtime),
+              secretKeyArrayBuffer.data(runtime));
         }
         else
         {
           auto ciphertextArrayBuffer = arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          ciphertext = ciphertextArrayBuffer.data(runtime);
-          ciphertextLength = ciphertextArrayBuffer.length(runtime);
+          message.resize(ciphertextArrayBuffer.length(runtime) - crypto_box_MACBYTES);
+          result = crypto_box_open_easy(
+              message.data(),
+              ciphertextArrayBuffer.data(runtime),
+              ciphertextArrayBuffer.length(runtime),
+              nonceArrayBuffer.data(runtime),
+              publicKeyArrayBuffer.data(runtime),
+              secretKeyArrayBuffer.data(runtime));
         }
-        auto nonceDataArrayBuffer =
-            arguments[1].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-        auto publicKeyDataArrayBuffer =
-            arguments[2].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
-
-        auto secretKeyDataArrayBuffer =
-            arguments[3].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
-
-        uint64_t message_length = ciphertextLength - crypto_box_MACBYTES;
-        std::vector<uint8_t> message(message_length);
-
-        int result = crypto_box_open_easy(message.data(), ciphertext, ciphertextLength, nonce, publicKey, secretKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);
@@ -690,7 +715,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string passwordArgumentName = "password";
         unsigned int passwordArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
+        JsiArgType passwordArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
 
         std::string saltArgumentName = "salt";
         unsigned int saltArgumentPosition = 2;
@@ -709,35 +734,41 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         validateIsNumber(functionName, runtime, arguments[algorithmArgumentPosition], algorithmArgumentName, true);
 
         int keyLength = arguments[keyLengthArgumentPosition].asNumber();
-
-        const unsigned int position = passwordArgumentPosition;
-        unsigned char *password;
-        uint64_t passwordLength;
-        if (arguments[position].isString())
-        {
-          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
-          password = (unsigned char *)dataString.data();
-          passwordLength = dataString.length();
-        }
-        else
-        {
-          auto dataArrayBuffer =
-              arguments[position].asObject(runtime).getArrayBuffer(runtime);
-          password = dataArrayBuffer.data(runtime);
-          passwordLength = dataArrayBuffer.length(runtime);
-        }
-
         auto saltDataArrayBuffer =
             arguments[saltArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *salt = saltDataArrayBuffer.data(runtime);
-
         int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
         int memLimit = arguments[memLimitArgumentPosition].asNumber();
         int algorithm = arguments[algorithmArgumentPosition].asNumber();
-
         std::vector<uint8_t> key(keyLength);
 
-        int result = crypto_pwhash(key.data(), keyLength, (const char *)password, passwordLength, salt, opsLimit, memLimit, algorithm);
+        int result = -1;
+        if (passwordArgType == JsiArgType::string)
+        {
+          std::string passwordString = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
+          result = crypto_pwhash(
+              key.data(),
+              keyLength,
+              reinterpret_cast<const char *>(passwordString.data()),
+              passwordString.length(),
+              saltDataArrayBuffer.data(runtime),
+              opsLimit,
+              memLimit,
+              algorithm);
+        }
+        else
+        {
+          auto passwordArrayBuffer =
+              arguments[passwordArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          result = crypto_pwhash(
+              key.data(),
+              keyLength,
+              reinterpret_cast<const char *>(passwordArrayBuffer.data(runtime)),
+              passwordArrayBuffer.length(runtime),
+              saltDataArrayBuffer.data(runtime),
+              opsLimit,
+              memLimit,
+              algorithm);
+        }
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, key);
@@ -767,27 +798,34 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string masterKeyArgumentName = "masterKey";
         unsigned int masterKeyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
+        JsiArgType masterKeyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
 
+        std::string context = arguments[contextArgumentPosition].asString(runtime).utf8(runtime);
         int subkeyLength = arguments[subkeyLengthArgumentPosition].asNumber();
         int subkeyId = arguments[subkeyIdArgumentPosition].asNumber();
-        std::string context = arguments[contextArgumentPosition].asString(runtime).utf8(runtime);
+        std::vector<uint8_t> subkey(subkeyLength);
 
-        unsigned char *masterKey;
-        if (arguments[masterKeyArgumentPosition].isString())
+        int result = -1;
+        if (masterKeyArgType == JsiArgType::string)
         {
           std::string masterKeyString = arguments[masterKeyArgumentPosition].asString(runtime).utf8(runtime);
-          masterKey = (unsigned char *)masterKeyString.data();
+          result = crypto_kdf_derive_from_key(
+              subkey.data(),
+              subkeyLength,
+              subkeyId,
+              reinterpret_cast<const char *>(context.data()),
+              reinterpret_cast<const unsigned char *>(masterKeyString.data()));
         }
         else
         {
           auto masterKeyArrayBuffer = arguments[masterKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          masterKey = masterKeyArrayBuffer.data(runtime);
+          result = crypto_kdf_derive_from_key(
+              subkey.data(),
+              subkeyLength,
+              subkeyId,
+              reinterpret_cast<const char *>(context.data()),
+              masterKeyArrayBuffer.data(runtime));
         }
-
-        std::vector<uint8_t> subkey(subkeyLength);
-
-        int result = crypto_kdf_derive_from_key(subkey.data(), subkeyLength, subkeyId, const_cast<char *>(reinterpret_cast<const char *>(context.data())), masterKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, subkey);
@@ -805,7 +843,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -819,46 +857,48 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
-        const unsigned int position = messageArgumentPosition;
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[position].isString())
+        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
+        auto nonceArrayBuffer =
+            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyArrayBuffer =
+            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        std::vector<uint8_t> ciphertext;
+        int result = -1;
+
+        if (messageArgType == JsiArgType::string)
         {
-          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
-          message = (unsigned char *)dataString.data();
-          messageLength = dataString.length();
+          std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+          uint64_t ciphertextLength = messageString.length() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          ciphertext.resize(ciphertextLength);
+          result = crypto_aead_xchacha20poly1305_ietf_encrypt(
+              ciphertext.data(),
+              &ciphertextLength,
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
+              additionalData.length(),
+              NULL,
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
         else
         {
-          auto dataArrayBuffer =
-              arguments[position].asObject(runtime).getArrayBuffer(runtime);
-          message = dataArrayBuffer.data(runtime);
-          messageLength = dataArrayBuffer.length(runtime);
+          auto messageArrayBuffer =
+              arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          uint64_t ciphertextLength = messageArrayBuffer.length(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          ciphertext.resize(ciphertextLength);
+          result = crypto_aead_xchacha20poly1305_ietf_encrypt(
+              ciphertext.data(),
+              &ciphertextLength,
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
+              additionalData.length(),
+              NULL,
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
-
-        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
-
-        auto nonceDataArrayBuffer =
-            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-        auto keyDataArrayBuffer =
-            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *key = keyDataArrayBuffer.data(runtime);
-
-        uint64_t ciphertextLength = messageLength + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        std::vector<uint8_t> ciphertext(ciphertextLength);
-
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(
-            ciphertext.data(),
-            &ciphertextLength,
-            message,
-            messageLength,
-            const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(additionalData.data())),
-            additionalData.length(),
-            NULL,
-            nonce,
-            key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, ciphertext);
@@ -876,7 +916,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -890,46 +930,47 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
-        const unsigned int position = ciphertextArgumentPosition;
-        unsigned char *ciphertext;
-        uint64_t ciphertextLength;
-        if (arguments[position].isString())
+        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
+        auto nonceDataArrayBuffer =
+            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyDataArrayBuffer =
+            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        std::vector<uint8_t> message;
+
+        int result = -1;
+        if (ciphertextArgType == JsiArgType::string)
         {
-          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
-          ciphertext = (unsigned char *)dataString.data();
-          ciphertextLength = dataString.length();
+          std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
+          uint64_t messageLength = ciphertextString.length() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          message.resize(messageLength);
+          result = crypto_aead_xchacha20poly1305_ietf_decrypt(
+              message.data(),
+              &messageLength,
+              NULL,
+              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
+              ciphertextString.length(),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
+              additionalData.length(),
+              nonceDataArrayBuffer.data(runtime),
+              keyDataArrayBuffer.data(runtime));
         }
         else
         {
-          auto dataArrayBuffer =
-              arguments[position].asObject(runtime).getArrayBuffer(runtime);
-          ciphertext = dataArrayBuffer.data(runtime);
-          ciphertextLength = dataArrayBuffer.length(runtime);
+          auto ciphertextArrayBuffer =
+              arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          uint64_t messageLength = ciphertextArrayBuffer.length(runtime) - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          message.resize(messageLength);
+          result = crypto_aead_xchacha20poly1305_ietf_decrypt(
+              message.data(),
+              &messageLength,
+              NULL,
+              ciphertextArrayBuffer.data(runtime),
+              ciphertextArrayBuffer.length(runtime),
+              reinterpret_cast<const unsigned char *>(additionalData.data()),
+              additionalData.length(),
+              nonceDataArrayBuffer.data(runtime),
+              keyDataArrayBuffer.data(runtime));
         }
-
-        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
-
-        auto nonceDataArrayBuffer =
-            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-        auto keyDataArrayBuffer =
-            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *key = keyDataArrayBuffer.data(runtime);
-
-        uint64_t messageLength = ciphertextLength - crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        std::vector<uint8_t> message(messageLength);
-
-        int result = crypto_aead_xchacha20poly1305_ietf_decrypt(
-            message.data(),
-            &messageLength,
-            NULL,
-            ciphertext,
-            ciphertextLength,
-            (unsigned char *)additionalData.data(),
-            additionalData.length(),
-            nonce,
-            key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);

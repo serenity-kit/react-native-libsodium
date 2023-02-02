@@ -419,6 +419,9 @@ export function crypto_pwhash(
   algorithm: number,
   outputFormat: OutputFormat
 ) {
+  if (salt.length !== crypto_pwhash_SALTBYTES) {
+    throw new Error('invalid salt length');
+  }
   let result: ArrayBuffer;
   const passwordParam =
     typeof password === 'string' ? password : password.buffer;
