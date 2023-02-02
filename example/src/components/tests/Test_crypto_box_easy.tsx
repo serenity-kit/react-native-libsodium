@@ -39,11 +39,25 @@ export const Test_crypto_box_easy: React.FC = () => {
     95, 224, 157, 125, 40, 151, 150, 147, 223, 7, 153, 132, 32, 92, 36,
   ]);
 
+  let throwErrorForInvalidPrivateKey = false;
+  try {
+    crypto_box_easy(
+      message,
+      nonce,
+      receiverKeyPair.publicKey,
+      // @ts-expect-error
+      'wrong_private_ke'
+    );
+  } catch (e) {
+    throwErrorForInvalidPrivateKey = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_box_easy"
         success={
+          throwErrorForInvalidPrivateKey &&
           isEqualUint8Array(
             crypto_box_easy(
               message,
