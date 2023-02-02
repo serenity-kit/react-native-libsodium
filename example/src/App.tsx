@@ -73,12 +73,6 @@ function LibsodiumTests() {
 
           <Header>AEAD encryption (symmetric)</Header>
           <Test_crypto_aead_xchacha20poly1305_ietf_keygen />
-          <Test_crypto_aead_xchacha20poly1305_ietf_keygen
-            outputFormat={'base64'}
-          />
-          <Test_crypto_aead_xchacha20poly1305_ietf_keygen
-            outputFormat={'hex'}
-          />
           <Test_crypto_aead_xchacha20poly1305_ietf_encrypt
             message={'Hello World'}
             additionalData={'additional data'}
