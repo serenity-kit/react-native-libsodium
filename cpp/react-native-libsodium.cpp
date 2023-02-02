@@ -180,32 +180,36 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+        JsiArgType valueArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
 
         std::string variantArgumentName = "variant";
         unsigned int variantArgumentPosition = 1;
         validateIsNumber(functionName, runtime, arguments[variantArgumentPosition], variantArgumentName, true);
 
-        unsigned char *data;
-        uint64_t dataLength;
-        if (arguments[valueArgumentPosition].isString())
+        std::string base64String;
+        uint8_t variant = arguments[variantArgumentPosition].asNumber();
+
+        if (valueArgType == JsiArgType::string)
         {
           std::string dataString = arguments[valueArgumentPosition].asString(runtime).utf8(runtime);
-          data = (unsigned char *)dataString.data();
-          dataLength = dataString.length();
+          base64String.resize(sodium_base64_encoded_len(dataString.length(), variant));
+          sodium_bin2base64(
+              const_cast<char *>(reinterpret_cast<const char *>(base64String.data())), base64String.size(),
+              reinterpret_cast<const unsigned char *>(dataString.data()),
+              dataString.length(),
+              variant);
         }
         else
         {
           auto dataArrayBuffer = arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          data = dataArrayBuffer.data(runtime);
-          dataLength = dataArrayBuffer.length(runtime);
+          base64String.resize(sodium_base64_encoded_len(dataArrayBuffer.length(runtime), variant));
+          sodium_bin2base64(
+              const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+              base64String.size(),
+              dataArrayBuffer.data(runtime),
+              dataArrayBuffer.length(runtime),
+              variant);
         }
-
-        uint8_t variant = arguments[variantArgumentPosition].asNumber();
-
-        std::string base64String;
-        base64String.resize(sodium_base64_encoded_len(dataLength, variant));
-        sodium_bin2base64(reinterpret_cast<char *>(base64String.data()), base64String.size(), data, dataLength, variant);
 
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (base64String.length() && base64String[base64String.length() - 1] == '\0')
@@ -228,26 +232,31 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
-        unsigned char *data;
-        uint64_t dataLength;
-        if (arguments[valueArgumentPosition].isString())
+        JsiArgType valueArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+
+        std::string hexString;
+
+        if (valueArgType == JsiArgType::string)
         {
           std::string dataString = arguments[valueArgumentPosition].asString(runtime).utf8(runtime);
-          data = (unsigned char *)dataString.data();
-          dataLength = dataString.length();
+          hexString.resize(dataString.length() * 2 + 1);
+          sodium_bin2hex(
+              const_cast<char *>(reinterpret_cast<const char *>(hexString.data())),
+              hexString.length(),
+              reinterpret_cast<const unsigned char *>(dataString.data()),
+              dataString.length());
         }
         else
         {
           auto dataArrayBuffer = arguments[valueArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          data = dataArrayBuffer.data(runtime);
-          dataLength = dataArrayBuffer.length(runtime);
+          hexString.resize(dataArrayBuffer.length(runtime) * 2 + 1);
+          sodium_bin2hex(
+              const_cast<char *>(reinterpret_cast<const char *>(hexString.data())),
+              hexString.length(),
+              dataArrayBuffer.data(runtime),
+              dataArrayBuffer.length(runtime));
         }
 
-        std::string hexString;
-        hexString.resize(dataLength * 2 + 1);
-
-        sodium_bin2hex(reinterpret_cast<char *>(hexString.data()), hexString.length(), data, dataLength);
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (hexString.length() && hexString[hexString.length() - 1] == '\0')
         {
