@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  crypto_secretbox_keygen,
   crypto_secretbox_open_easy,
   to_base64,
   to_string,
@@ -22,11 +23,26 @@ export const Test_crypto_secretbox_open_easy: React.FC = () => {
     95, 224, 157, 125, 40, 151, 150, 147, 223, 7, 153, 132, 32, 92, 36,
   ]);
 
+  let throwErrorForInvalidPrivateKey = false;
+  try {
+    crypto_secretbox_open_easy(
+      new Uint8Array([
+        107, 200, 44, 53, 220, 73, 233, 105, 148, 23, 198, 167, 238, 238, 50,
+        158, 211, 196, 113, 159, 40, 6, 156, 203, 145, 204, 154,
+      ]),
+      nonce,
+      crypto_secretbox_keygen() // random private key
+    );
+  } catch (e) {
+    throwErrorForInvalidPrivateKey = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_secretbox_open_easy"
         success={
+          throwErrorForInvalidPrivateKey &&
           to_string(
             crypto_secretbox_open_easy(
               new Uint8Array([

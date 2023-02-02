@@ -25,10 +25,29 @@ export const Test_crypto_sign_verify_detached: React.FC = () => {
     178, 31, 178, 48, 132, 136, 226, 123, 218, 227, 79, 228, 199, 161, 3, 71,
   ]);
 
+  let throwErrorForInvalidPublicKey = false;
+  try {
+    crypto_sign_verify_detached(
+      new Uint8Array([
+        154, 39, 102, 2, 196, 230, 161, 247, 167, 233, 155, 107, 60, 147, 34,
+        127, 184, 171, 14, 160, 82, 141, 238, 184, 214, 212, 171, 91, 142, 14,
+        156, 25, 89, 190, 173, 162, 109, 217, 249, 251, 2, 48, 82, 74, 113, 85,
+        136, 138, 200, 168, 70, 229, 251, 204, 208, 244, 105, 184, 217, 146,
+        173, 186, 63, 7,
+      ]),
+      message,
+      // @ts-expect-error
+      'invalid_public_key'
+    );
+  } catch (e) {
+    throwErrorForInvalidPublicKey = true;
+  }
+
   return (
     <FunctionStatus
       name="crypto_sign_verify_detached"
       success={
+        throwErrorForInvalidPublicKey &&
         crypto_sign_verify_detached(
           new Uint8Array([
             154, 39, 102, 2, 196, 230, 161, 247, 167, 233, 155, 107, 60, 147,

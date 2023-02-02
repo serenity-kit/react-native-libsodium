@@ -26,10 +26,22 @@ export const Test_crypto_sign_detached: React.FC = () => {
     178, 31, 178, 48, 132, 136, 226, 123, 218, 227, 79, 228, 199, 161, 3, 71,
   ]);
 
+  let throwErrorForInvalidPrivateKey = false;
+  try {
+    crypto_sign_detached(
+      message,
+      // @ts-expect-error
+      'wrong_private_key'
+    );
+  } catch (e) {
+    throwErrorForInvalidPrivateKey = true;
+  }
+
   return (
     <FunctionStatus
       name="crypto_sign_detached"
       success={
+        throwErrorForInvalidPrivateKey &&
         isEqualUint8Array(
           crypto_sign_detached(message, keyPair.privateKey),
           new Uint8Array([
