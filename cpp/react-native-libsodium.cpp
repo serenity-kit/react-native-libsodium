@@ -437,40 +437,27 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 1;
-        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
-        unsigned char *signature;
-        if (arguments[signatureArgumentPosition].isString())
-        {
-          std::string signatureString = arguments[signatureArgumentPosition].asString(runtime).utf8(runtime);
-          signature = (unsigned char *)signatureString.data();
-        }
-        else
-        {
-          auto signatureArrayBuffer = arguments[signatureArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          signature = signatureArrayBuffer.data(runtime);
-        }
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+
+        auto signatureArrayBuffer = arguments[signatureArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        auto publicKeyArrayBuffer = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        int result = -1;
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          result = crypto_sign_verify_detached(signatureArrayBuffer.data(runtime), (uint8_t *)messageString.data(), messageString.length(), publicKeyArrayBuffer.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          result = crypto_sign_verify_detached(signatureArrayBuffer.data(runtime), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), publicKeyArrayBuffer.data(runtime));
         }
-
-        unsigned char *publicKey = (unsigned char *)arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime).data(runtime);
-
-        int result = crypto_sign_verify_detached(signature, message, messageLength, publicKey);
 
         return jsi::Value(static_cast<bool>(result == 0));
       });
