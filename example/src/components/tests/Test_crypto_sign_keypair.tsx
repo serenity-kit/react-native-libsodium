@@ -6,8 +6,6 @@ export const Test_crypto_sign_keypair: React.FC = () => {
   const keyPair = crypto_sign_keypair();
   const keyPairBase64 = crypto_sign_keypair('base64');
 
-  console.log(keyPairBase64.publicKey.length, keyPairBase64.privateKey.length);
-
   return (
     <FunctionStatus
       name="crypto_sign_keypair"

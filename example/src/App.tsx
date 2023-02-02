@@ -58,14 +58,8 @@ function LibsodiumTests() {
 
           <Header>signing</Header>
           <Test_crypto_sign_keypair />
-          <Test_crypto_sign_detached message={'Hello World'} />
-          <Test_crypto_sign_detached
-            message={from_base64(to_base64('Hello World'))}
-          />
-          <Test_crypto_sign_verify_detached message={'Hello World'} />
-          <Test_crypto_sign_verify_detached
-            message={from_base64(to_base64('Hello World'))}
-          />
+          <Test_crypto_sign_detached />
+          <Test_crypto_sign_verify_detached />
 
           <Header>Box Encryption (Asymmetric Key)</Header>
           <Test_crypto_box_keypair />

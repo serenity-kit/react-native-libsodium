@@ -11,6 +11,12 @@
 // syntactic sugar around the JSI objects. ex. call: jsi::Function
 using namespace facebook;
 
+enum class JsiArgType
+{
+  string,
+  arrayBuffer
+};
+
 // Convert an array buffer to a JavaScript object
 jsi::Object arrayBufferAsObject(jsi::Runtime &runtime, std::vector<uint8_t> &data)
 {
@@ -59,14 +65,22 @@ void validateIsArrayBuffer(const std::string &functionName, jsi::Runtime &runtim
   }
 }
 
-void validateIsStringArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
+JsiArgType validateIsStringOrArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
 {
   if (required)
   {
     validateRequired(functionName, runtime, argument, argumentName);
   }
-  if (!(argument.isString() || (argument.isObject() &&
-                                argument.asObject(runtime).isArrayBuffer(runtime))))
+  if (argument.isString())
+  {
+    return JsiArgType::string;
+  }
+  else if (argument.isObject() &&
+           argument.asObject(runtime).isArrayBuffer(runtime))
+  {
+    return JsiArgType::arrayBuffer;
+  }
+  else
   {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be a string or an ArrayBuffer";
     throw jsi::JSError(runtime, errorMessage);
@@ -168,7 +182,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
 
         std::string variantArgumentName = "variant";
         unsigned int variantArgumentPosition = 1;
@@ -216,7 +230,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName, true);
         unsigned char *data;
         uint64_t dataLength;
         if (arguments[valueArgumentPosition].isString())
@@ -383,7 +397,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string secretKeyArgumentName = "secretKey";
         unsigned int secretKeyArgumentPosition = 1;
@@ -394,22 +408,17 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
         std::vector<uint8_t> sig(crypto_sign_BYTES);
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[messageArgumentPosition].isString())
+        if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          message = (unsigned char *)messageString.data();
-          messageLength = messageString.length();
+          crypto_sign_detached(sig.data(), NULL, (uint8_t *)messageString.data(), messageString.length(), secretKey);
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          message = messageArrayBuffer.data(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
+          crypto_sign_detached(sig.data(), NULL, messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), secretKey);
         }
 
-        crypto_sign_detached(sig.data(), NULL, message, messageLength, secretKey);
         return arrayBufferAsObject(runtime, sig);
       });
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_detached", std::move(jsi_crypto_sign_detached));
@@ -428,7 +437,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string publicKeyArgumentName = "publicKey";
         unsigned int publicKeyArgumentPosition = 2;
@@ -478,7 +487,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -524,7 +533,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -571,7 +580,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -625,7 +634,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -690,7 +699,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string passwordArgumentName = "password";
         unsigned int passwordArgumentPosition = 1;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
 
         std::string saltArgumentName = "salt";
         unsigned int saltArgumentPosition = 2;
@@ -767,7 +776,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string masterKeyArgumentName = "masterKey";
         unsigned int masterKeyArgumentPosition = 3;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[masterKeyArgumentPosition], masterKeyArgumentName, true);
 
         int subkeyLength = arguments[subkeyLengthArgumentPosition].asNumber();
         int subkeyId = arguments[subkeyIdArgumentPosition].asNumber();
@@ -805,7 +814,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -876,7 +885,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
