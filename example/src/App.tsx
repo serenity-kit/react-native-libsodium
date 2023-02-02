@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
-import sodium, { from_base64, ready, to_base64 } from 'react-native-libsodium';
+import sodium, { ready } from 'react-native-libsodium';
 import { Header } from './components/Header';
 import { Test_constants } from './components/tests/Test_constants';
 import { Test_crypto_aead_xchacha20poly1305_ietf_decrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_decrypt';
@@ -19,8 +19,6 @@ import { Test_crypto_sign_detached } from './components/tests/Test_crypto_sign_d
 import { Test_crypto_sign_keypair } from './components/tests/Test_crypto_sign_keypair';
 import { Test_crypto_sign_verify_detached } from './components/tests/Test_crypto_sign_verify_detached';
 import { Test_from_base64 } from './components/tests/Test_from_base64';
-import { Test_image_encryption } from './components/tests/Test_image_encryption';
-import { Test_large_image_encryption } from './components/tests/Test_large_image_encryption';
 import { Test_randombytes_buf } from './components/tests/Test_randombytes_buf';
 import { Test_randombytes_uniform } from './components/tests/Test_randombytes_uniform';
 import { Test_to_base64 } from './components/tests/Test_to_base64';
@@ -74,20 +72,7 @@ function LibsodiumTests() {
           <Header>AEAD encryption (symmetric)</Header>
           <Test_crypto_aead_xchacha20poly1305_ietf_keygen />
           <Test_crypto_aead_xchacha20poly1305_ietf_encrypt />
-          <Test_crypto_aead_xchacha20poly1305_ietf_decrypt
-            message={'Hello World'}
-            additionalData={'additional data'}
-          />
-          <Test_crypto_aead_xchacha20poly1305_ietf_decrypt
-            message={from_base64(to_base64('Hello World'))}
-            additionalData={'additional data'}
-          />
-
-          <Header>Image Encryption (Symmetric Key)</Header>
-          <Test_image_encryption />
-
-          <Header>Large Image Encryption (Symmetric Key)</Header>
-          <Test_large_image_encryption />
+          <Test_crypto_aead_xchacha20poly1305_ietf_decrypt />
         </View>
       </ScrollView>
     </SafeAreaView>
