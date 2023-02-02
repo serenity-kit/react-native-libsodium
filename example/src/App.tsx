@@ -6,6 +6,7 @@ import { Test_constants } from './components/tests/Test_constants';
 import { Test_crypto_aead_xchacha20poly1305_ietf_decrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_decrypt';
 import { Test_crypto_aead_xchacha20poly1305_ietf_encrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_encrypt';
 import { Test_crypto_aead_xchacha20poly1305_ietf_keygen } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_keygen';
+import { Test_crypto_box_easy } from './components/tests/Test_crypto_box_easy';
 import { Test_crypto_box_keypair } from './components/tests/Test_crypto_box_keypair';
 import { Test_crypto_box_open_easy } from './components/tests/Test_crypto_box_open_easy';
 import { Test_crypto_kdf_derive_from_key } from './components/tests/Test_crypto_kdf_derive_from_key';
@@ -62,14 +63,8 @@ function LibsodiumTests() {
 
           <Header>Box Encryption (Asymmetric Key)</Header>
           <Test_crypto_box_keypair />
-          {/* <Test_crypto_box_easy message={'Hello World'} />
-          <Test_crypto_box_easy
-            message={from_base64(to_base64('Hello World'))}
-          /> */}
+          <Test_crypto_box_easy />
           <Test_crypto_box_open_easy message={'Hello World'} />
-          <Test_crypto_box_open_easy
-            message={from_base64(to_base64('Hello World'))}
-          />
 
           <Header>Secret Box Encryption (Symmetric Key)</Header>
           <Test_crypto_secretbox_keygen />
