@@ -411,7 +411,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          crypto_sign_detached(sig.data(), NULL, (uint8_t *)messageString.data(), messageString.length(), secretKey);
+          crypto_sign_detached(sig.data(), NULL, reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), secretKey);
         }
         else
         {
@@ -451,7 +451,11 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          result = crypto_sign_verify_detached(signatureArrayBuffer.data(runtime), (uint8_t *)messageString.data(), messageString.length(), publicKeyArrayBuffer.data(runtime));
+          result = crypto_sign_verify_detached(
+              signatureArrayBuffer.data(runtime),
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              publicKeyArrayBuffer.data(runtime));
         }
         else
         {
@@ -492,7 +496,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
           ciphertext.resize(messageString.length() + crypto_secretbox_MACBYTES);
-          crypto_secretbox_easy(ciphertext.data(), (uint8_t *)messageString.data(), messageString.length(), nonce.data(runtime), key.data(runtime));
+          crypto_secretbox_easy(ciphertext.data(), reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), nonce.data(runtime), key.data(runtime));
         }
         else
         {
@@ -587,13 +591,25 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
           ciphertext.resize(messageString.length() + crypto_box_MACBYTES);
-          result = crypto_box_easy(ciphertext.data(), (uint8_t *)messageString.data(), messageString.length(), nonce.data(runtime), publicKey.data(runtime), secretKey.data(runtime));
+          result = crypto_box_easy(
+              ciphertext.data(),
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              nonce.data(runtime),
+              publicKey.data(runtime),
+              secretKey.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
           ciphertext.resize(messageArrayBuffer.length(runtime) + crypto_box_MACBYTES);
-          result = crypto_box_easy(ciphertext.data(), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), nonce.data(runtime), publicKey.data(runtime), secretKey.data(runtime));
+          result = crypto_box_easy(
+              ciphertext.data(),
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              nonce.data(runtime),
+              publicKey.data(runtime),
+              secretKey.data(runtime));
         }
 
         throwOnBadResult(functionName, runtime, result);
@@ -642,13 +658,25 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
           message.resize(ciphertextString.length() - crypto_box_MACBYTES);
-          result = crypto_box_open_easy(message.data(), (uint8_t *)ciphertextString.data(), ciphertextString.length(), nonceArrayBuffer.data(runtime), publicKeyArrayBuffer.data(runtime), secretKeyArrayBuffer.data(runtime));
+          result = crypto_box_open_easy(
+              message.data(),
+              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
+              ciphertextString.length(),
+              nonceArrayBuffer.data(runtime),
+              publicKeyArrayBuffer.data(runtime),
+              secretKeyArrayBuffer.data(runtime));
         }
         else
         {
           auto ciphertextArrayBuffer = arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
           message.resize(ciphertextArrayBuffer.length(runtime) - crypto_box_MACBYTES);
-          result = crypto_box_open_easy(message.data(), ciphertextArrayBuffer.data(runtime), ciphertextArrayBuffer.length(runtime), nonceArrayBuffer.data(runtime), publicKeyArrayBuffer.data(runtime), secretKeyArrayBuffer.data(runtime));
+          result = crypto_box_open_easy(
+              message.data(),
+              ciphertextArrayBuffer.data(runtime),
+              ciphertextArrayBuffer.length(runtime),
+              nonceArrayBuffer.data(runtime),
+              publicKeyArrayBuffer.data(runtime),
+              secretKeyArrayBuffer.data(runtime));
         }
 
         throwOnBadResult(functionName, runtime, result);
@@ -817,7 +845,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
           result = crypto_aead_xchacha20poly1305_ietf_encrypt(
               ciphertext.data(),
               &ciphertextLength,
-              (uint8_t *)messageString.data(),
+              reinterpret_cast<const unsigned char *>(messageString.data()),
               messageString.length(),
               const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(additionalData.data())),
               additionalData.length(),
