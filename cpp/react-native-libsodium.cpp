@@ -152,9 +152,9 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         size_t length = 0;
         int result = sodium_base642bin(
-            reinterpret_cast<uint8_t *>(uint8Vector.data()),
+            reinterpret_cast<unsigned char *>(uint8Vector.data()),
             uint8Vector.size(),
-            const_cast<char *>(reinterpret_cast<const char *>(base64String.data())),
+            reinterpret_cast<const char *>(base64String.data()),
             base64String.size(),
             nullptr,
             &length,
@@ -164,9 +164,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         throwOnBadResult(functionName, runtime, result);
 
         uint8Vector.resize(length);
-
         jsi::Object returnBufferAsObject = arrayBufferAsObject(runtime, uint8Vector);
-
         return returnBufferAsObject;
       });
 
@@ -207,7 +205,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string base64String;
         base64String.resize(sodium_base64_encoded_len(dataLength, variant));
-        sodium_bin2base64(const_cast<char *>(reinterpret_cast<const char *>(base64String.data())), base64String.size(), data, dataLength, variant);
+        sodium_bin2base64(reinterpret_cast<char *>(base64String.data()), base64String.size(), data, dataLength, variant);
 
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (base64String.length() && base64String[base64String.length() - 1] == '\0')
@@ -249,7 +247,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string hexString;
         hexString.resize(dataLength * 2 + 1);
 
-        sodium_bin2hex(const_cast<char *>(reinterpret_cast<const char *>(hexString.data())), hexString.length(), data, dataLength);
+        sodium_bin2hex(reinterpret_cast<char *>(hexString.data()), hexString.length(), data, dataLength);
         // libsodium adds a nul byte (\0) terminator to the end of the string
         if (hexString.length() && hexString[hexString.length() - 1] == '\0')
         {
@@ -405,18 +403,17 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         auto secretKeyDataArrayBuffer =
             arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
 
         std::vector<uint8_t> sig(crypto_sign_BYTES);
         if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          crypto_sign_detached(sig.data(), NULL, reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), secretKey);
+          crypto_sign_detached(sig.data(), NULL, reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), secretKeyDataArrayBuffer.data(runtime));
         }
         else
         {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          crypto_sign_detached(sig.data(), NULL, messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), secretKey);
+          crypto_sign_detached(sig.data(), NULL, messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), secretKeyDataArrayBuffer.data(runtime));
         }
 
         return arrayBufferAsObject(runtime, sig);
