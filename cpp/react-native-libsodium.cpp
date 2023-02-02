@@ -786,7 +786,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
-        validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -800,46 +800,48 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
-        const unsigned int position = messageArgumentPosition;
-        unsigned char *message;
-        uint64_t messageLength;
-        if (arguments[position].isString())
+        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
+        auto nonceArrayBuffer =
+            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyArrayBuffer =
+            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        std::vector<uint8_t> ciphertext;
+        int result = -1;
+
+        if (messageArgType == JsiArgType::string)
         {
-          std::string dataString = arguments[position].asString(runtime).utf8(runtime);
-          message = (unsigned char *)dataString.data();
-          messageLength = dataString.length();
+          std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+          uint64_t ciphertextLength = messageString.length() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          ciphertext.resize(ciphertextLength);
+          result = crypto_aead_xchacha20poly1305_ietf_encrypt(
+              ciphertext.data(),
+              &ciphertextLength,
+              (uint8_t *)messageString.data(),
+              messageString.length(),
+              const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(additionalData.data())),
+              additionalData.length(),
+              NULL,
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
         else
         {
-          auto dataArrayBuffer =
-              arguments[position].asObject(runtime).getArrayBuffer(runtime);
-          message = dataArrayBuffer.data(runtime);
-          messageLength = dataArrayBuffer.length(runtime);
+          auto messageArrayBuffer =
+              arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          uint64_t ciphertextLength = messageArrayBuffer.length(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          ciphertext.resize(ciphertextLength);
+          result = crypto_aead_xchacha20poly1305_ietf_encrypt(
+              ciphertext.data(),
+              &ciphertextLength,
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(additionalData.data())),
+              additionalData.length(),
+              NULL,
+              nonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
-
-        std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
-
-        auto nonceDataArrayBuffer =
-            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-        auto keyDataArrayBuffer =
-            arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *key = keyDataArrayBuffer.data(runtime);
-
-        uint64_t ciphertextLength = messageLength + crypto_aead_xchacha20poly1305_ietf_ABYTES;
-        std::vector<uint8_t> ciphertext(ciphertextLength);
-
-        int result = crypto_aead_xchacha20poly1305_ietf_encrypt(
-            ciphertext.data(),
-            &ciphertextLength,
-            message,
-            messageLength,
-            const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(additionalData.data())),
-            additionalData.length(),
-            NULL,
-            nonce,
-            key);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, ciphertext);
