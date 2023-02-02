@@ -612,7 +612,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string nonceArgumentName = "nonce";
         unsigned int nonceArgumentPosition = 1;
@@ -626,36 +626,30 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int secretKeyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[secretKeyArgumentPosition], secretKeyArgumentName, true);
 
-        unsigned char *ciphertext;
-        uint64_t ciphertextLength;
-        if (arguments[ciphertextArgumentPosition].isString())
+        auto nonceArrayBuffer =
+            arguments[1].asObject(runtime).getArrayBuffer(runtime);
+
+        auto publicKeyArrayBuffer =
+            arguments[2].asObject(runtime).getArrayBuffer(runtime);
+
+        auto secretKeyArrayBuffer =
+            arguments[3].asObject(runtime).getArrayBuffer(runtime);
+
+        std::vector<uint8_t> message;
+        int result = -1;
+
+        if (messageArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          ciphertext = (unsigned char *)ciphertextString.data();
-          ciphertextLength = ciphertextString.length();
+          message.resize(ciphertextString.length() - crypto_box_MACBYTES);
+          result = crypto_box_open_easy(message.data(), (uint8_t *)ciphertextString.data(), ciphertextString.length(), nonceArrayBuffer.data(runtime), publicKeyArrayBuffer.data(runtime), secretKeyArrayBuffer.data(runtime));
         }
         else
         {
           auto ciphertextArrayBuffer = arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          ciphertext = ciphertextArrayBuffer.data(runtime);
-          ciphertextLength = ciphertextArrayBuffer.length(runtime);
+          message.resize(ciphertextArrayBuffer.length(runtime) - crypto_box_MACBYTES);
+          result = crypto_box_open_easy(message.data(), ciphertextArrayBuffer.data(runtime), ciphertextArrayBuffer.length(runtime), nonceArrayBuffer.data(runtime), publicKeyArrayBuffer.data(runtime), secretKeyArrayBuffer.data(runtime));
         }
-        auto nonceDataArrayBuffer =
-            arguments[1].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *nonce = nonceDataArrayBuffer.data(runtime);
-
-        auto publicKeyDataArrayBuffer =
-            arguments[2].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *publicKey = publicKeyDataArrayBuffer.data(runtime);
-
-        auto secretKeyDataArrayBuffer =
-            arguments[3].asObject(runtime).getArrayBuffer(runtime);
-        const unsigned char *secretKey = secretKeyDataArrayBuffer.data(runtime);
-
-        uint64_t message_length = ciphertextLength - crypto_box_MACBYTES;
-        std::vector<uint8_t> message(message_length);
-
-        int result = crypto_box_open_easy(message.data(), ciphertext, ciphertextLength, nonce, publicKey, secretKey);
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);

@@ -61,17 +61,17 @@ function LibsodiumTests() {
           <Test_crypto_sign_detached />
           <Test_crypto_sign_verify_detached />
 
-          <Header>Box Encryption (Asymmetric Key)</Header>
+          <Header>box encryption (asymmetric)</Header>
           <Test_crypto_box_keypair />
           <Test_crypto_box_easy />
-          <Test_crypto_box_open_easy message={'Hello World'} />
+          <Test_crypto_box_open_easy />
 
-          <Header>Secret Box Encryption (Symmetric Key)</Header>
+          <Header>secretbox encryption (symmetric)</Header>
           <Test_crypto_secretbox_keygen />
           <Test_crypto_secretbox_easy />
           <Test_crypto_secretbox_open_easy />
 
-          <Header>AEAD Encryption (Symmetric Key)</Header>
+          <Header>AEAD encryption (symmetric)</Header>
           <Test_crypto_aead_xchacha20poly1305_ietf_keygen />
           <Test_crypto_aead_xchacha20poly1305_ietf_keygen
             outputFormat={'base64'}
