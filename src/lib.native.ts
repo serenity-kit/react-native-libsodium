@@ -593,4 +593,6 @@ export default {
   to_base64,
   to_hex,
   to_string,
+  from_string,
+  base64_variants,
 };
