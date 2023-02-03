@@ -19,6 +19,7 @@ import { Test_crypto_sign_detached } from './components/tests/Test_crypto_sign_d
 import { Test_crypto_sign_keypair } from './components/tests/Test_crypto_sign_keypair';
 import { Test_crypto_sign_verify_detached } from './components/tests/Test_crypto_sign_verify_detached';
 import { Test_from_base64 } from './components/tests/Test_from_base64';
+import { Test_from_string } from './components/tests/Test_from_string';
 import { Test_randombytes_buf } from './components/tests/Test_randombytes_buf';
 import { Test_randombytes_uniform } from './components/tests/Test_randombytes_uniform';
 import { Test_to_base64 } from './components/tests/Test_to_base64';
@@ -39,6 +40,9 @@ function LibsodiumTests() {
           <Header>base64</Header>
           <Test_to_base64 />
           <Test_from_base64 />
+
+          <Header>string</Header>
+          <Test_from_string />
 
           <Header>hex</Header>
           <Test_to_hex />
