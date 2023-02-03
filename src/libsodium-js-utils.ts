@@ -76,6 +76,18 @@ export const to_string = (bytes: Uint8Array): string => {
   return totalString;
 };
 
+export const from_string = (str: string): Uint8Array => {
+  if (typeof TextEncoder === 'function') {
+    return new TextEncoder().encode(str);
+  }
+  str = unescape(encodeURIComponent(str));
+  var bytes = new Uint8Array(str.length);
+  for (var i = 0, j = str.length; i < j; i++) {
+    bytes[i] = str.charCodeAt(i);
+  }
+  return bytes;
+};
+
 // licensed under MIT, see LICENSE_Libsodiumjs
 export enum base64_variants {
   ORIGINAL = 1,
