@@ -14,7 +14,9 @@ using namespace facebook;
 enum class JsiArgType
 {
   string,
-  arrayBuffer
+  arrayBuffer,
+  null,
+  undefined
 };
 
 // Convert an array buffer to a JavaScript object
@@ -80,6 +82,14 @@ JsiArgType validateIsStringOrArrayBuffer(const std::string &functionName, jsi::R
   {
     return JsiArgType::arrayBuffer;
   }
+  else if (argument.isNull())
+  {
+    return JsiArgType::null;
+  }
+  else if (argument.isUndefined())
+  {
+    return JsiArgType::undefined;
+  }
   else
   {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be a string or an ArrayBuffer";
@@ -127,6 +137,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MAX", static_cast<int>(crypto_pwhash_BYTES_MAX));
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MIN", static_cast<int>(crypto_pwhash_BYTES_MIN));
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_CONTEXTBYTES", static_cast<int>(crypto_kdf_CONTEXTBYTES));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_BYTES", static_cast<int>(crypto_generichash_BYTES));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_BYTES_MIN", static_cast<int>(crypto_generichash_BYTES_MIN));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_BYTES_MAX", static_cast<int>(crypto_generichash_BYTES_MAX));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_KEYBYTES", static_cast<int>(crypto_generichash_KEYBYTES));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_KEYBYTES_MIN", static_cast<int>(crypto_generichash_KEYBYTES_MIN));
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_KEYBYTES_MAX", static_cast<int>(crypto_generichash_KEYBYTES_MAX));
 
   auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
       jsiRuntime,
@@ -977,6 +993,81 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       });
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt", std::move(jsi_crypto_aead_xchacha20poly1305_ietf_decrypt));
+
+  auto jsi_crypto_generichash = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_generichash"),
+      6,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        const std::string functionName = "jsi_crypto_generichash";
+
+        std::string hashLengthArgumentName = "hashLength";
+        unsigned int hashLengthArgumentPosition = 0;
+        validateIsNumber(functionName, runtime, arguments[hashLengthArgumentPosition], hashLengthArgumentName, true);
+
+        std::string messageArgumentName = "message";
+        unsigned int messageArgumentPosition = 1;
+        JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+        uint64_t messageLength = 0;
+
+        std::string keyArgumentName = "key";
+        unsigned int keyArgumentPosition = 2;
+        JsiArgType keyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, false);
+        uint64_t keyLength = 0;
+
+        int hashLength = arguments[hashLengthArgumentPosition].asNumber();
+
+        unsigned char* message;
+        unsigned char* key;
+
+        if (messageArgType == JsiArgType::string) {
+          std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+          messageLength = messageString.length();
+          message = (unsigned char *) messageString.data();
+        } else {
+          auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          messageLength = messageArrayBuffer.length(runtime);
+          message = reinterpret_cast<unsigned char *>(messageArrayBuffer.data(runtime));
+        }
+
+        if (keyArgType == JsiArgType::string) {
+          std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
+          keyLength = keyString.length();
+          key = (unsigned char*) keyString.data();
+        } else if (keyArgType == JsiArgType::arrayBuffer) {
+          auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          keyLength = keyArrayBuffer.length(runtime);
+          key = reinterpret_cast<unsigned char *>(keyArrayBuffer.data(runtime));
+        } else {
+          keyLength = 0;
+        }
+
+        std::vector<uint8_t> hash(hashLength);
+        int result = -1;
+
+        if (keyLength == 0) {
+          result = crypto_generichash(
+            hash.data(),
+            hashLength,
+            message,
+            messageLength,
+            NULL,
+            0);
+        } else {
+          result = crypto_generichash(
+            hash.data(),
+            hashLength,
+            message,
+            messageLength,
+            key,
+            keyLength);
+        }
+        throwOnBadResult(functionName, runtime, result);
+        return arrayBufferAsObject(runtime, hash);
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash", std::move(jsi_crypto_generichash));
 }
 
 void cleanUpLibsodium()

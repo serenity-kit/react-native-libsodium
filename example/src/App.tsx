@@ -11,6 +11,7 @@ import { Test_crypto_box_keypair } from './components/tests/Test_crypto_box_keyp
 import { Test_crypto_box_open_easy } from './components/tests/Test_crypto_box_open_easy';
 import { Test_crypto_kdf_derive_from_key } from './components/tests/Test_crypto_kdf_derive_from_key';
 import { Test_crypto_kdf_keygen } from './components/tests/Test_crypto_kdf_keygen';
+import { Test_crypto_generichash } from './components/tests/Test_crypto_generichash';
 import { Test_crypto_pwhash } from './components/tests/Test_crypto_pwhash';
 import { Test_crypto_secretbox_easy } from './components/tests/Test_crypto_secretbox_easy';
 import { Test_crypto_secretbox_keygen } from './components/tests/Test_crypto_secretbox_keygen';
@@ -47,7 +48,8 @@ function LibsodiumTests() {
           <Test_randombytes_buf />
           <Test_randombytes_uniform />
 
-          <Header>password hashing</Header>
+          <Header>hashing</Header>
+          <Test_crypto_generichash />
           <Test_crypto_pwhash />
 
           <Header>key derivation</Header>
