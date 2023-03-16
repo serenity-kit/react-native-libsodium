@@ -43,11 +43,7 @@ export const Test_crypto_secretbox_open_easy: React.FC = () => {
   let throwErrorForInvalidNonceLength = false;
   try {
     const badNonce = randombytes_buf(crypto_secretbox_NONCEBYTES + 1);
-    crypto_secretbox_open_easy(
-      message2,
-      badNonce,
-      key
-    );
+    crypto_secretbox_open_easy(message2, badNonce, key);
   } catch (e) {
     throwErrorForInvalidNonceLength = true;
   }
@@ -55,11 +51,7 @@ export const Test_crypto_secretbox_open_easy: React.FC = () => {
   let throwErrorForInvalidKeyLength = false;
   try {
     const badKey = randombytes_buf(crypto_secretbox_KEYBYTES + 1);
-    crypto_secretbox_open_easy(
-      message2,
-      nonce,
-      badKey
-    );
+    crypto_secretbox_open_easy(message2, nonce, badKey);
   } catch (e) {
     throwErrorForInvalidKeyLength = true;
   }
