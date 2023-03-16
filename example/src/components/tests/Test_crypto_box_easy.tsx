@@ -1,5 +1,10 @@
 import React from 'react';
-import { crypto_box_easy, to_base64 } from 'react-native-libsodium';
+import {
+  crypto_box_easy,
+  crypto_box_NONCEBYTES,
+  randombytes_buf,
+  to_base64,
+} from 'react-native-libsodium';
 import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';
 
@@ -39,6 +44,54 @@ export const Test_crypto_box_easy: React.FC = () => {
     95, 224, 157, 125, 40, 151, 150, 147, 223, 7, 153, 132, 32, 92, 36,
   ]);
 
+  let throwErrorForInvalidNonceLength = false;
+  try {
+    const badNonce = randombytes_buf(crypto_box_NONCEBYTES + 1);
+    crypto_box_easy(
+      message,
+      badNonce,
+      receiverKeyPair.publicKey,
+      senderKeyPair.privateKey
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidNonceLength = true;
+  }
+
+  let throwErrorForInvalidPublicKeyLength = false;
+  try {
+    crypto_box_easy(
+      message,
+      nonce,
+      new Uint8Array([
+        232, 167, 21, 228, 54, 165, 143, 50, 85, 27, 167, 176, 163, 211, 176, 7,
+        159, 111, 77, 250, 19, 16, 169, 199, 109, 135, 21, 253, 184, 239, 207,
+        172, 100,
+      ]),
+      senderKeyPair.privateKey
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidPublicKeyLength = true;
+  }
+
+  let throwErrorForInvalidPrivateKeyLength = false;
+  try {
+    crypto_box_easy(
+      message,
+      nonce,
+      receiverKeyPair.publicKey,
+      new Uint8Array([
+        244, 123, 174, 160, 45, 184, 205, 250, 78, 208, 138, 200, 88, 36, 126,
+        12, 19, 168, 140, 14, 151, 209, 47, 0, 36, 93, 189, 49, 182, 176, 19,
+        90, 100,
+      ])
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidPrivateKeyLength = true;
+  }
+
   let throwErrorForInvalidPrivateKey = false;
   try {
     crypto_box_easy(
@@ -58,6 +111,9 @@ export const Test_crypto_box_easy: React.FC = () => {
         name="crypto_box_easy"
         success={
           throwErrorForInvalidPrivateKey &&
+          throwErrorForInvalidNonceLength &&
+          throwErrorForInvalidPublicKeyLength &&
+          throwErrorForInvalidPrivateKeyLength &&
           isEqualUint8Array(
             crypto_box_easy(
               message,
