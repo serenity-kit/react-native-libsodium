@@ -886,14 +886,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int additionalDataArgumentPosition = 1;
         validateIsString(functionName, runtime, arguments[additionalDataArgumentPosition], additionalDataArgumentName, true);
 
-        // secret_nonce not yet implemented
-
         std::string publicNonceArgumentName = "public_nonce";
-        unsigned int publicNonceArgumentPosition = 3;
+        unsigned int publicNonceArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[publicNonceArgumentPosition], publicNonceArgumentName, true);
 
         std::string keyArgumentName = "key";
-        unsigned int keyArgumentPosition = 4;
+        unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
@@ -960,22 +958,20 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       {
         const std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt";
 
-        // secret_nonce not yet implemented
-
         std::string ciphertextArgumentName = "ciphertext";
-        unsigned int ciphertextArgumentPosition = 1;
+        unsigned int ciphertextArgumentPosition = 0;
         JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
-        unsigned int additionalDataArgumentPosition = 2;
+        unsigned int additionalDataArgumentPosition = 1;
         validateIsString(functionName, runtime, arguments[additionalDataArgumentPosition], additionalDataArgumentName, true);
 
         std::string publicNonceArgumentName = "public_nonce";
-        unsigned int publicNonceArgumentPosition = 3;
+        unsigned int publicNonceArgumentPosition = 2;
         validateIsArrayBuffer(functionName, runtime, arguments[publicNonceArgumentPosition], publicNonceArgumentName, true);
 
         std::string keyArgumentName = "key";
-        unsigned int keyArgumentPosition = 4;
+        unsigned int keyArgumentPosition = 3;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
