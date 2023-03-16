@@ -96,13 +96,15 @@ declare global {
   function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | ArrayBuffer,
     additionalData: string,
-    nonce: ArrayBuffer,
+    secret_nonce: null | undefined,
+    public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    secret_nonce: null | undefined,
     ciphertext: string | ArrayBuffer,
     additionalData: string,
-    nonce: ArrayBuffer,
+    public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
 }
@@ -500,6 +502,7 @@ export function crypto_aead_xchacha20poly1305_ietf_encrypt(
   result = global.jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     messageParam,
     additional_data,
+    null,
     public_nonce.buffer,
     key.buffer
   );
@@ -544,6 +547,7 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   const ciphertextParam =
     typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
   result = global.jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    null,
     ciphertextParam,
     additional_data,
     public_nonce.buffer,

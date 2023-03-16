@@ -496,6 +496,14 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         auto nonce = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto key = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        if (nonce.length(runtime) != crypto_secretbox_NONCEBYTES) {
+          throw jsi::JSError(runtime, "invalid nonce length");
+        }
+        if (key.length(runtime) != crypto_secretbox_KEYBYTES) {
+          throw jsi::JSError(runtime, "invalid key length");
+        }
+
         std::vector<uint8_t> ciphertext;
 
         if (messageArgType == JsiArgType::string)
@@ -538,6 +546,14 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         auto nonceArrayBuffer = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        if (nonceArrayBuffer.length(runtime) != crypto_secretbox_NONCEBYTES) {
+          throw jsi::JSError(runtime, "invalid nonce length");
+        }
+        if (keyArrayBuffer.length(runtime) != crypto_secretbox_KEYBYTES) {
+          throw jsi::JSError(runtime, "invalid key length");
+        }
+
         std::vector<uint8_t> message;
         int result = -1;
 
@@ -600,6 +616,17 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto nonce = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto secretKey = arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        if (nonce.length(runtime) != crypto_box_NONCEBYTES) {
+          throw jsi::JSError(runtime, "invalid nonce length");
+        }
+        if (publicKey.length(runtime) != crypto_box_PUBLICKEYBYTES) {
+          throw jsi::JSError(runtime, "invalid publicKey length");
+        }
+        if (secretKey.length(runtime) != crypto_box_SECRETKEYBYTES) {
+          throw jsi::JSError(runtime, "invalid privateKey length");
+        }
+
         std::vector<uint8_t> ciphertext;
         int result = -1;
 
@@ -666,6 +693,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         auto secretKeyArrayBuffer =
             arguments[3].asObject(runtime).getArrayBuffer(runtime);
+
+        if (nonceArrayBuffer.length(runtime) != crypto_box_NONCEBYTES) {
+          throw jsi::JSError(runtime, "invalid nonce length");
+        }
+        if (publicKeyArrayBuffer.length(runtime) != crypto_box_PUBLICKEYBYTES) {
+          throw jsi::JSError(runtime, "invalid publicKey length");
+        }
+        if (secretKeyArrayBuffer.length(runtime) != crypto_box_SECRETKEYBYTES) {
+          throw jsi::JSError(runtime, "invalid privateKey length");
+        }
 
         std::vector<uint8_t> message;
         int result = -1;
@@ -849,19 +886,28 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         unsigned int additionalDataArgumentPosition = 1;
         validateIsString(functionName, runtime, arguments[additionalDataArgumentPosition], additionalDataArgumentName, true);
 
-        std::string nonceArgumentName = "nonce";
-        unsigned int nonceArgumentPosition = 2;
-        validateIsArrayBuffer(functionName, runtime, arguments[nonceArgumentPosition], nonceArgumentName, true);
+        // secret_nonce not yet implemented
+
+        std::string publicNonceArgumentName = "public_nonce";
+        unsigned int publicNonceArgumentPosition = 3;
+        validateIsArrayBuffer(functionName, runtime, arguments[publicNonceArgumentPosition], publicNonceArgumentName, true);
 
         std::string keyArgumentName = "key";
-        unsigned int keyArgumentPosition = 3;
+        unsigned int keyArgumentPosition = 4;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
-        auto nonceArrayBuffer =
-            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto publicNonceArrayBuffer =
+            arguments[publicNonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto keyArrayBuffer =
             arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) {
+          throw jsi::JSError(runtime, "invalid public_nonce length");
+        }
+        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) {
+          throw jsi::JSError(runtime, "invalid key length");
+        }
 
         std::vector<uint8_t> ciphertext;
         int result = -1;
@@ -879,7 +925,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
               NULL,
-              nonceArrayBuffer.data(runtime),
+              publicNonceArrayBuffer.data(runtime),
               keyArrayBuffer.data(runtime));
         }
         else
@@ -896,7 +942,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
               NULL,
-              nonceArrayBuffer.data(runtime),
+              publicNonceArrayBuffer.data(runtime),
               keyArrayBuffer.data(runtime));
         }
 
@@ -914,27 +960,37 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       {
         const std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt";
 
+        // secret_nonce not yet implemented
+
         std::string ciphertextArgumentName = "ciphertext";
-        unsigned int ciphertextArgumentPosition = 0;
+        unsigned int ciphertextArgumentPosition = 1;
         JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
-        unsigned int additionalDataArgumentPosition = 1;
+        unsigned int additionalDataArgumentPosition = 2;
         validateIsString(functionName, runtime, arguments[additionalDataArgumentPosition], additionalDataArgumentName, true);
 
-        std::string nonceArgumentName = "nonce";
-        unsigned int nonceArgumentPosition = 2;
-        validateIsArrayBuffer(functionName, runtime, arguments[nonceArgumentPosition], nonceArgumentName, true);
+        std::string publicNonceArgumentName = "public_nonce";
+        unsigned int publicNonceArgumentPosition = 3;
+        validateIsArrayBuffer(functionName, runtime, arguments[publicNonceArgumentPosition], publicNonceArgumentName, true);
 
         std::string keyArgumentName = "key";
-        unsigned int keyArgumentPosition = 3;
+        unsigned int keyArgumentPosition = 4;
         validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
         std::string additionalData = arguments[additionalDataArgumentPosition].asString(runtime).utf8(runtime);
-        auto nonceDataArrayBuffer =
-            arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-        auto keyDataArrayBuffer =
+        auto publicNonceArrayBuffer =
+            arguments[publicNonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+        auto keyArrayBuffer =
             arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) {
+          throw jsi::JSError(runtime, "invalid public_nonce length");
+        }
+        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) {
+          throw jsi::JSError(runtime, "invalid key length");
+        }
+
         std::vector<uint8_t> message;
 
         int result = -1;
@@ -951,8 +1007,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               ciphertextString.length(),
               reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
-              nonceDataArrayBuffer.data(runtime),
-              keyDataArrayBuffer.data(runtime));
+              publicNonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
         else
         {
@@ -968,8 +1024,8 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
               ciphertextArrayBuffer.length(runtime),
               reinterpret_cast<const unsigned char *>(additionalData.data()),
               additionalData.length(),
-              nonceDataArrayBuffer.data(runtime),
-              keyDataArrayBuffer.data(runtime));
+              publicNonceArrayBuffer.data(runtime),
+              keyArrayBuffer.data(runtime));
         }
 
         throwOnBadResult(functionName, runtime, result);

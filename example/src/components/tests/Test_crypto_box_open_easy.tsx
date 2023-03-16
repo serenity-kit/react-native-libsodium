@@ -2,6 +2,8 @@ import React from 'react';
 import {
   crypto_box_keypair,
   crypto_box_open_easy,
+  crypto_box_NONCEBYTES,
+  randombytes_buf,
   to_base64,
   to_string,
 } from 'react-native-libsodium';
@@ -59,12 +61,63 @@ export const Test_crypto_box_open_easy: React.FC = () => {
     throwErrorForInvalidPrivateKey = true;
   }
 
+  let throwErrorForInvalidNonceLength = false;
+  try {
+    const badNonce = randombytes_buf(crypto_box_NONCEBYTES + 1);
+    crypto_box_open_easy(
+      message,
+      badNonce,
+      receiverKeyPair.publicKey,
+      senderKeyPair.privateKey
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidNonceLength = true;
+  }
+
+  let throwErrorForInvalidPublicKeyLength = false;
+  try {
+    crypto_box_open_easy(
+      message,
+      nonce,
+      new Uint8Array([
+        232, 167, 21, 228, 54, 165, 143, 50, 85, 27, 167, 176, 163, 211, 176, 7,
+        159, 111, 77, 250, 19, 16, 169, 199, 109, 135, 21, 253, 184, 239, 207,
+        172, 100,
+      ]),
+      senderKeyPair.privateKey
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidPublicKeyLength = true;
+  }
+
+  let throwErrorForInvalidPrivateKeyLength = false;
+  try {
+    crypto_box_open_easy(
+      message,
+      nonce,
+      receiverKeyPair.publicKey,
+      new Uint8Array([
+        244, 123, 174, 160, 45, 184, 205, 250, 78, 208, 138, 200, 88, 36, 126,
+        12, 19, 168, 140, 14, 151, 209, 47, 0, 36, 93, 189, 49, 182, 176, 19,
+        90, 100,
+      ])
+    );
+  } catch (e) {
+    console.log(e);
+    throwErrorForInvalidPrivateKeyLength = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_box_open_easy"
         success={
           throwErrorForInvalidPrivateKey &&
+          throwErrorForInvalidNonceLength &&
+          throwErrorForInvalidPublicKeyLength &&
+          throwErrorForInvalidPrivateKeyLength &&
           to_string(
             crypto_box_open_easy(
               new Uint8Array([

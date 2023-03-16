@@ -1,5 +1,11 @@
 import React from 'react';
-import { crypto_secretbox_easy, to_base64 } from 'react-native-libsodium';
+import {
+  crypto_secretbox_easy,
+  crypto_secretbox_KEYBYTES,
+  crypto_secretbox_NONCEBYTES,
+  to_base64,
+  randombytes_buf,
+ } from 'react-native-libsodium';
 import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';
 
@@ -33,12 +39,38 @@ export const Test_crypto_secretbox_easy: React.FC = () => {
     throwErrorForInvalidPrivateKey = true;
   }
 
+  let throwErrorForInvalidNonceLength = false;
+  try {
+    const badNonce = randombytes_buf(crypto_secretbox_NONCEBYTES + 1);
+    crypto_secretbox_easy(
+      message,
+      badNonce,
+      key
+    );
+  } catch (e) {
+    throwErrorForInvalidNonceLength = true;
+  }
+
+  let throwErrorForInvalidKeyLength = false;
+  try {
+    const badKey = randombytes_buf(crypto_secretbox_KEYBYTES + 1);
+    crypto_secretbox_easy(
+      message,
+      nonce,
+      badKey
+    );
+  } catch (e) {
+    throwErrorForInvalidKeyLength = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_secretbox_easy"
         success={
           throwErrorForInvalidPrivateKey &&
+          throwErrorForInvalidNonceLength &&
+          throwErrorForInvalidKeyLength &&
           isEqualUint8Array(
             crypto_secretbox_easy(message, nonce, key),
             new Uint8Array([

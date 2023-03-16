@@ -1,7 +1,10 @@
 import React from 'react';
 import {
+  crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
+  crypto_secretbox_NONCEBYTES,
   crypto_secretbox_open_easy,
+  randombytes_buf,
   to_base64,
   to_string,
 } from 'react-native-libsodium';
@@ -37,12 +40,38 @@ export const Test_crypto_secretbox_open_easy: React.FC = () => {
     throwErrorForInvalidPrivateKey = true;
   }
 
+  let throwErrorForInvalidNonceLength = false;
+  try {
+    const badNonce = randombytes_buf(crypto_secretbox_NONCEBYTES + 1);
+    crypto_secretbox_open_easy(
+      message2,
+      badNonce,
+      key
+    );
+  } catch (e) {
+    throwErrorForInvalidNonceLength = true;
+  }
+
+  let throwErrorForInvalidKeyLength = false;
+  try {
+    const badKey = randombytes_buf(crypto_secretbox_KEYBYTES + 1);
+    crypto_secretbox_open_easy(
+      message2,
+      nonce,
+      badKey
+    );
+  } catch (e) {
+    throwErrorForInvalidKeyLength = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_secretbox_open_easy"
         success={
           throwErrorForInvalidPrivateKey &&
+          throwErrorForInvalidNonceLength &&
+          throwErrorForInvalidKeyLength &&
           to_string(
             crypto_secretbox_open_easy(
               new Uint8Array([
