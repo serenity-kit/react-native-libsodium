@@ -1,14 +1,15 @@
 import React from 'react';
 import {
-  randombytes_buf,
   crypto_generichash,
   crypto_generichash_BYTES,
-  crypto_generichash_BYTES_MIN,
   crypto_generichash_BYTES_MAX,
+  crypto_generichash_BYTES_MIN,
   crypto_generichash_KEYBYTES,
-  crypto_generichash_KEYBYTES_MIN,
   crypto_generichash_KEYBYTES_MAX,
+  crypto_generichash_KEYBYTES_MIN,
+  randombytes_buf,
 } from 'react-native-libsodium';
+import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';
 
 export const Test_crypto_generichash: React.FC = () => {
@@ -39,7 +40,15 @@ export const Test_crypto_generichash: React.FC = () => {
             crypto_generichash_BYTES,
             message,
             randombytes_buf(crypto_generichash_KEYBYTES_MAX)
-          ).length === crypto_generichash_BYTES
+          ).length === crypto_generichash_BYTES &&
+          isEqualUint8Array(
+            crypto_generichash(crypto_generichash_BYTES, message),
+            new Uint8Array([
+              29, 192, 23, 114, 238, 1, 113, 245, 246, 20, 198, 115, 227, 199,
+              250, 17, 7, 168, 207, 114, 123, 223, 90, 109, 173, 179, 121, 233,
+              60, 13, 29, 0,
+            ])
+          )
         }
       />
     </>
