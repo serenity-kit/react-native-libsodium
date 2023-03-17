@@ -1061,59 +1061,74 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 1;
         JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
-        uint64_t messageLength = 0;
 
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 2;
         JsiArgType keyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, false);
-        uint64_t keyLength = 0;
 
         int hashLength = arguments[hashLengthArgumentPosition].asNumber();
-
-        unsigned char* message;
-        unsigned char* key;
-
-        if (messageArgType == JsiArgType::string) {
-          std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          messageLength = messageString.length();
-          message = (unsigned char *) messageString.data();
-        } else {
-          auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          messageLength = messageArrayBuffer.length(runtime);
-          message = reinterpret_cast<unsigned char *>(messageArrayBuffer.data(runtime));
-        }
-
-        if (keyArgType == JsiArgType::string) {
-          std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
-          keyLength = keyString.length();
-          key = (unsigned char*) keyString.data();
-        } else if (keyArgType == JsiArgType::arrayBuffer) {
-          auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          keyLength = keyArrayBuffer.length(runtime);
-          key = reinterpret_cast<unsigned char *>(keyArrayBuffer.data(runtime));
-        } else {
-          keyLength = 0;
-        }
 
         std::vector<uint8_t> hash(hashLength);
         int result = -1;
 
-        if (keyLength == 0) {
-          result = crypto_generichash(
-            hash.data(),
-            hashLength,
-            message,
-            messageLength,
-            NULL,
-            0);
+        if (messageArgType == JsiArgType::string) {
+          std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+          if (keyArgType == JsiArgType::string) {
+            std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              reinterpret_cast<const unsigned char *>(keyString.data()),
+              keyString.length());
+          } else if (keyArgType == JsiArgType::arrayBuffer) {
+            auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              keyArrayBuffer.data(runtime),
+              keyArrayBuffer.length(runtime));
+          } else {
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              reinterpret_cast<const unsigned char *>(messageString.data()),
+              messageString.length(),
+              NULL,
+              0);
+          }
         } else {
-          result = crypto_generichash(
-            hash.data(),
-            hashLength,
-            message,
-            messageLength,
-            key,
-            keyLength);
+          auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+          if (keyArgType == JsiArgType::string) {
+            std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              reinterpret_cast<const unsigned char *>(keyString.data()),
+              keyString.length());
+          } else if (keyArgType == JsiArgType::arrayBuffer) {
+            auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              keyArrayBuffer.data(runtime),
+              keyArrayBuffer.length(runtime));
+          } else {
+            result = crypto_generichash(
+              hash.data(),
+              hashLength,
+              messageArrayBuffer.data(runtime),
+              messageArrayBuffer.length(runtime),
+              NULL,
+              0);
+          }
         }
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, hash);

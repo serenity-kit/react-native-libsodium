@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  to_base64,
   randombytes_buf,
   crypto_generichash,
   crypto_generichash_BYTES,
@@ -13,6 +14,10 @@ import { FunctionStatus } from '../FunctionStatus';
 
 export const Test_crypto_generichash: React.FC = () => {
   const message = 'Hello World';
+  const message2 = new Uint8Array([
+    8, 231, 240, 41, 106, 138, 234, 14, 38, 102, 70, 86, 168, 115, 93, 238, 3,
+    95, 224, 157, 125, 40, 151, 150, 147, 223, 7, 153, 132, 32, 92, 36,
+  ]);
 
   return (
     <>
@@ -30,6 +35,8 @@ export const Test_crypto_generichash: React.FC = () => {
             message,
             randombytes_buf(crypto_generichash_KEYBYTES_MIN)
           ).length === crypto_generichash_BYTES &&
+          crypto_generichash(crypto_generichash_BYTES, message2 ).length ===
+            crypto_generichash_BYTES &&
           crypto_generichash(
             crypto_generichash_BYTES,
             message,
@@ -39,6 +46,16 @@ export const Test_crypto_generichash: React.FC = () => {
             crypto_generichash_BYTES,
             message,
             randombytes_buf(crypto_generichash_KEYBYTES_MAX)
+          ).length === crypto_generichash_BYTES &&
+          crypto_generichash(
+            crypto_generichash_BYTES,
+            message2,
+            randombytes_buf(crypto_generichash_KEYBYTES_MAX)
+          ).length === crypto_generichash_BYTES &&
+          crypto_generichash(
+            crypto_generichash_BYTES,
+            message2,
+            to_base64(randombytes_buf(crypto_generichash_KEYBYTES))
           ).length === crypto_generichash_BYTES
         }
       />
