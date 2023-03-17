@@ -311,7 +311,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_secretbox_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -324,7 +324,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_aead_xchacha20poly1305_ietf_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -337,7 +337,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_kdf_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_kdf_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -350,7 +350,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_box_keypair = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_box_keypair"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -373,7 +373,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_sign_keypair = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_sign_keypair"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
