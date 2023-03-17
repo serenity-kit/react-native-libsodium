@@ -1,10 +1,5 @@
 import React from 'react';
 import {
-<<<<<<< HEAD
-  to_base64,
-  randombytes_buf,
-=======
->>>>>>> 3deddf2a523c037bebc2e35b0dee2b508272e628
   crypto_generichash,
   crypto_generichash_BYTES,
   crypto_generichash_BYTES_MAX,
@@ -13,6 +8,7 @@ import {
   crypto_generichash_KEYBYTES_MAX,
   crypto_generichash_KEYBYTES_MIN,
   randombytes_buf,
+  to_base64,
 } from 'react-native-libsodium';
 import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';
