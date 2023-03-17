@@ -107,13 +107,13 @@ declare global {
   function jsi_crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string | ArrayBuffer,
     additionalData: string,
-    nonce: ArrayBuffer,
+    public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
   function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
     ciphertext: string | ArrayBuffer,
     additionalData: string,
-    nonce: ArrayBuffer,
+    public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
 }

@@ -1,6 +1,9 @@
 import React from 'react';
 import {
   crypto_aead_xchacha20poly1305_ietf_encrypt,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
+  randombytes_buf,
   to_base64,
 } from 'react-native-libsodium';
 import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
@@ -42,12 +45,40 @@ export const Test_crypto_aead_xchacha20poly1305_ietf_encrypt: React.FC = () => {
     throwErrorForInvalidPrivateKey = true;
   }
 
+  let throwErrorForInvalidPublicNonceLength = false;
+  try {
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      to_base64(message2),
+      additionalData,
+      secretNonce,
+      randombytes_buf(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES + 1),
+      key
+    );
+  } catch (e) {
+    throwErrorForInvalidPublicNonceLength = true;
+  }
+
+  let throwErrorForInvalidKeyLength = false;
+  try {
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      to_base64(message2),
+      additionalData,
+      secretNonce,
+      publicNonce,
+      randombytes_buf(crypto_aead_xchacha20poly1305_ietf_KEYBYTES + 1)
+    );
+  } catch (e) {
+    throwErrorForInvalidKeyLength = true;
+  }
+
   return (
     <>
       <FunctionStatus
         name="crypto_aead_xchacha20poly1305_ietf_encrypt"
         success={
           throwErrorForInvalidPrivateKey &&
+          throwErrorForInvalidPublicNonceLength &&
+          throwErrorForInvalidKeyLength &&
           isEqualUint8Array(
             crypto_aead_xchacha20poly1305_ietf_encrypt(
               message,
