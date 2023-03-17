@@ -109,6 +109,25 @@ void throwOnBadResult(const std::string &functionName, jsi::Runtime &runtime, in
   }
 }
 
+std::vector<uint8_t> stringOrArrayBufferToVector(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required) {
+  JsiArgType argType = validateIsStringOrArrayBuffer(functionName, runtime, argument, argumentName, required);
+  std::vector<uint8_t> returnVector;
+  if (argType == JsiArgType::string) {
+    // copy the string into the vector
+    std::string s = argument.asString(runtime).utf8(runtime);
+    std::copy(s.begin(), s.end(), std::back_inserter(returnVector));
+  } else if (argType == JsiArgType::arrayBuffer) {
+    // copy the data from ArrayBuffer into the vector
+    auto buffer = argument.asObject(runtime).getArrayBuffer(runtime);
+    uint64_t bufferLength = buffer.length(runtime);
+    returnVector.resize(bufferLength);
+    memcpy(returnVector.data(), buffer.data(runtime), bufferLength);
+  } else {
+    // Do nothing. Return an empty vector
+  }
+  return returnVector;
+}
+
 // get the runtime and create native functions
 void installLibsodium(jsi::Runtime &jsiRuntime)
 {
@@ -960,7 +979,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
-        JsiArgType ciphertextArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
+        std::vector<uint8_t> ciphertextVector = stringOrArrayBufferToVector(functionName, runtime, arguments[ciphertextArgumentPosition], ciphertextArgumentName, true);
 
         std::string additionalDataArgumentName = "additionalData";
         unsigned int additionalDataArgumentPosition = 1;
@@ -987,42 +1006,22 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
           throw jsi::JSError(runtime, "invalid key length");
         }
 
-        std::vector<uint8_t> message;
+        uint64_t messageLength = ciphertextVector.size() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+        std::vector<uint8_t> message(messageLength);
 
         int result = -1;
-        if (ciphertextArgType == JsiArgType::string)
-        {
-          std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          uint64_t messageLength = ciphertextString.length() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
-          message.resize(messageLength);
-          result = crypto_aead_xchacha20poly1305_ietf_decrypt(
-              message.data(),
-              &messageLength,
-              NULL,
-              reinterpret_cast<const unsigned char *>(ciphertextString.data()),
-              ciphertextString.length(),
-              reinterpret_cast<const unsigned char *>(additionalData.data()),
-              additionalData.length(),
-              publicNonceArrayBuffer.data(runtime),
-              keyArrayBuffer.data(runtime));
-        }
-        else
-        {
-          auto ciphertextArrayBuffer =
-              arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          uint64_t messageLength = ciphertextArrayBuffer.length(runtime) - crypto_aead_xchacha20poly1305_ietf_ABYTES;
-          message.resize(messageLength);
-          result = crypto_aead_xchacha20poly1305_ietf_decrypt(
-              message.data(),
-              &messageLength,
-              NULL,
-              ciphertextArrayBuffer.data(runtime),
-              ciphertextArrayBuffer.length(runtime),
-              reinterpret_cast<const unsigned char *>(additionalData.data()),
-              additionalData.length(),
-              publicNonceArrayBuffer.data(runtime),
-              keyArrayBuffer.data(runtime));
-        }
+
+        result = crypto_aead_xchacha20poly1305_ietf_decrypt(
+          message.data(),
+          &messageLength,
+          NULL,
+          ciphertextVector.data(),
+          ciphertextVector.size(),
+          reinterpret_cast<const unsigned char *>(additionalData.data()),
+          additionalData.length(),
+          publicNonceArrayBuffer.data(runtime),
+          keyArrayBuffer.data(runtime));
+
 
         throwOnBadResult(functionName, runtime, result);
         return arrayBufferAsObject(runtime, message);
