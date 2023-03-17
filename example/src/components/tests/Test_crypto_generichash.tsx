@@ -36,7 +36,7 @@ export const Test_crypto_generichash: React.FC = () => {
             message,
             randombytes_buf(crypto_generichash_KEYBYTES_MIN)
           ).length === crypto_generichash_BYTES &&
-          crypto_generichash(crypto_generichash_BYTES, message2 ).length ===
+          crypto_generichash(crypto_generichash_BYTES, message2).length ===
             crypto_generichash_BYTES &&
           crypto_generichash(
             crypto_generichash_BYTES,
