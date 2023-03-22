@@ -253,6 +253,7 @@ export function crypto_sign_detached(
   const messageParam = typeof message === 'string' ? message : message.buffer;
   const privateKeyParam =
     typeof privateKey === 'string' ? privateKey : privateKey.buffer;
+  console.log({ privateKeyParam });
   result = global.jsi_crypto_sign_detached(messageParam, privateKeyParam);
   return convertToOutputFormat(result, outputFormat);
 }

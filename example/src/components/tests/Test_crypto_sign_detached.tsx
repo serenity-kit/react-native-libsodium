@@ -20,11 +20,23 @@ export const Test_crypto_sign_detached: React.FC = () => {
       158,
     ]),
   };
+  const stringPrivateKey = to_base64(keyPair.privateKey);
+  console.log({ stringPrivateKey });
 
   const message2 = new Uint8Array([
     72, 90, 158, 219, 156, 134, 114, 6, 249, 234, 125, 71, 159, 107, 113, 242,
     178, 31, 178, 48, 132, 136, 226, 123, 218, 227, 79, 228, 199, 161, 3, 71,
   ]);
+
+
+  try {
+    crypto_sign_detached(
+      message,
+      keyPair.privateKey
+    );
+  } catch (e) {
+    console.error(e);
+  }
 
   let throwErrorForInvalidPrivateKey = false;
   try {
