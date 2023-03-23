@@ -53,15 +53,21 @@ void validateIsString(const std::string &functionName, jsi::Runtime &runtime, co
   }
 }
 
-void validateIsArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
+JsiArgType validateIsArrayBuffer(const std::string &functionName, jsi::Runtime &runtime, const jsi::Value &argument, std::string &argumentName, bool required)
 {
   if (required)
   {
     validateRequired(functionName, runtime, argument, argumentName);
   }
-  if (!argument.isObject() ||
-      !argument.asObject(runtime).isArrayBuffer(runtime))
+  if (argument.isObject() &&
+      argument.asObject(runtime).isArrayBuffer(runtime))
   {
+    return JsiArgType::arrayBuffer;
+  } else if (argument.isNull()) {
+    return JsiArgType::null;
+  } else if (argument.isUndefined()) {
+    return JsiArgType::undefined;
+  } else {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be an ArrayBuffer";
     throw jsi::JSError(runtime, errorMessage);
   }
@@ -1064,7 +1070,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         std::string keyArgumentName = "key";
         unsigned int keyArgumentPosition = 2;
-        JsiArgType keyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, false);
+        JsiArgType keyArgType = validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
 
         int hashLength = arguments[hashLengthArgumentPosition].asNumber();
 
@@ -1073,16 +1079,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
         if (messageArgType == JsiArgType::string) {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          if (keyArgType == JsiArgType::string) {
-            std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
-            result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              reinterpret_cast<const unsigned char *>(messageString.data()),
-              messageString.length(),
-              reinterpret_cast<const unsigned char *>(keyString.data()),
-              keyString.length());
-          } else if (keyArgType == JsiArgType::arrayBuffer) {
+          if (keyArgType == JsiArgType::arrayBuffer) {
             auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
             result = crypto_generichash(
               hash.data(),
@@ -1102,16 +1099,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
           }
         } else {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          if (keyArgType == JsiArgType::string) {
-            std::string keyString = arguments[keyArgumentPosition].asString(runtime).utf8(runtime);
-            result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              messageArrayBuffer.data(runtime),
-              messageArrayBuffer.length(runtime),
-              reinterpret_cast<const unsigned char *>(keyString.data()),
-              keyString.length());
-          } else if (keyArgType == JsiArgType::arrayBuffer) {
+          if (keyArgType == JsiArgType::arrayBuffer) {
             auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
             result = crypto_generichash(
               hash.data(),

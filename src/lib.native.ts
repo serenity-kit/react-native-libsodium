@@ -88,7 +88,7 @@ declare global {
   function jsi_crypto_generichash(
     hashLength: number,
     message: string | ArrayBuffer,
-    key?: string | ArrayBuffer | null | undefined
+    key?: ArrayBuffer | null | undefined
   ): ArrayBuffer;
   function jsi_crypto_pwhash(
     keyLength: number,
@@ -417,30 +417,26 @@ export function crypto_box_open_easy(
 export function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
-  key?: string | Uint8Array | null | undefined,
+  key?: Uint8Array | null | undefined,
   outputFormat?: Uint8ArrayOutputFormat | null
 ): Uint8Array;
 export function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
-  key: string | Uint8Array | null | undefined,
+  key: Uint8Array | null | undefined,
   outputFormat: StringOutputFormat
 ): string;
 export function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
-  key: string | Uint8Array | null | undefined,
+  key: Uint8Array | null | undefined,
   outputFormat: OutputFormat
 ) {
   const messageParam = typeof message === 'string' ? message : message.buffer;
-  let keyParam: ArrayBuffer | string | null | undefined = key;
-  if (key) {
-    keyParam = typeof key === 'string' ? key : key.buffer;
-  }
   const result = global.jsi_crypto_generichash(
     hash_length,
     messageParam,
-    keyParam
+    key ? key.buffer : undefined
   );
   return convertToOutputFormat(result, outputFormat);
 }
