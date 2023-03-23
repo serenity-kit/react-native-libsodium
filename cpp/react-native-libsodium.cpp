@@ -176,7 +176,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_to_base64";
+        const std::string functionName = "to_base64";
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
@@ -228,7 +228,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_to_hex";
+        const std::string functionName = "to_hex";
 
         std::string valueArgumentName = "value";
         unsigned int valueArgumentPosition = 0;
@@ -274,7 +274,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       1,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_randombytes_buf";
+        const std::string functionName = "randombytes_buf";
 
         std::string sizeArgumentName = "size";
         unsigned int sizeArgumentPosition = 0;
@@ -311,7 +311,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_secretbox_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -324,7 +324,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_aead_xchacha20poly1305_ietf_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_aead_xchacha20poly1305_ietf_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -337,7 +337,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_kdf_keygen = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_kdf_keygen"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -350,7 +350,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_box_keypair = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_box_keypair"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -373,7 +373,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   auto jsi_crypto_sign_keypair = jsi::Function::createFromHostFunction(
       jsiRuntime,
-      jsi::PropNameID::forUtf8(jsiRuntime, "from_base64"),
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_sign_keypair"),
       0,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
@@ -400,7 +400,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       2,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_sign_detached";
+        const std::string functionName = "crypto_sign_detached";
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
@@ -435,7 +435,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       3,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_sign_verify_detached";
+        const std::string functionName = "crypto_sign_verify_detached";
 
         std::string signatureArgumentName = "signature";
         unsigned int signatureArgumentPosition = 0;
@@ -480,7 +480,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       3,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_secretbox_easy";
+        const std::string functionName = "crypto_secretbox_easy";
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
@@ -530,7 +530,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       3,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_secretbox_open_easy";
+        const std::string functionName = "crypto_secretbox_open_easy";
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
@@ -595,7 +595,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       4,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_box_easy";
+        const std::string functionName = "crypto_box_easy";
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
@@ -667,7 +667,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       4,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_box_open_easy";
+        const std::string functionName = "crypto_box_open_easy";
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
@@ -744,7 +744,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_pwhash";
+        const std::string functionName = "crypto_pwhash";
 
         std::string keyLengthArgumentName = "keyLength";
         unsigned int keyLengthArgumentPosition = 0;
@@ -819,7 +819,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       4,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_kdf_derive_from_key";
+        const std::string functionName = "crypto_kdf_derive_from_key";
 
         std::string subkeyLengthArgumentName = "subkeyLength";
         unsigned int subkeyLengthArgumentPosition = 0;
@@ -876,7 +876,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_encrypt";
+        const std::string functionName = "crypto_aead_xchacha20poly1305_ietf_encrypt";
 
         std::string messageArgumentName = "message";
         unsigned int messageArgumentPosition = 0;
@@ -956,7 +956,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
       6,
       [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
       {
-        const std::string functionName = "jsi_crypto_aead_xchacha20poly1305_ietf_decrypt";
+        const std::string functionName = "crypto_aead_xchacha20poly1305_ietf_decrypt";
 
         std::string ciphertextArgumentName = "ciphertext";
         unsigned int ciphertextArgumentPosition = 0;
