@@ -3,6 +3,9 @@ import { Image } from 'react-native';
 import {
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_keygen,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
+  randombytes_buf,
   to_base64,
   to_string,
 } from 'react-native-libsodium';
@@ -50,6 +53,32 @@ export const Test_crypto_aead_xchacha20poly1305_ietf_decrypt: React.FC = () => {
     throwErrorForInvalidPrivateKey = true;
   }
 
+  let throwErrorForInvalidPublicNonceLength = false;
+  try {
+    crypto_aead_xchacha20poly1305_ietf_decrypt(
+      secretNonce,
+      message,
+      additionalData,
+      randombytes_buf(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES + 1),
+      key
+    );
+  } catch (e) {
+    throwErrorForInvalidPublicNonceLength = true;
+  }
+
+  let throwErrorForInvalidKeyLength = false;
+  try {
+    crypto_aead_xchacha20poly1305_ietf_decrypt(
+      secretNonce,
+      message,
+      additionalData,
+      publicNonce,
+      randombytes_buf(crypto_aead_xchacha20poly1305_ietf_KEYBYTES + 1)
+    );
+  } catch (e) {
+    throwErrorForInvalidKeyLength = true;
+  }
+
   let validImageEncryptionAndDecryption = true;
   let decryptedImage;
   let decryptedLargeImage;
@@ -66,6 +95,8 @@ export const Test_crypto_aead_xchacha20poly1305_ietf_decrypt: React.FC = () => {
       success={
         validImageEncryptionAndDecryption &&
         throwErrorForInvalidPrivateKey &&
+        throwErrorForInvalidPublicNonceLength &&
+        throwErrorForInvalidKeyLength &&
         to_string(
           crypto_aead_xchacha20poly1305_ietf_decrypt(
             secretNonce,
