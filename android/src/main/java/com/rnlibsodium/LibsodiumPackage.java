@@ -16,7 +16,7 @@ public class LibsodiumPackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    modules.add(new LibsodiumModule(reactContext));
+    modules.add(new Libsodium(reactContext));
     return modules;
   }
 

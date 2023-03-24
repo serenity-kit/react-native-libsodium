@@ -929,7 +929,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         if (messageArgType == JsiArgType::string)
         {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          uint64_t ciphertextLength = messageString.length() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          unsigned long long ciphertextLength = messageString.length() + crypto_aead_xchacha20poly1305_ietf_ABYTES;
           ciphertext.resize(ciphertextLength);
           result = crypto_aead_xchacha20poly1305_ietf_encrypt(
               ciphertext.data(),
@@ -946,7 +946,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           auto messageArrayBuffer =
               arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          uint64_t ciphertextLength = messageArrayBuffer.length(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          unsigned long long ciphertextLength = messageArrayBuffer.length(runtime) + crypto_aead_xchacha20poly1305_ietf_ABYTES;
           ciphertext.resize(ciphertextLength);
           result = crypto_aead_xchacha20poly1305_ietf_encrypt(
               ciphertext.data(),
@@ -1009,7 +1009,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         if (ciphertextArgType == JsiArgType::string)
         {
           std::string ciphertextString = arguments[ciphertextArgumentPosition].asString(runtime).utf8(runtime);
-          uint64_t messageLength = ciphertextString.length() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          unsigned long long messageLength = ciphertextString.length() - crypto_aead_xchacha20poly1305_ietf_ABYTES;
           message.resize(messageLength);
           result = crypto_aead_xchacha20poly1305_ietf_decrypt(
               message.data(),
@@ -1026,7 +1026,7 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         {
           auto ciphertextArrayBuffer =
               arguments[ciphertextArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          uint64_t messageLength = ciphertextArrayBuffer.length(runtime) - crypto_aead_xchacha20poly1305_ietf_ABYTES;
+          unsigned long long messageLength = ciphertextArrayBuffer.length(runtime) - crypto_aead_xchacha20poly1305_ietf_ABYTES;
           message.resize(messageLength);
           result = crypto_aead_xchacha20poly1305_ietf_decrypt(
               message.data(),

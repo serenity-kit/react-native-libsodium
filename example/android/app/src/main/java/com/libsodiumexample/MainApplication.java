@@ -1,5 +1,6 @@
 package com.libsodiumexample;
 
+import com.facebook.react.bridge.JSIModulePackage;
 import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
@@ -11,12 +12,19 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.libsodiumexample.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
+import com.libsodium.LibsodiumModule;
+import com.libsodium.LibsodiumPackage;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
       new ReactNativeHost(this) {
+        @Override
+        protected JSIModulePackage getJSIModulePackage() {
+          return new LibsodiumPackage();
+        }
+
         @Override
         public boolean getUseDeveloperSupport() {
           return BuildConfig.DEBUG;
@@ -26,8 +34,9 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
-          // Packages that cannot be autolinked yet can be added manually here, for example:
+          // Packages that cannot be autolinked yet can be added manually here, for LibsodiumExample:
           // packages.add(new MyReactNativePackage());
+          packages.add(new LibsodiumModule());
           return packages;
         }
 

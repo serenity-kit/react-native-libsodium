@@ -1,8 +1,13 @@
 #include <jni.h>
+#include <jsi/jsi.h>
 #include "include/react-native-libsodium.h"
 
 extern "C"
-JNIEXPORT jint JNICALL
-Java_com_libsodium_LibsodiumModule_nativeMultiply(JNIEnv *env, jclass type, jdouble a, jdouble b) {
-    return libsodium::multiply(a, b);
+{
+    JNIEXPORT void JNICALL
+    Java_com_example_cpp_adapter_cppAdapter_init(JNIEnv *env, jobject thiz, jlong runtimePtr)
+    {
+        facebook::jsi::Runtime *runtime = reinterpret_cast<facebook::jsi::Runtime *>(runtimePtr);
+        installLibsodium(*runtime);
+    }
 }
