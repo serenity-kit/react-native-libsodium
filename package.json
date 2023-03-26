@@ -47,6 +47,7 @@
   ],
   "repository": "https://github.com/SerenityNotes/react-native-libsodium",
   "author": "Nikolaus Graf <hi@serenity.re> (https://github.com/SerenityNotes)",
+  "contributors": ["Adonis Gaitatzis <backupbrain@gmail.com>"],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/SerenityNotes/react-native-libsodium/issues"

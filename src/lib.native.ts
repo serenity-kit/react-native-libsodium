@@ -25,6 +25,12 @@ declare global {
   var jsi_crypto_pwhash_BYTES_MIN: number;
   var jsi_crypto_pwhash_BYTES_MAX: number;
   var jsi_crypto_kdf_CONTEXTBYTES: number;
+  var jsi_crypto_generichash_BYTES: number;
+  var jsi_crypto_generichash_BYTES_MIN: number;
+  var jsi_crypto_generichash_BYTES_MAX: number;
+  var jsi_crypto_generichash_KEYBYTES: number;
+  var jsi_crypto_generichash_KEYBYTES_MIN: number;
+  var jsi_crypto_generichash_KEYBYTES_MAX: number;
 
   function jsi_from_base64_to_arraybuffer(
     input: string,
@@ -79,6 +85,11 @@ declare global {
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_generichash(
+    hashLength: number,
+    message: string | ArrayBuffer,
+    key?: ArrayBuffer | null | undefined
+  ): ArrayBuffer;
   function jsi_crypto_pwhash(
     keyLength: number,
     password: string | ArrayBuffer,
@@ -127,6 +138,17 @@ export const crypto_kdf_KEYBYTES = global.jsi_crypto_kdf_KEYBYTES;
 export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
 export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
 export const crypto_kdf_CONTEXTBYTES = global.jsi_crypto_kdf_CONTEXTBYTES;
+export const crypto_generichash_BYTES = global.jsi_crypto_generichash_BYTES;
+export const crypto_generichash_BYTES_MIN =
+  global.jsi_crypto_generichash_BYTES_MIN;
+export const crypto_generichash_BYTES_MAX =
+  global.jsi_crypto_generichash_BYTES_MAX;
+export const crypto_generichash_KEYBYTES =
+  global.jsi_crypto_generichash_KEYBYTES;
+export const crypto_generichash_KEYBYTES_MIN =
+  global.jsi_crypto_generichash_KEYBYTES_MIN;
+export const crypto_generichash_KEYBYTES_MAX =
+  global.jsi_crypto_generichash_KEYBYTES_MAX;
 
 export const from_base64 = (
   input: string,
@@ -388,6 +410,33 @@ export function crypto_box_open_easy(
     nonce.buffer,
     publicKey.buffer,
     privateKey.buffer
+  );
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_generichash(
+  hash_length: number,
+  message: string | Uint8Array,
+  key?: Uint8Array | null | undefined,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_generichash(
+  hash_length: number,
+  message: string | Uint8Array,
+  key: Uint8Array | null | undefined,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_generichash(
+  hash_length: number,
+  message: string | Uint8Array,
+  key: Uint8Array | null | undefined,
+  outputFormat: OutputFormat
+) {
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  const result = global.jsi_crypto_generichash(
+    hash_length,
+    messageParam,
+    key ? key.buffer : undefined
   );
   return convertToOutputFormat(result, outputFormat);
 }
