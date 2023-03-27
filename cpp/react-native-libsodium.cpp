@@ -63,11 +63,17 @@ JsiArgType validateIsArrayBuffer(const std::string &functionName, jsi::Runtime &
       argument.asObject(runtime).isArrayBuffer(runtime))
   {
     return JsiArgType::arrayBuffer;
-  } else if (argument.isNull()) {
+  }
+  else if (argument.isNull())
+  {
     return JsiArgType::null;
-  } else if (argument.isUndefined()) {
+  }
+  else if (argument.isUndefined())
+  {
     return JsiArgType::undefined;
-  } else {
+  }
+  else
+  {
     std::string errorMessage = "[react-native-libsodium][" + functionName + "] " + argumentName + " must be an ArrayBuffer";
     throw jsi::JSError(runtime, errorMessage);
   }
@@ -416,6 +422,38 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
 
   jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair", std::move(jsi_crypto_sign_keypair));
 
+  auto jsi_crypto_sign_seed_keypair = jsi::Function::createFromHostFunction(
+      jsiRuntime,
+      jsi::PropNameID::forUtf8(jsiRuntime, "crypto_sign_seed_keypair"),
+      1,
+      [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+      {
+        const std::string functionName = "crypto_sign_seed_keypair";
+
+        std::string seedArgumentName = "seed";
+        unsigned int seedArgumentPosition = 0;
+        validateIsArrayBuffer(functionName, runtime, arguments[seedArgumentPosition], seedArgumentName, true);
+
+        auto seedDataArrayBuffer =
+            arguments[seedArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+        uint64_t publickeyLength = crypto_sign_PUBLICKEYBYTES;
+        uint64_t secretkeyLength = crypto_sign_SECRETKEYBYTES;
+        std::vector<uint8_t> publickey(publickeyLength);
+        std::vector<uint8_t> secretkey(secretkeyLength);
+        crypto_sign_seed_keypair(publickey.data(), secretkey.data(), seedDataArrayBuffer.data(runtime));
+
+        jsi::Object returnPublicKeyBufferAsObject = arrayBufferAsObject(runtime, publickey);
+        jsi::Object returnSecretKeyBufferAsObject = arrayBufferAsObject(runtime, secretkey);
+
+        auto object = jsi::Object(runtime);
+        object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
+        object.setProperty(runtime, "secretKey", returnSecretKeyBufferAsObject);
+        return object;
+      });
+
+  jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_seed_keypair", std::move(jsi_crypto_sign_seed_keypair));
+
   auto jsi_crypto_sign_detached = jsi::Function::createFromHostFunction(
       jsiRuntime,
       jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_detached"),
@@ -519,10 +557,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto nonce = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto key = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-        if (nonce.length(runtime) != crypto_secretbox_NONCEBYTES) {
+        if (nonce.length(runtime) != crypto_secretbox_NONCEBYTES)
+        {
           throw jsi::JSError(runtime, "invalid nonce length");
         }
-        if (key.length(runtime) != crypto_secretbox_KEYBYTES) {
+        if (key.length(runtime) != crypto_secretbox_KEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid key length");
         }
 
@@ -569,10 +609,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto nonceArrayBuffer = arguments[nonceArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-        if (nonceArrayBuffer.length(runtime) != crypto_secretbox_NONCEBYTES) {
+        if (nonceArrayBuffer.length(runtime) != crypto_secretbox_NONCEBYTES)
+        {
           throw jsi::JSError(runtime, "invalid nonce length");
         }
-        if (keyArrayBuffer.length(runtime) != crypto_secretbox_KEYBYTES) {
+        if (keyArrayBuffer.length(runtime) != crypto_secretbox_KEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid key length");
         }
 
@@ -639,13 +681,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
         auto secretKey = arguments[secretKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-        if (nonce.length(runtime) != crypto_box_NONCEBYTES) {
+        if (nonce.length(runtime) != crypto_box_NONCEBYTES)
+        {
           throw jsi::JSError(runtime, "invalid nonce length");
         }
-        if (publicKey.length(runtime) != crypto_box_PUBLICKEYBYTES) {
+        if (publicKey.length(runtime) != crypto_box_PUBLICKEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid publicKey length");
         }
-        if (secretKey.length(runtime) != crypto_box_SECRETKEYBYTES) {
+        if (secretKey.length(runtime) != crypto_box_SECRETKEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid privateKey length");
         }
 
@@ -716,13 +761,16 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto secretKeyArrayBuffer =
             arguments[3].asObject(runtime).getArrayBuffer(runtime);
 
-        if (nonceArrayBuffer.length(runtime) != crypto_box_NONCEBYTES) {
+        if (nonceArrayBuffer.length(runtime) != crypto_box_NONCEBYTES)
+        {
           throw jsi::JSError(runtime, "invalid nonce length");
         }
-        if (publicKeyArrayBuffer.length(runtime) != crypto_box_PUBLICKEYBYTES) {
+        if (publicKeyArrayBuffer.length(runtime) != crypto_box_PUBLICKEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid publicKey length");
         }
-        if (secretKeyArrayBuffer.length(runtime) != crypto_box_SECRETKEYBYTES) {
+        if (secretKeyArrayBuffer.length(runtime) != crypto_box_SECRETKEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid privateKey length");
         }
 
@@ -922,10 +970,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto keyArrayBuffer =
             arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) {
+        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES)
+        {
           throw jsi::JSError(runtime, "invalid public_nonce length");
         }
-        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) {
+        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid key length");
         }
 
@@ -1002,10 +1052,12 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         auto keyArrayBuffer =
             arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) {
+        if (publicNonceArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES)
+        {
           throw jsi::JSError(runtime, "invalid public_nonce length");
         }
-        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) {
+        if (keyArrayBuffer.length(runtime) != crypto_aead_xchacha20poly1305_ietf_KEYBYTES)
+        {
           throw jsi::JSError(runtime, "invalid key length");
         }
 
@@ -1077,45 +1129,54 @@ void installLibsodium(jsi::Runtime &jsiRuntime)
         std::vector<uint8_t> hash(hashLength);
         int result = -1;
 
-        if (messageArgType == JsiArgType::string) {
+        if (messageArgType == JsiArgType::string)
+        {
           std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
-          if (keyArgType == JsiArgType::arrayBuffer) {
+          if (keyArgType == JsiArgType::arrayBuffer)
+          {
             auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
             result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              reinterpret_cast<const unsigned char *>(messageString.data()),
-              messageString.length(),
-              keyArrayBuffer.data(runtime),
-              keyArrayBuffer.length(runtime));
-          } else {
-            result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              reinterpret_cast<const unsigned char *>(messageString.data()),
-              messageString.length(),
-              NULL,
-              0);
+                hash.data(),
+                hashLength,
+                reinterpret_cast<const unsigned char *>(messageString.data()),
+                messageString.length(),
+                keyArrayBuffer.data(runtime),
+                keyArrayBuffer.length(runtime));
           }
-        } else {
+          else
+          {
+            result = crypto_generichash(
+                hash.data(),
+                hashLength,
+                reinterpret_cast<const unsigned char *>(messageString.data()),
+                messageString.length(),
+                NULL,
+                0);
+          }
+        }
+        else
+        {
           auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-          if (keyArgType == JsiArgType::arrayBuffer) {
+          if (keyArgType == JsiArgType::arrayBuffer)
+          {
             auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
             result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              messageArrayBuffer.data(runtime),
-              messageArrayBuffer.length(runtime),
-              keyArrayBuffer.data(runtime),
-              keyArrayBuffer.length(runtime));
-          } else {
+                hash.data(),
+                hashLength,
+                messageArrayBuffer.data(runtime),
+                messageArrayBuffer.length(runtime),
+                keyArrayBuffer.data(runtime),
+                keyArrayBuffer.length(runtime));
+          }
+          else
+          {
             result = crypto_generichash(
-              hash.data(),
-              hashLength,
-              messageArrayBuffer.data(runtime),
-              messageArrayBuffer.length(runtime),
-              NULL,
-              0);
+                hash.data(),
+                hashLength,
+                messageArrayBuffer.data(runtime),
+                messageArrayBuffer.length(runtime),
+                NULL,
+                0);
           }
         }
         throwOnBadResult(functionName, runtime, result);

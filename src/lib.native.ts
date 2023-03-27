@@ -54,6 +54,10 @@ declare global {
     publicKey: ArrayBuffer;
     secretKey: ArrayBuffer;
   };
+  function jsi_crypto_sign_seed_keypair(seed: ArrayBuffer): {
+    publicKey: ArrayBuffer;
+    secretKey: ArrayBuffer;
+  };
   function jsi_crypto_sign_detached(
     message: string | ArrayBuffer,
     privateKey: ArrayBuffer
@@ -249,6 +253,26 @@ export function crypto_sign_keypair(
 ): StringKeyPair;
 export function crypto_sign_keypair(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_sign_keypair();
+  return {
+    keyType: 'ed25519',
+    publicKey: convertToOutputFormat(result.publicKey, outputFormat),
+    privateKey: convertToOutputFormat(result.secretKey, outputFormat),
+  };
+}
+
+export function crypto_sign_seed_keypair(
+  seed: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): KeyPair;
+export function crypto_sign_seed_keypair(
+  seed: Uint8Array,
+  outputFormat: StringOutputFormat
+): StringKeyPair;
+export function crypto_sign_seed_keypair(
+  seed: Uint8Array,
+  outputFormat: OutputFormat
+): unknown {
+  const result = global.jsi_crypto_sign_seed_keypair(seed.buffer);
   return {
     keyType: 'ed25519',
     publicKey: convertToOutputFormat(result.publicKey, outputFormat),
