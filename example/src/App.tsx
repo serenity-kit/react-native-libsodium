@@ -9,15 +9,16 @@ import { Test_crypto_aead_xchacha20poly1305_ietf_keygen } from './components/tes
 import { Test_crypto_box_easy } from './components/tests/Test_crypto_box_easy';
 import { Test_crypto_box_keypair } from './components/tests/Test_crypto_box_keypair';
 import { Test_crypto_box_open_easy } from './components/tests/Test_crypto_box_open_easy';
+import { Test_crypto_generichash } from './components/tests/Test_crypto_generichash';
 import { Test_crypto_kdf_derive_from_key } from './components/tests/Test_crypto_kdf_derive_from_key';
 import { Test_crypto_kdf_keygen } from './components/tests/Test_crypto_kdf_keygen';
-import { Test_crypto_generichash } from './components/tests/Test_crypto_generichash';
 import { Test_crypto_pwhash } from './components/tests/Test_crypto_pwhash';
 import { Test_crypto_secretbox_easy } from './components/tests/Test_crypto_secretbox_easy';
 import { Test_crypto_secretbox_keygen } from './components/tests/Test_crypto_secretbox_keygen';
 import { Test_crypto_secretbox_open_easy } from './components/tests/Test_crypto_secretbox_open_easy';
 import { Test_crypto_sign_detached } from './components/tests/Test_crypto_sign_detached';
 import { Test_crypto_sign_keypair } from './components/tests/Test_crypto_sign_keypair';
+import { Test_crypto_sign_seed_keypair } from './components/tests/Test_crypto_sign_seed_keypair';
 import { Test_crypto_sign_verify_detached } from './components/tests/Test_crypto_sign_verify_detached';
 import { Test_from_base64 } from './components/tests/Test_from_base64';
 import { Test_randombytes_buf } from './components/tests/Test_randombytes_buf';
@@ -58,6 +59,7 @@ function LibsodiumTests() {
 
           <Header>signing</Header>
           <Test_crypto_sign_keypair />
+          <Test_crypto_sign_seed_keypair />
           <Test_crypto_sign_detached />
           <Test_crypto_sign_verify_detached />
 
