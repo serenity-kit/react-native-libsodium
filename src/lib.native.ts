@@ -31,6 +31,7 @@ declare global {
   var jsi_crypto_generichash_KEYBYTES: number;
   var jsi_crypto_generichash_KEYBYTES_MIN: number;
   var jsi_crypto_generichash_KEYBYTES_MAX: number;
+  var jsi_crypto_sign_SEEDBYTES: number;
 
   function jsi_from_base64_to_arraybuffer(
     input: string,
@@ -153,6 +154,7 @@ export const crypto_generichash_KEYBYTES_MIN =
   global.jsi_crypto_generichash_KEYBYTES_MIN;
 export const crypto_generichash_KEYBYTES_MAX =
   global.jsi_crypto_generichash_KEYBYTES_MAX;
+export const crypto_sign_SEEDBYTES = global.jsi_crypto_sign_SEEDBYTES;
 
 export const from_base64 = (
   input: string,

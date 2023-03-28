@@ -13,10 +13,12 @@ import {
   crypto_pwhash_SALTBYTES,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_NONCEBYTES,
+  crypto_sign_SEEDBYTES,
 } from 'react-native-libsodium';
 import { FunctionStatus } from '../FunctionStatus';
 
 export const Test_constants: React.FC = () => {
+  console.log('crypto_sign_SEEDBYTES', crypto_sign_SEEDBYTES);
   return (
     <>
       <FunctionStatus
@@ -34,7 +36,8 @@ export const Test_constants: React.FC = () => {
           crypto_kdf_KEYBYTES === 32 &&
           crypto_pwhash_BYTES_MIN === 16 &&
           crypto_pwhash_BYTES_MAX === -1 &&
-          crypto_kdf_CONTEXTBYTES === 8
+          crypto_kdf_CONTEXTBYTES === 8 &&
+          crypto_sign_SEEDBYTES === 32
         }
       />
     </>

@@ -75,6 +75,7 @@ import {
   crypto_secretbox_open_easy,
   crypto_sign_detached,
   crypto_sign_keypair,
+  crypto_sign_SEEDBYTES,
   crypto_sign_verify_detached,
   from_base64,
   randombytes_buf,
