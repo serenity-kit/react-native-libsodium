@@ -33,7 +33,7 @@ jobs:
         run: pip install cpplint
 
       - name: Run cpplint
-        run: cpplint --recursive cpp android --filter=-legal/copyright,-whitespace/braces,-whitespace/newline,-whitespace/ending_newline,-readability/fn_size,-build/namespaces,-runtime/references
+        run: cpplint --recursive cpp
 
   test:
     runs-on: ubuntu-latest
@@ -57,4 +57,4 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build package
-        run: yarn prepare
+        run: yarn prepack
