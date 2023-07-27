@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  crypto_secretbox_easy,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_NONCEBYTES,
-  to_base64,
+  crypto_secretbox_easy,
   randombytes_buf,
+  to_base64,
 } from 'react-native-libsodium';
 import { isEqualUint8Array } from '../../utils/isEqualUint8Array';
 import { FunctionStatus } from '../FunctionStatus';

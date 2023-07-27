@@ -4,27 +4,31 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "android-release": "react-native run-android --mode Release",
+    "android-e2e-tests": "maestro test ../e2e-tests/maestro-flow-android.yml",
+    "e2e-debug": "maestro hierarchy",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "pods": "pod-install --quiet",
     "web": "webpack serve --config ./web/webpack.config.js --mode development --hot"
   },
   "dependencies": {
-    "react": "18.1.0",
+    "react": "18.2.0",
     "react-dom": "^18.2.0",
-    "react-native": "0.70.6",
-    "react-native-web": "^0.18.10"
+    "react-native": "0.71.6",
+    "react-native-web": "^0.19.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
-    "@babel/runtime": "^7.12.5",
-    "babel-loader": "^9.1.0",
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "babel-loader": "^9.1.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "babel-plugin-react-native-web": "^0.18.10",
-    "metro-react-native-babel-preset": "0.72.3",
+    "babel-plugin-react-native-web": "^0.19.4",
+    "metro-react-native-babel-preset": "0.73.9",
     "url-loader": "^4.1.1",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^4.11.1"
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
   }
 }

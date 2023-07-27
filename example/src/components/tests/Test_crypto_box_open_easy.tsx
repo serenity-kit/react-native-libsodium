@@ -1,8 +1,8 @@
 import React from 'react';
 import {
+  crypto_box_NONCEBYTES,
   crypto_box_keypair,
   crypto_box_open_easy,
-  crypto_box_NONCEBYTES,
   randombytes_buf,
   to_base64,
   to_string,
