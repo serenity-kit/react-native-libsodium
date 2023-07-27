@@ -5,7 +5,7 @@ React Native bindings to Libsodium matching the [libsodium-wrappers package](htt
 Supported Platforms:
 
 - iOS
-- Android (coming in the next months)
+- Android
 - Web
 
 Currently only a subset of the libsodium-wrappers exposed functionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
