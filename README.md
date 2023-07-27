@@ -8,7 +8,7 @@ Supported Platforms:
 - Android (coming in the next months)
 - Web
 
-Currently only a subset of the libsodium-wrappers exposed funtionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
+Currently only a subset of the libsodium-wrappers exposed functionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
 
 ## Installation Expo (dev-client)
 
@@ -24,7 +24,7 @@ Extend app.config.js with the following plugins entry:
 export default {
   expo: {
     …
-    plugins: [["react-native-sodium-expo-plugin", {}]],
+    plugins: [["react-native-libsodium", {}]],
   }
 }
 ```
