@@ -9,6 +9,19 @@ import { base64_variants, to_string } from './libsodium-js-utils';
 import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
+import { NativeModules } from 'react-native';
+
+const Libsodium = NativeModules.Libsodium;
+
+if (Libsodium && typeof Libsodium.install === 'function') {
+  console.log('calling Libsodium.install');
+  Libsodium.install();
+} else if (!Libsodium) {
+  console.warn('Libsodium module not defined');
+} else {
+  console.warn('Libsodium.install not a function');
+}
+
 declare global {
   var jsi_crypto_secretbox_KEYBYTES: number;
   var jsi_crypto_secretbox_NONCEBYTES: number;
