@@ -28,6 +28,13 @@ To run the example app on Android:
 yarn example android
 ```
 
+You need the emulator to run beforehand. This can be done using:
+
+```sh
+emulator -list-avds
+emulator -adv <name_from_the_list>
+```
+
 To run the example app on iOS:
 
 ```sh
@@ -44,7 +51,7 @@ yarn example web
 Make sure your code passes TypeScript and ESLint. Run the following to verify:
 
 ```sh
-yarn typescript
+yarn typecheck
 yarn lint
 ```
 
@@ -59,10 +66,6 @@ Remember to add tests for your change if possible. Run the unit tests by:
 ```sh
 yarn test
 ```
-
-To edit the Objective-C or Swift files, open `example/ios/LibsodiumExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-libsodium`.
-
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `react-native-libsodium` under `Android`.
 
 ### Commit message convention
 
@@ -100,7 +103,7 @@ yarn release
 The `package.json` file contains various scripts for common tasks:
 
 - `yarn bootstrap`: setup project by installing all dependencies and pods.
-- `yarn typescript`: type-check files with TypeScript.
+- `yarn typecheck`: type-check files with TypeScript.
 - `yarn lint`: lint files with ESLint.
 - `yarn test`: run unit tests with Jest.
 - `yarn example start`: start the Metro server for the example app.
