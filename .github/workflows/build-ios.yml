@@ -1,0 +1,73 @@
+name: Build iOS
+
+on: [push]
+
+jobs:
+  build:
+    name: Build iOS Example App
+    runs-on: macOS-latest
+    defaults:
+      run:
+        working-directory: example/ios
+    steps:
+      - uses: actions/checkout@v3
+      # Unpack Libsodium
+      - name: Unpack Libsodium
+        run: yarn postinstall
+        working-directory: ./
+      # build iOS app
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Restore node_modules from cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install node_modules for example/
+        run: yarn install --frozen-lockfile --cwd ..
+      - name: Restore buildcache
+        uses: mikehardy/buildcache-action@v1
+        continue-on-error: true
+      - name: Setup Ruby (bundle)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+          bundler-cache: true
+          working-directory: example/ios
+      - name: Restore Pods cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            example/ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+      # fix for ruby https://github.com/facebook/react-native/issues/37301#issuecomment-1540484759
+      - name: Fix for ruby
+        run: |
+          bundle config --local build.ffi --with-cflags=-Wno-error=implicit-function-declaration
+          bundle install
+      - name: Install Pods
+        run: bundle exec pod check || bundle exec pod install
+      - name: Install xcpretty
+        run: gem install xcpretty
+      - name: Build App
+        run: "set -o pipefail && xcodebuild \
+          CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
+          -derivedDataPath build -UseModernBuildSystem=YES \
+          -workspace LibsodiumExample.xcworkspace \
+          -scheme LibsodiumExample \
+          -sdk iphonesimulator \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 11' \
+          build \
+          CODE_SIGNING_ALLOWED=NO | xcpretty"
+      # - name: Build iOS App
+      #   working-directory: example
+      #   run: yarn build:ios
