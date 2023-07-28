@@ -187,18 +187,12 @@ namespace ReactNativeLibsodium
     {
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_KEYBYTES", static_cast<int>(crypto_secretbox_KEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_secretbox_NONCEBYTES", static_cast<int>(crypto_secretbox_NONCEBYTES));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_SALTBYTES", static_cast<int>(crypto_pwhash_SALTBYTES));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_ALG_DEFAULT", static_cast<int>(crypto_pwhash_ALG_DEFAULT));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_OPSLIMIT_INTERACTIVE));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_MEMLIMIT_INTERACTIVE));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_PUBLICKEYBYTES", static_cast<int>(crypto_box_PUBLICKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SECRETKEYBYTES", static_cast<int>(crypto_box_SECRETKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_NONCEBYTES", static_cast<int>(crypto_box_NONCEBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES", static_cast<int>(crypto_aead_xchacha20poly1305_ietf_KEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES", static_cast<int>(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_KEYBYTES", static_cast<int>(crypto_kdf_KEYBYTES));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MAX", static_cast<int>(crypto_pwhash_BYTES_MAX));
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_BYTES_MIN", static_cast<int>(crypto_pwhash_BYTES_MIN));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_CONTEXTBYTES", static_cast<int>(crypto_kdf_CONTEXTBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_BYTES", static_cast<int>(crypto_generichash_BYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_BYTES_MIN", static_cast<int>(crypto_generichash_BYTES_MIN));
@@ -859,81 +853,6 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy", std::move(jsi_crypto_box_open_easy));
-
-        auto jsi_crypto_pwhash = jsi::Function::createFromHostFunction(
-            jsiRuntime,
-            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash"),
-            6,
-            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
-            {
-                const std::string functionName = "crypto_pwhash";
-
-                std::string keyLengthArgumentName = "keyLength";
-                unsigned int keyLengthArgumentPosition = 0;
-                validateIsNumber(functionName, runtime, arguments[keyLengthArgumentPosition], keyLengthArgumentName, true);
-
-                std::string passwordArgumentName = "password";
-                unsigned int passwordArgumentPosition = 1;
-                JsiArgType passwordArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[passwordArgumentPosition], passwordArgumentName, true);
-
-                std::string saltArgumentName = "salt";
-                unsigned int saltArgumentPosition = 2;
-                validateIsArrayBuffer(functionName, runtime, arguments[saltArgumentPosition], saltArgumentName, true);
-
-                std::string opsLimitArgumentName = "opsLimit";
-                unsigned int opsLimitArgumentPosition = 3;
-                validateIsNumber(functionName, runtime, arguments[opsLimitArgumentPosition], opsLimitArgumentName, true);
-
-                std::string memLimitArgumentName = "memLimit";
-                unsigned int memLimitArgumentPosition = 4;
-                validateIsNumber(functionName, runtime, arguments[memLimitArgumentPosition], memLimitArgumentName, true);
-
-                std::string algorithmArgumentName = "algorithm";
-                unsigned int algorithmArgumentPosition = 5;
-                validateIsNumber(functionName, runtime, arguments[algorithmArgumentPosition], algorithmArgumentName, true);
-
-                int keyLength = arguments[keyLengthArgumentPosition].asNumber();
-                auto saltDataArrayBuffer =
-                    arguments[saltArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-                int opsLimit = arguments[opsLimitArgumentPosition].asNumber();
-                int memLimit = arguments[memLimitArgumentPosition].asNumber();
-                int algorithm = arguments[algorithmArgumentPosition].asNumber();
-                std::vector<uint8_t> key(keyLength);
-
-                int result = -1;
-                if (passwordArgType == JsiArgType::string)
-                {
-                    std::string passwordString = arguments[passwordArgumentPosition].asString(runtime).utf8(runtime);
-                    result = crypto_pwhash(
-                        key.data(),
-                        keyLength,
-                        reinterpret_cast<const char *>(passwordString.data()),
-                        passwordString.length(),
-                        saltDataArrayBuffer.data(runtime),
-                        opsLimit,
-                        memLimit,
-                        algorithm);
-                }
-                else
-                {
-                    auto passwordArrayBuffer =
-                        arguments[passwordArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
-                    result = crypto_pwhash(
-                        key.data(),
-                        keyLength,
-                        reinterpret_cast<const char *>(passwordArrayBuffer.data(runtime)),
-                        passwordArrayBuffer.length(runtime),
-                        saltDataArrayBuffer.data(runtime),
-                        opsLimit,
-                        memLimit,
-                        algorithm);
-                }
-
-                throwOnBadResult(functionName, runtime, result);
-                return arrayBufferAsObject(runtime, key);
-            });
-
-        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash", std::move(jsi_crypto_pwhash));
 
         auto jsi_crypto_kdf_derive_from_key = jsi::Function::createFromHostFunction(
             jsiRuntime,
