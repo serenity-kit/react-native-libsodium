@@ -1,11 +1,11 @@
+#include "react-native-libsodium.h"
+#include <sodium.h> // libsodium
 #include <sstream>
 #include <string>
 #include <utility>
+#include <vector>
 #include "jsi/jsilib.h"
 #include "jsi/jsi.h"
-#include "react-native-libsodium.h"
-// libsodium
-#include <sodium.h>
 
 namespace ReactNativeLibsodium
 {
