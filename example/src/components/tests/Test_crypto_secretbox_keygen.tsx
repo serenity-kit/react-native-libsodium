@@ -9,7 +9,7 @@ export const Test_crypto_secretbox_keygen: React.FC = () => {
   return (
     <>
       <FunctionStatus
-        name="crypto_kdf_keygen"
+        name="crypto_secretbox_keygen"
         success={crypto_secretbox_keygen().length === crypto_secretbox_KEYBYTES}
       />
     </>

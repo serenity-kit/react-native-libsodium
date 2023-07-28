@@ -6,6 +6,9 @@ import { Test_constants } from './components/tests/Test_constants';
 import { Test_crypto_aead_xchacha20poly1305_ietf_decrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_decrypt';
 import { Test_crypto_aead_xchacha20poly1305_ietf_encrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_encrypt';
 import { Test_crypto_aead_xchacha20poly1305_ietf_keygen } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_keygen';
+import { Test_crypto_auth } from './components/tests/Test_crypto_auth';
+import { Test_crypto_auth_keygen } from './components/tests/Test_crypto_auth_keygen';
+import { Test_crypto_auth_verify } from './components/tests/Test_crypto_auth_verify';
 import { Test_crypto_box_easy } from './components/tests/Test_crypto_box_easy';
 import { Test_crypto_box_keypair } from './components/tests/Test_crypto_box_keypair';
 import { Test_crypto_box_open_easy } from './components/tests/Test_crypto_box_open_easy';
@@ -50,6 +53,11 @@ function LibsodiumTests() {
 
           <Header>hashing</Header>
           <Test_crypto_generichash />
+
+          <Header>auth</Header>
+          <Test_crypto_auth_keygen />
+          <Test_crypto_auth />
+          <Test_crypto_auth_verify />
 
           <Header>key derivation</Header>
           <Test_crypto_kdf_keygen />

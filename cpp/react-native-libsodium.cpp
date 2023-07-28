@@ -201,6 +201,8 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_KEYBYTES_MIN", static_cast<int>(crypto_generichash_KEYBYTES_MIN));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash_KEYBYTES_MAX", static_cast<int>(crypto_generichash_KEYBYTES_MAX));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_SEEDBYTES", static_cast<int>(crypto_sign_SEEDBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_BYTES", static_cast<int>(crypto_auth_BYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_KEYBYTES", static_cast<int>(crypto_auth_KEYBYTES));
 
         auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
             jsiRuntime,
@@ -383,6 +385,19 @@ namespace ReactNativeLibsodium
             });
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_randombytes_uniform", std::move(jsi_randombytes_uniform));
 
+        auto jsi_crypto_auth_keygen = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "crypto_auth_keygen"),
+            0,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                std::vector<uint8_t> key(crypto_auth_KEYBYTES);
+                crypto_auth_keygen(key.data());
+                return arrayBufferAsObject(runtime, key);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_keygen", std::move(jsi_crypto_auth_keygen));
+
         auto jsi_crypto_secretbox_keygen = jsi::Function::createFromHostFunction(
             jsiRuntime,
             jsi::PropNameID::forUtf8(jsiRuntime, "crypto_secretbox_keygen"),
@@ -467,6 +482,96 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_keypair", std::move(jsi_crypto_sign_keypair));
+
+        auto jsi_crypto_auth = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_auth"),
+            2,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_auth";
+
+                std::string messageArgumentName = "message";
+                unsigned int messageArgumentPosition = 0;
+                JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+
+                std::string keyArgumentName = "key";
+                unsigned int keyArgumentPosition = 1;
+                validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
+
+                auto keyDataArrayBuffer =
+                    arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                if (keyDataArrayBuffer.length(runtime) != crypto_auth_KEYBYTES)
+                {
+                    throw jsi::JSError(runtime, "invalid key length");
+                }
+
+                std::vector<uint8_t> mac(crypto_auth_BYTES);
+                if (messageArgType == JsiArgType::string)
+                {
+                    std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+                    crypto_auth(mac.data(), reinterpret_cast<const unsigned char *>(messageString.data()), messageString.length(), keyDataArrayBuffer.data(runtime));
+                }
+                else
+                {
+                    auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                    crypto_auth(mac.data(), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), keyDataArrayBuffer.data(runtime));
+                }
+
+                return arrayBufferAsObject(runtime, mac);
+            });
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth", std::move(jsi_crypto_auth));
+
+        auto jsi_crypto_auth_verify = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_auth_verify"),
+            3,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_auth_verify";
+
+                std::string macArgumentName = "mac";
+                unsigned int macArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[macArgumentPosition], macArgumentName, true);
+
+                std::string messageArgumentName = "message";
+                unsigned int messageArgumentPosition = 1;
+                JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+
+                std::string keyArgumentName = "key";
+                unsigned int keyArgumentPosition = 2;
+                validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
+
+                auto macArrayBuffer = arguments[macArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                if (keyArrayBuffer.length(runtime) != crypto_auth_KEYBYTES)
+                {
+                    throw jsi::JSError(runtime, "invalid key length");
+                }
+
+                int result = -1;
+                if (messageArgType == JsiArgType::string)
+                {
+                    std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+                    result = crypto_auth_verify(
+                        macArrayBuffer.data(runtime),
+                        reinterpret_cast<const unsigned char *>(messageString.data()),
+                        messageString.length(),
+                        keyArrayBuffer.data(runtime));
+                }
+                else
+                {
+                    auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                    result = crypto_auth_verify(macArrayBuffer.data(runtime), messageArrayBuffer.data(runtime), messageArrayBuffer.length(runtime), keyArrayBuffer.data(runtime));
+                }
+
+                return jsi::Value(static_cast<bool>(result == 0));
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_verify", std::move(jsi_crypto_auth_verify));
 
         auto jsi_crypto_sign_seed_keypair = jsi::Function::createFromHostFunction(
             jsiRuntime,
