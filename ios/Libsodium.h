@@ -4,6 +4,6 @@
 
 @interface Libsodium : NSObject <RCTBridgeModule>
 
-@property (nonatomic, assign) BOOL setBridgeOnMainQueue;
+@property(nonatomic, assign) BOOL setBridgeOnMainQueue;
 
 @end

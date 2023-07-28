@@ -5,10 +5,10 @@ React Native bindings to Libsodium matching the [libsodium-wrappers package](htt
 Supported Platforms:
 
 - iOS
-- Android (coming in the next months)
+- Android
 - Web
 
-Currently only a subset of the libsodium-wrappers exposed funtionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
+Currently only a subset of the libsodium-wrappers exposed functionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
 
 ## Installation Expo (dev-client)
 
@@ -24,7 +24,7 @@ Extend app.config.js with the following plugins entry:
 export default {
   expo: {
     …
-    plugins: [["react-native-sodium-expo-plugin", {}]],
+    plugins: [["react-native-libsodium", {}]],
   }
 }
 ```
@@ -56,11 +56,6 @@ import {
   crypto_kdf_derive_from_key,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
-  crypto_pwhash,
-  crypto_pwhash_ALG_DEFAULT,
-  crypto_pwhash_MEMLIMIT_INTERACTIVE,
-  crypto_pwhash_OPSLIMIT_INTERACTIVE,
-  crypto_pwhash_SALTBYTES,
   crypto_generichash,
   crypto_generichash_BYTES,
   crypto_generichash_BYTES_MIN,

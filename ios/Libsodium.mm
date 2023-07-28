@@ -1,34 +1,27 @@
-#import "react-native-libsodium.h"
+#import "Libsodium.h"
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
-#import "Libsodium.h"
+#import <React/RCTLog.h>
+#import "react-native-libsodium.h"
 
 @implementation Libsodium
 
 @synthesize bridge=_bridge;
-@synthesize methodQueue = _methodQueue;
 
 RCT_EXPORT_MODULE()
 
-+ (BOOL)requiresMainQueueSetup {
-  return YES;
-}
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
 
-- (void)setBridge:(RCTBridge *)bridge {
-  _bridge = bridge;
-  _setBridgeOnMainQueue = RCTIsMainQueue();
-
+  RCTLogInfo(@"installing libsodium");
   RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
   if (!cxxBridge.runtime) {
-    return;
+    RCTLogInfo(@"libsodium install failure: no cxx bridge runtime");
+    return nil;
   }
 
-  installLibsodium(*(facebook::jsi::Runtime *)cxxBridge.runtime);
+  RCTLogInfo(@"calling installLibsodium with cxx bridge runtime");
+  ReactNativeLibsodium::installLibsodium(*(facebook::jsi::Runtime *)cxxBridge.runtime);
+  return nil;
 }
-
-- (void)invalidate {
-  cleanUpLibsodium();
-}
-
 
 @end

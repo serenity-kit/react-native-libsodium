@@ -9,21 +9,28 @@ import { base64_variants, to_string } from './libsodium-js-utils';
 import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
+import { NativeModules } from 'react-native';
+
+const Libsodium = NativeModules.Libsodium;
+
+if (Libsodium && typeof Libsodium.install === 'function') {
+  console.log('calling Libsodium.install');
+  Libsodium.install();
+} else if (!Libsodium) {
+  console.warn('Libsodium module not defined');
+} else {
+  console.warn('Libsodium.install not a function');
+}
+
 declare global {
   var jsi_crypto_secretbox_KEYBYTES: number;
   var jsi_crypto_secretbox_NONCEBYTES: number;
-  var jsi_crypto_pwhash_SALTBYTES: number;
-  var jsi_crypto_pwhash_ALG_DEFAULT: number;
-  var jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
-  var jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
   var jsi_crypto_box_PUBLICKEYBYTES: number;
   var jsi_crypto_box_SECRETKEYBYTES: number;
   var jsi_crypto_box_NONCEBYTES: number;
   var jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
   var jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
   var jsi_crypto_kdf_KEYBYTES: number;
-  var jsi_crypto_pwhash_BYTES_MIN: number;
-  var jsi_crypto_pwhash_BYTES_MAX: number;
   var jsi_crypto_kdf_CONTEXTBYTES: number;
   var jsi_crypto_generichash_BYTES: number;
   var jsi_crypto_generichash_BYTES_MIN: number;
@@ -95,14 +102,6 @@ declare global {
     message: string | ArrayBuffer,
     key?: ArrayBuffer | null | undefined
   ): ArrayBuffer;
-  function jsi_crypto_pwhash(
-    keyLength: number,
-    password: string | ArrayBuffer,
-    salt: ArrayBuffer,
-    opsLimit: number,
-    memLimit: number,
-    algorithm: number
-  ): ArrayBuffer;
   function jsi_crypto_kdf_derive_from_key(
     subkeyLength: number,
     subkeyId: number,
@@ -126,12 +125,6 @@ declare global {
 export const crypto_secretbox_KEYBYTES = global.jsi_crypto_secretbox_KEYBYTES;
 export const crypto_secretbox_NONCEBYTES =
   global.jsi_crypto_secretbox_NONCEBYTES;
-export const crypto_pwhash_SALTBYTES = global.jsi_crypto_pwhash_SALTBYTES;
-export const crypto_pwhash_ALG_DEFAULT = global.jsi_crypto_pwhash_ALG_DEFAULT;
-export const crypto_pwhash_OPSLIMIT_INTERACTIVE =
-  global.jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE;
-export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
-  global.jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE;
 export const crypto_box_PUBLICKEYBYTES = global.jsi_crypto_box_PUBLICKEYBYTES;
 export const crypto_box_SECRETKEYBYTES = global.jsi_crypto_box_SECRETKEYBYTES;
 export const crypto_box_NONCEBYTES = global.jsi_crypto_box_NONCEBYTES;
@@ -140,8 +133,6 @@ export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
 export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
   global.jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
 export const crypto_kdf_KEYBYTES = global.jsi_crypto_kdf_KEYBYTES;
-export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
-export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
 export const crypto_kdf_CONTEXTBYTES = global.jsi_crypto_kdf_CONTEXTBYTES;
 export const crypto_generichash_BYTES = global.jsi_crypto_generichash_BYTES;
 export const crypto_generichash_BYTES_MIN =
@@ -467,50 +458,6 @@ export function crypto_generichash(
   return convertToOutputFormat(result, outputFormat);
 }
 
-export function crypto_pwhash(
-  keyLength: number,
-  password: string | Uint8Array,
-  salt: Uint8Array,
-  opsLimit: number,
-  memLimit: number,
-  algorithm: number,
-  outputFormat?: Uint8ArrayOutputFormat | null
-): Uint8Array;
-export function crypto_pwhash(
-  keyLength: number,
-  password: string | Uint8Array,
-  salt: Uint8Array,
-  opsLimit: number,
-  memLimit: number,
-  algorithm: number,
-  outputFormat: StringOutputFormat
-): string;
-export function crypto_pwhash(
-  keyLength: number,
-  password: string | Uint8Array,
-  salt: Uint8Array,
-  opsLimit: number,
-  memLimit: number,
-  algorithm: number,
-  outputFormat: OutputFormat
-) {
-  if (salt.length !== crypto_pwhash_SALTBYTES) {
-    throw new Error('invalid salt length');
-  }
-  let result: ArrayBuffer;
-  const passwordParam =
-    typeof password === 'string' ? password : password.buffer;
-  result = global.jsi_crypto_pwhash(
-    keyLength,
-    passwordParam,
-    salt.buffer,
-    opsLimit,
-    memLimit,
-    algorithm
-  );
-  return convertToOutputFormat(result, outputFormat);
-}
-
 export function crypto_kdf_derive_from_key(
   subkey_len: number,
   subkey_id: number,
@@ -646,13 +593,6 @@ export default {
   crypto_kdf_CONTEXTBYTES,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
-  crypto_pwhash,
-  crypto_pwhash_ALG_DEFAULT,
-  crypto_pwhash_BYTES_MAX,
-  crypto_pwhash_BYTES_MIN,
-  crypto_pwhash_MEMLIMIT_INTERACTIVE,
-  crypto_pwhash_OPSLIMIT_INTERACTIVE,
-  crypto_pwhash_SALTBYTES,
   crypto_secretbox_easy,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
