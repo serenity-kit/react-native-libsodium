@@ -23,6 +23,8 @@ if (Libsodium && typeof Libsodium.install === 'function') {
 }
 
 declare global {
+  var jsi_crypto_auth_BYTES: number;
+  var jsi_crypto_auth_KEYBYTES: number;
   var jsi_crypto_secretbox_KEYBYTES: number;
   var jsi_crypto_secretbox_NONCEBYTES: number;
   var jsi_crypto_box_PUBLICKEYBYTES: number;
@@ -40,6 +42,16 @@ declare global {
   var jsi_crypto_generichash_KEYBYTES_MAX: number;
   var jsi_crypto_sign_SEEDBYTES: number;
 
+  function jsi_crypto_auth(
+    message: string | ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_auth_verify(
+    tag: ArrayBuffer,
+    message: string | ArrayBuffer,
+    key: ArrayBuffer
+  ): boolean;
+  function jsi_crypto_auth_keygen(): ArrayBuffer;
   function jsi_from_base64_to_arraybuffer(
     input: string,
     variant?: base64_variants
@@ -122,6 +134,8 @@ declare global {
   ): ArrayBuffer;
 }
 
+export const crypto_auth_BYTES = global.jsi_crypto_auth_BYTES;
+export const crypto_auth_KEYBYTES = global.jsi_crypto_auth_KEYBYTES;
 export const crypto_secretbox_KEYBYTES = global.jsi_crypto_secretbox_KEYBYTES;
 export const crypto_secretbox_NONCEBYTES =
   global.jsi_crypto_secretbox_NONCEBYTES;
@@ -188,6 +202,44 @@ export function randombytes_buf(
 
 export function randombytes_uniform(upper_bound: number): number {
   return global.jsi_randombytes_uniform(upper_bound);
+}
+
+export function crypto_auth(
+  message: string | Uint8Array,
+  key: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_auth(
+  message: string | Uint8Array,
+  key: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_auth(
+  message: string | Uint8Array,
+  key: Uint8Array,
+  outputFormat: OutputFormat
+): unknown {
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  const result = global.jsi_crypto_auth(messageParam, key.buffer);
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_auth_keygen(
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_auth_keygen(outputFormat: StringOutputFormat): string;
+export function crypto_auth_keygen(outputFormat: OutputFormat): unknown {
+  const result = global.jsi_crypto_auth_keygen();
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_auth_verify(
+  tag: Uint8Array,
+  message: string | Uint8Array,
+  key: Uint8Array
+): boolean {
+  const messageParam = typeof message === 'string' ? message : message.buffer;
+  return global.jsi_crypto_auth_verify(tag.buffer, messageParam, key.buffer);
 }
 
 export function crypto_secretbox_keygen(
@@ -578,6 +630,11 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
 export default {
+  // crypto_auth,
+  // crypto_auth_verify,
+  crypto_auth_BYTES,
+  crypto_auth_KEYBYTES,
+  crypto_auth_keygen,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,

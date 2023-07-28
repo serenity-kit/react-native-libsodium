@@ -42,6 +42,11 @@ cd ios && pod install
 
 ```js
 import {
+  crypto_auth,
+  crypto_auth_verify,
+  crypto_auth_BYTES,
+  crypto_auth_KEYBYTES,
+  crypto_auth_keygen,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
