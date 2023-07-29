@@ -1,0 +1,6 @@
+appId: org.reactjs.native.example.LibsodiumExample
+---
+- launchApp
+- assertVisible:
+    text: 'Tests passed'
+    enabled: true
