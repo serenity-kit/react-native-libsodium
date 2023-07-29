@@ -1,32 +1,8 @@
 import * as React from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import sodium, { ready } from 'react-native-libsodium';
-import { Header } from './components/Header';
-import { Test_constants } from './components/tests/Test_constants';
-import { Test_crypto_aead_xchacha20poly1305_ietf_decrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_decrypt';
-import { Test_crypto_aead_xchacha20poly1305_ietf_encrypt } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_encrypt';
-import { Test_crypto_aead_xchacha20poly1305_ietf_keygen } from './components/tests/Test_crypto_aead_xchacha20poly1305_ietf_keygen';
-import { Test_crypto_auth } from './components/tests/Test_crypto_auth';
-import { Test_crypto_auth_keygen } from './components/tests/Test_crypto_auth_keygen';
-import { Test_crypto_auth_verify } from './components/tests/Test_crypto_auth_verify';
-import { Test_crypto_box_easy } from './components/tests/Test_crypto_box_easy';
-import { Test_crypto_box_keypair } from './components/tests/Test_crypto_box_keypair';
-import { Test_crypto_box_open_easy } from './components/tests/Test_crypto_box_open_easy';
-import { Test_crypto_generichash } from './components/tests/Test_crypto_generichash';
-import { Test_crypto_kdf_derive_from_key } from './components/tests/Test_crypto_kdf_derive_from_key';
-import { Test_crypto_kdf_keygen } from './components/tests/Test_crypto_kdf_keygen';
-import { Test_crypto_secretbox_easy } from './components/tests/Test_crypto_secretbox_easy';
-import { Test_crypto_secretbox_keygen } from './components/tests/Test_crypto_secretbox_keygen';
-import { Test_crypto_secretbox_open_easy } from './components/tests/Test_crypto_secretbox_open_easy';
-import { Test_crypto_sign_detached } from './components/tests/Test_crypto_sign_detached';
-import { Test_crypto_sign_keypair } from './components/tests/Test_crypto_sign_keypair';
-import { Test_crypto_sign_seed_keypair } from './components/tests/Test_crypto_sign_seed_keypair';
-import { Test_crypto_sign_verify_detached } from './components/tests/Test_crypto_sign_verify_detached';
-import { Test_from_base64 } from './components/tests/Test_from_base64';
-import { Test_randombytes_buf } from './components/tests/Test_randombytes_buf';
-import { Test_randombytes_uniform } from './components/tests/Test_randombytes_uniform';
-import { Test_to_base64 } from './components/tests/Test_to_base64';
-import { Test_to_hex } from './components/tests/Test_to_hex';
+import { TestResults } from './components/TestResults';
+import { VisualImageTest } from './components/VisualImageTest';
 
 function LibsodiumTests() {
   if (sodium.crypto_secretbox_KEYBYTES !== 32) {
@@ -37,52 +13,8 @@ function LibsodiumTests() {
     <SafeAreaView style={styles.safeAreaContainer}>
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
-          <Header>constants</Header>
-          <Test_constants />
-
-          <Header>base64</Header>
-          <Test_to_base64 />
-          <Test_from_base64 />
-
-          <Header>hex</Header>
-          <Test_to_hex />
-
-          <Header>random</Header>
-          <Test_randombytes_buf />
-          <Test_randombytes_uniform />
-
-          <Header>hashing</Header>
-          <Test_crypto_generichash />
-
-          <Header>auth</Header>
-          <Test_crypto_auth_keygen />
-          <Test_crypto_auth />
-          <Test_crypto_auth_verify />
-
-          <Header>key derivation</Header>
-          <Test_crypto_kdf_keygen />
-          <Test_crypto_kdf_derive_from_key />
-
-          <Header>signing</Header>
-          <Test_crypto_sign_keypair />
-          <Test_crypto_sign_seed_keypair />
-          <Test_crypto_sign_detached />
-          <Test_crypto_sign_verify_detached />
-
-          <Header>box encryption (asymmetric)</Header>
-          <Test_crypto_box_keypair />
-          <Test_crypto_box_easy />
-          <Test_crypto_box_open_easy />
-
-          <Header>secretbox encryption (symmetric)</Header>
-          <Test_crypto_secretbox_keygen />
-          <Test_crypto_secretbox_easy />
-          <Test_crypto_secretbox_open_easy />
-
-          <Header>AEAD encryption (symmetric)</Header>
-          <Test_crypto_aead_xchacha20poly1305_ietf_keygen />
-          <Test_crypto_aead_xchacha20poly1305_ietf_encrypt />
-          <Test_crypto_aead_xchacha20poly1305_ietf_decrypt />
+          <TestResults />
+          <VisualImageTest />
         </View>
       </ScrollView>
     </SafeAreaView>
