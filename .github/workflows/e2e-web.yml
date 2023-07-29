@@ -1,0 +1,24 @@
+name: e2e tests Web
+
+on: [push]
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install node_modules
+        run: yarn install --frozen-lockfile
+      - name: Install node_modules for example/
+        run: yarn install --frozen-lockfile --cwd example
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Run e2e tests
+        run: yarn test:e2e:web
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
