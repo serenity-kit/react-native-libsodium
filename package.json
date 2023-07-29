@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "test": "jest",
+    "test:e2e:web": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepack": "bob build",
