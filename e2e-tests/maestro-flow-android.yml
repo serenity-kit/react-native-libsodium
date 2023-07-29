@@ -1,0 +1,6 @@
+appId: com.libsodiumexample
+---
+- launchApp
+- assertVisible:
+    text: 'Tests passed'
+    enabled: true

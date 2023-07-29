@@ -1,0 +1,62 @@
+name: e2e tests Android
+
+on: [push]
+
+jobs:
+  test-android:
+    name: e2e-android-test
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      # build app
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Setup Java environment
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+      - name: Install node_modules in root
+        run: yarn install --frozen-lockfile
+      - name: Install node_modules in example
+        working-directory: example
+        run: yarn install --frozen-lockfile
+      # Install Maestro
+      - name: Install Maestro CLI
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+      - name: Add Maestro to path
+        run: echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+      # Run emulator and e2e tests
+      - name: Run Android Emulator and app
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          working-directory: example
+          # For some reason in `script` we can't run scripts with multiple
+          # arguments and therefor we created the yarn scripts.
+          # Noticed this workaround in: https://github.com/stripe/stripe-react-native/blob/master/.github/workflows/e2e-tests.yml#L71
+          script: |
+            yarn android-release
+            yarn e2e-debug
+            yarn android-e2e-tests
