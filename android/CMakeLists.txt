@@ -6,9 +6,9 @@ set (CMAKE_CXX_STANDARD 11)
 # add directories to "include" search paths
 include_directories(
             ../cpp
-            ../../../node_modules/react-native/React
-            ../../../node_modules/react-native/React/Base
-            ../../../node_modules/react-native/ReactCommon/jsi
+            "${NODE_MODULES_DIR}/react-native/React"
+            "${NODE_MODULES_DIR}/react-native/React/Base"
+            "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi"
 )
 
 # set the base libsodium build directory
@@ -33,7 +33,7 @@ set_target_properties( sodium PROPERTIES IMPORTED_LOCATION ${LIBSODIUM_BUILD_DIR
 # which will be built from the listed source files
 add_library(libsodium
   SHARED
-  ../../../node_modules/react-native/ReactCommon/jsi/jsi/jsi.cpp
+  "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi/jsi/jsi.cpp"
   ../cpp/react-native-libsodium.cpp
   ../cpp/react-native-libsodium.h
   cpp-adapter.cpp

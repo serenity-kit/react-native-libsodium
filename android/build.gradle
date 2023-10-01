@@ -1,3 +1,5 @@
+import java.nio.file.Paths
+
 buildscript {
   repositories {
     google()
@@ -30,6 +32,21 @@ def getExtOrIntegerDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Libsodium_" + name]).toInteger()
 }
 
+static def findNodeModules(baseDir) {
+  def basePath = baseDir.toPath().normalize()
+  while (basePath) {
+    def nodeModulesPath = Paths.get(basePath.toString(), "node_modules")
+    def reactNativePath = Paths.get(nodeModulesPath.toString(), "react-native")
+    if (nodeModulesPath.toFile().exists() && reactNativePath.toFile().exists()) {
+      return nodeModulesPath.toString()
+    }
+    basePath = basePath.getParent()
+  }
+  throw new GradleException("react-native-libsodium: Failed to find node_modules path")
+}
+
+def nodeModules = findNodeModules(projectDir)
+
 android {
   ndkVersion getExtOrDefault("ndkVersion")
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
@@ -48,7 +65,8 @@ android {
         // exceptions (and other STL types) across shared object boundaries work
         // correctly.
         // see https://developer.android.com/ndk/guides/cpp-support#selecting_a_c_runtime
-        arguments "-DANDROID_STL=c++_shared"
+        arguments "-DANDROID_STL=c++_shared",
+                  "-DNODE_MODULES_DIR=${nodeModules}"
       }
     }
   }
