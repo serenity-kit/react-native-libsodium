@@ -630,8 +630,8 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
 export default {
-  // crypto_auth,
-  // crypto_auth_verify,
+  crypto_auth,
+  crypto_auth_verify,
   crypto_auth_BYTES,
   crypto_auth_KEYBYTES,
   crypto_auth_keygen,
@@ -646,6 +646,13 @@ export default {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_generichash,
+  crypto_generichash_BYTES,
+  crypto_generichash_BYTES_MIN,
+  crypto_generichash_BYTES_MAX,
+  crypto_generichash_KEYBYTES,
+  crypto_generichash_KEYBYTES_MIN,
+  crypto_generichash_KEYBYTES_MAX,
   crypto_kdf_derive_from_key,
   crypto_kdf_CONTEXTBYTES,
   crypto_kdf_KEYBYTES,
