@@ -13,6 +13,7 @@ import '../tests/crypto_box_open_easy_test';
 import '../tests/crypto_generichash_test';
 import '../tests/crypto_kdf_derive_from_key_test';
 import '../tests/crypto_kdf_keygen_test';
+import '../tests/crypto_pwhash_test';
 import '../tests/crypto_secretbox_easy_test';
 import '../tests/crypto_secretbox_keygen_test';
 import '../tests/crypto_secretbox_open_easy_test';
