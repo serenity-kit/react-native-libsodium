@@ -4,6 +4,10 @@ description: Setup Node.js and install dependencies
 runs:
   using: composite
   steps:
+    - name: Enable corepack
+      run: corepack enable
+      shell: bash
+
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:

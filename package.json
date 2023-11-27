@@ -90,7 +90,7 @@
   "engines": {
     "node": ">= 16.0.0"
   },
-  "packageManager": "^yarn@1.22.15",
+  "packageManager": "yarn@1.22.21",
   "jest": {
     "preset": "react-native",
     "modulePathIgnorePatterns": [
@@ -165,7 +165,7 @@
     ]
   },
   "dependencies": {
-    "@types/libsodium-wrappers": "^0.7.10",
-    "libsodium-wrappers": "^0.7.11"
+    "@types/libsodium-wrappers": "^0.7.13",
+    "libsodium-wrappers": "^0.7.13"
   }
 }
