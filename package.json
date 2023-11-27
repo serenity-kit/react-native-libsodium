@@ -165,7 +165,7 @@
     ]
   },
   "dependencies": {
-    "@types/libsodium-wrappers": "^0.7.10",
-    "libsodium-wrappers": "^0.7.11"
+    "@types/libsodium-wrappers": "^0.7.13",
+    "libsodium-wrappers": "^0.7.13"
   }
 }
