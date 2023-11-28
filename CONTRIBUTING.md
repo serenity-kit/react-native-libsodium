@@ -98,6 +98,10 @@ To publish new versions, run the following:
 yarn release
 ```
 
+### Upgrade Libsodium c library
+
+Download a the new minisig file e.g. `libsodium-1.0.19-stable.tar.gz.minisig` to `./libsodium`. Update the version in `./libsodium/build.sh` and run `cd libsodium && ./build.sh` to build the new library.
+
 ### Scripts
 
 The `package.json` file contains various scripts for common tasks:
