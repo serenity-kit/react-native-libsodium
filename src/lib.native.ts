@@ -41,6 +41,12 @@ declare global {
   var jsi_crypto_generichash_KEYBYTES_MIN: number;
   var jsi_crypto_generichash_KEYBYTES_MAX: number;
   var jsi_crypto_sign_SEEDBYTES: number;
+  var jsi_crypto_pwhash_SALTBYTES: number;
+  var jsi_crypto_pwhash_ALG_DEFAULT: number;
+  var jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
+  var jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
+  var jsi_crypto_pwhash_BYTES_MIN: number;
+  var jsi_crypto_pwhash_BYTES_MAX: number;
 
   function jsi_crypto_auth(
     message: string | ArrayBuffer,
@@ -114,6 +120,14 @@ declare global {
     message: string | ArrayBuffer,
     key?: ArrayBuffer | null | undefined
   ): ArrayBuffer;
+  function jsi_crypto_pwhash(
+    keyLength: number,
+    password: string | ArrayBuffer,
+    salt: ArrayBuffer,
+    opsLimit: number,
+    memLimit: number,
+    algorithm: number
+  ): ArrayBuffer;
   function jsi_crypto_kdf_derive_from_key(
     subkeyLength: number,
     subkeyId: number,
@@ -160,6 +174,14 @@ export const crypto_generichash_KEYBYTES_MIN =
 export const crypto_generichash_KEYBYTES_MAX =
   global.jsi_crypto_generichash_KEYBYTES_MAX;
 export const crypto_sign_SEEDBYTES = global.jsi_crypto_sign_SEEDBYTES;
+export const crypto_pwhash_SALTBYTES = global.jsi_crypto_pwhash_SALTBYTES;
+export const crypto_pwhash_ALG_DEFAULT = global.jsi_crypto_pwhash_ALG_DEFAULT;
+export const crypto_pwhash_OPSLIMIT_INTERACTIVE =
+  global.jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE;
+export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
+  global.jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE;
+export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
+export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
 
 export const from_base64 = (
   input: string,
@@ -510,6 +532,50 @@ export function crypto_generichash(
   return convertToOutputFormat(result, outputFormat);
 }
 
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_pwhash(
+  keyLength: number,
+  password: string | Uint8Array,
+  salt: Uint8Array,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number,
+  outputFormat: OutputFormat
+) {
+  if (salt.length !== crypto_pwhash_SALTBYTES) {
+    throw new Error('invalid salt length');
+  }
+  let result: ArrayBuffer;
+  const passwordParam =
+    typeof password === 'string' ? password : password.buffer;
+  result = global.jsi_crypto_pwhash(
+    keyLength,
+    passwordParam,
+    salt.buffer,
+    opsLimit,
+    memLimit,
+    algorithm
+  );
+  return convertToOutputFormat(result, outputFormat);
+}
+
 export function crypto_kdf_derive_from_key(
   subkey_len: number,
   subkey_id: number,
@@ -629,6 +695,9 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
+// add no-op ready to match the react-nativ-libsodium API for web
+export const loadSumoVersion = () => undefined;
+
 export default {
   crypto_auth,
   crypto_auth_verify,
@@ -657,6 +726,13 @@ export default {
   crypto_kdf_CONTEXTBYTES,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
+  crypto_pwhash,
+  crypto_pwhash_ALG_DEFAULT,
+  crypto_pwhash_BYTES_MAX,
+  crypto_pwhash_BYTES_MIN,
+  crypto_pwhash_MEMLIMIT_INTERACTIVE,
+  crypto_pwhash_OPSLIMIT_INTERACTIVE,
+  crypto_pwhash_SALTBYTES,
   crypto_secretbox_easy,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,
