@@ -47,6 +47,9 @@ declare global {
   var jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
   var jsi_crypto_pwhash_BYTES_MIN: number;
   var jsi_crypto_pwhash_BYTES_MAX: number;
+  var jsi_crypto_kdf_hkdf_sha256_BYTES_MAX: number;
+  var jsi_crypto_kdf_hkdf_sha256_BYTES_MIN: number;
+  var jsi_crypto_kdf_hkdf_sha256_KEYBYTES: number;
 
   function jsi_crypto_auth(
     message: string | ArrayBuffer,
@@ -146,6 +149,21 @@ declare global {
     public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+    ciphertext: string | ArrayBuffer,
+    additionalData: string,
+    public_nonce: ArrayBuffer,
+    key: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_kdf_hkdf_sha256_extract(
+    key: ArrayBuffer,
+    salt: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_kdf_hkdf_sha256_expand(
+    key: ArrayBuffer,
+    info: string,
+    length: number
+  ): ArrayBuffer;
 }
 
 export const crypto_auth_BYTES = global.jsi_crypto_auth_BYTES;
@@ -182,6 +200,12 @@ export const crypto_pwhash_MEMLIMIT_INTERACTIVE =
   global.jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE;
 export const crypto_pwhash_BYTES_MIN = global.jsi_crypto_pwhash_BYTES_MIN;
 export const crypto_pwhash_BYTES_MAX = global.jsi_crypto_pwhash_BYTES_MAX;
+export const _unstable_crypto_kdf_hkdf_sha256_BYTES_MAX =
+  global.jsi_crypto_kdf_hkdf_sha256_BYTES_MAX;
+export const _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN =
+  global.jsi_crypto_kdf_hkdf_sha256_BYTES_MIN;
+export const _unstable_crypto_kdf_hkdf_sha256_KEYBYTES =
+  global.jsi_crypto_kdf_hkdf_sha256_KEYBYTES;
 
 export const from_base64 = (
   input: string,
@@ -692,6 +716,25 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
   return convertToOutputFormat(result, outputFormat);
 }
 
+export function _unstable_crypto_kdf_hkdf_sha256_extract(
+  key: Uint8Array,
+  salt: Uint8Array
+) {
+  return new Uint8Array(
+    global.jsi_crypto_kdf_hkdf_sha256_extract(key.buffer, salt.buffer)
+  );
+}
+
+export function _unstable_crypto_kdf_hkdf_sha256_expand(
+  key: Uint8Array,
+  info: string,
+  length: number
+) {
+  return new Uint8Array(
+    global.jsi_crypto_kdf_hkdf_sha256_expand(key.buffer, info, length)
+  );
+}
+
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
@@ -748,4 +791,9 @@ export default {
   to_base64,
   to_hex,
   to_string,
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MAX,
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN,
+  _unstable_crypto_kdf_hkdf_sha256_KEYBYTES,
+  _unstable_crypto_kdf_hkdf_sha256_extract,
+  _unstable_crypto_kdf_hkdf_sha256_expand,
 };

@@ -1,4 +1,7 @@
 import {
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MAX,
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN,
+  _unstable_crypto_kdf_hkdf_sha256_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_auth_BYTES,
   crypto_auth_KEYBYTES,
@@ -23,4 +26,7 @@ test('constants', () => {
   expect(crypto_kdf_KEYBYTES).toEqual(32);
   expect(crypto_kdf_CONTEXTBYTES).toEqual(8);
   expect(crypto_sign_SEEDBYTES).toEqual(32);
+  expect(_unstable_crypto_kdf_hkdf_sha256_KEYBYTES).toEqual(32);
+  expect(_unstable_crypto_kdf_hkdf_sha256_BYTES_MIN).toEqual(0);
+  expect(_unstable_crypto_kdf_hkdf_sha256_BYTES_MAX).toEqual(8160);
 });
