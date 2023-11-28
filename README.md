@@ -61,11 +61,11 @@ import {
   crypto_kdf_derive_from_key,
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
-  crypto_pwhash,
-  crypto_pwhash_ALG_DEFAULT,
-  crypto_pwhash_MEMLIMIT_INTERACTIVE,
-  crypto_pwhash_OPSLIMIT_INTERACTIVE,
-  crypto_pwhash_SALTBYTES,
+  crypto_pwhash, // only with loadSumoVersion with react-native-web
+  crypto_pwhash_ALG_DEFAULT, // only with loadSumoVersion with react-native-web
+  crypto_pwhash_MEMLIMIT_INTERACTIVE, // only with loadSumoVersion with react-native-web
+  crypto_pwhash_OPSLIMIT_INTERACTIVE, // only with loadSumoVersion with react-native-web
+  crypto_pwhash_SALTBYTES, // only with loadSumoVersion with react-native-web
   crypto_generichash,
   crypto_generichash_BYTES,
   crypto_generichash_BYTES_MIN,
@@ -88,9 +88,23 @@ import {
   to_base64,
   to_hex,
   to_string,
+  ready, // only needed for react-native-web
+  loadSumoVersion, // only relevant for react-native-web
 } from 'react-native-libsodium';
 
 // ...
+```
+
+## React Native Web
+
+For the web platform the constants and functions from the `libsodium-wrappers` package is exposed. This also means you need to wait for the `ready` Promise to be resolved before using any constant or function.
+
+Certain constants and functions e.g. `crypto_pwhash` are only available in the `libsodium-wrappers-sumo` package. To load this package instead for web you can call `loadSumoVersion` right after importing the package.
+
+```ts
+import { loadSumoVersion, ready } from 'react-native-libsodium';
+
+loadSumoVersion();
 ```
 
 ## Contributing

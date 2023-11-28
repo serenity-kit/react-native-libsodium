@@ -695,6 +695,9 @@ export function crypto_aead_xchacha20poly1305_ietf_decrypt(
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
+// add no-op ready to match the react-nativ-libsodium API for web
+export const loadSumoVersion = () => undefined;
+
 export default {
   crypto_auth,
   crypto_auth_verify,

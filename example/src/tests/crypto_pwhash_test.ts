@@ -8,6 +8,7 @@ import {
   randombytes_buf,
 } from 'react-native-libsodium';
 import { isEqualUint8Array } from '../utils/isEqualUint8Array';
+import { expect, test } from '../utils/testRunner';
 
 test('crypto_pwhash', () => {
   const password = 'password123';

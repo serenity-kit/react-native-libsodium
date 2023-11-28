@@ -14,6 +14,8 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'index.js'),
     path.resolve(appDirectory, 'src'),
     path.resolve(appDirectory, 'node_modules/react-native-uncompiled'),
+    // make sure the lib src files are also compiled
+    path.resolve(appDirectory, '../src'),
   ],
   use: {
     loader: 'babel-loader',
