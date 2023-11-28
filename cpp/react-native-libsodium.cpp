@@ -209,6 +209,9 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_SEEDBYTES", static_cast<int>(crypto_sign_SEEDBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_BYTES", static_cast<int>(crypto_auth_BYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_auth_KEYBYTES", static_cast<int>(crypto_auth_KEYBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_BYTES_MAX", static_cast<int>(crypto_kdf_hkdf_sha256_BYTES_MAX));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_BYTES_MIN", static_cast<int>(crypto_kdf_hkdf_sha256_BYTES_MIN));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_KEYBYTES", static_cast<int>(crypto_kdf_hkdf_sha256_KEYBYTES));
 
         auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
             jsiRuntime,
@@ -1341,5 +1344,80 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_generichash", std::move(jsi_crypto_generichash));
+
+        auto jsi_crypto_kdf_hkdf_sha256_extract = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_extract"),
+            2,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "jsi_crypto_kdf_hkdf_sha256_extract";
+
+                std::string keyArgumentName = "key";
+                unsigned int keyArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
+
+                std::string saltArgumentName = "salt";
+                unsigned int saltArgumentPosition = 1;
+                validateIsArrayBuffer(functionName, runtime, arguments[saltArgumentPosition], saltArgumentName, true);
+
+                std::vector<uint8_t> subkey(crypto_kdf_hkdf_sha256_KEYBYTES);
+                int result = -1;
+
+                auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                auto saltArrayBuffer = arguments[saltArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                result = crypto_kdf_hkdf_sha256_extract(
+                    subkey.data(),
+                    saltArrayBuffer.data(runtime),
+                    saltArrayBuffer.length(runtime),
+                    keyArrayBuffer.data(runtime),
+                    keyArrayBuffer.length(runtime));
+
+                throwOnBadResult(functionName, runtime, result);
+                return arrayBufferAsObject(runtime, subkey);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_extract", std::move(jsi_crypto_kdf_hkdf_sha256_extract));
+
+        auto jsi_crypto_kdf_hkdf_sha256_expand = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_expand"),
+            3,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "jsi_crypto_kdf_hkdf_sha256_expand";
+
+                std::string keyArgumentName = "key";
+                unsigned int keyArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[keyArgumentPosition], keyArgumentName, true);
+
+                std::string infoArgumentName = "info";
+                unsigned int infoArgumentPosition = 1;
+                validateIsString(functionName, runtime, arguments[infoArgumentPosition], infoArgumentName, true);
+
+                std::string subkeyLengthArgumentName = "subkeyLength";
+                unsigned int subkeyLengthArgumentPosition = 2;
+                validateIsNumber(functionName, runtime, arguments[subkeyLengthArgumentPosition], subkeyLengthArgumentName, true);
+
+                std::string info = arguments[infoArgumentPosition].asString(runtime).utf8(runtime);
+                int subkeyLength = arguments[subkeyLengthArgumentPosition].asNumber();
+                std::vector<uint8_t> subkey(subkeyLength);
+                int result = -1;
+
+                auto keyArrayBuffer = arguments[keyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                result = crypto_kdf_hkdf_sha256_expand(
+                    subkey.data(),
+                    subkey.size(),
+                    reinterpret_cast<const char *>(info.data()),
+                    info.length(),
+                    keyArrayBuffer.data(runtime));
+
+                throwOnBadResult(functionName, runtime, result);
+                return arrayBufferAsObject(runtime, subkey);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_expand", std::move(jsi_crypto_kdf_hkdf_sha256_expand));
     }
 } // namespace ReactNativeLibsodium

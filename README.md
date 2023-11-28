@@ -90,6 +90,11 @@ import {
   to_string,
   ready, // only needed for react-native-web
   loadSumoVersion, // only relevant for react-native-web
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MAX, // has no counterpart in libsodium-wrappers yet
+  _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN, // has no counterpart in libsodium-wrappers yet
+  _unstable_crypto_kdf_hkdf_sha256_KEYBYTES, // has no counterpart in libsodium-wrappers yet
+  _unstable_crypto_kdf_hkdf_sha256_extract, // has no counterpart in libsodium-wrappers yet
+  _unstable_crypto_kdf_hkdf_sha256_expand, // has no counterpart in libsodium-wrappers yet
 } from 'react-native-libsodium';
 
 // ...

@@ -14,6 +14,8 @@ export type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
+import * as hkdf from '@noble/hashes/hkdf';
+import { sha256 } from '@noble/hashes/sha256';
 
 type SodiumPackage = typeof import('libsodium-wrappers');
 
@@ -818,3 +820,20 @@ export let crypto_sign_SECRETKEYBYTES = sodium.crypto_sign_SECRETKEYBYTES;
 export let crypto_sign_SEEDBYTES = sodium.crypto_sign_SEEDBYTES;
 export let SODIUM_VERSION_STRING = sodium.SODIUM_VERSION_STRING;
 export let crypto_pwhash_STRPREFIX = sodium.crypto_pwhash_STRPREFIX;
+
+export let _unstable_crypto_kdf_hkdf_sha256_BYTES_MAX = 8160;
+export let _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN = 0;
+export let _unstable_crypto_kdf_hkdf_sha256_KEYBYTES = 32;
+export let _unstable_crypto_kdf_hkdf_sha256_extract = (
+  key: Uint8Array,
+  salt: Uint8Array
+) => {
+  return hkdf.extract(sha256, key, salt);
+};
+export let _unstable_crypto_kdf_hkdf_sha256_expand = (
+  key: Uint8Array,
+  info: string,
+  length: number
+) => {
+  return hkdf.expand(sha256, key, info, length);
+};

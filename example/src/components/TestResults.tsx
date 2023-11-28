@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
+import '../tests/_unstable_crypto_kdf_hkdf_sha256_expand_test';
+import '../tests/_unstable_crypto_kdf_hkdf_sha256_extract_test';
 import '../tests/constants_test';
 import '../tests/crypto_aead_xchacha20poly1305_ietf_decrypt_test';
 import '../tests/crypto_aead_xchacha20poly1305_ietf_encrypt_test';
