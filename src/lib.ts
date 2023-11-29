@@ -62,14 +62,29 @@ export const loadSumoVersion = () => {
   isLoadSumoVersion = true;
 };
 
-// @ts-expect-error initial object is empty and only filed after ready is resolved
-let sodium: Sodium = { loadSumoVersion };
+let lib: typeof import('libsodium-wrappers');
+
+// @ts-expect-error this is a proxy and basically can fail if loading is not complete
+let sodium: Sodium = new Proxy(
+  {},
+  {
+    get(_, prop) {
+      if (prop === 'loadSumoVersion') {
+        return loadSumoVersion;
+      }
+      if (lib) {
+        // @ts-expect-error
+        return lib[prop];
+      }
+      return undefined;
+    },
+  }
+);
 
 export const ready = new Promise<void>(async (resolve) => {
   // wait for next tick to allow loadSumoVersion to be called
   await new Promise((r) => setTimeout(r, 0));
 
-  let lib: typeof import('libsodium-wrappers');
   if (isLoadSumoVersion) {
     lib = await import('libsodium-wrappers-sumo');
   } else {
@@ -332,260 +347,6 @@ export const ready = new Promise<void>(async (resolve) => {
   crypto_sign_SEEDBYTES = lib.crypto_sign_SEEDBYTES;
   SODIUM_VERSION_STRING = lib.SODIUM_VERSION_STRING;
   crypto_pwhash_STRPREFIX = lib.crypto_pwhash_STRPREFIX;
-
-  sodium.add = lib.add;
-  sodium.base64_variants = lib.base64_variants;
-  sodium.compare = lib.compare;
-  sodium.from_base64 = lib.from_base64;
-  sodium.from_hex = lib.from_hex;
-  sodium.from_string = lib.from_string;
-  sodium.increment = lib.increment;
-  sodium.is_zero = lib.is_zero;
-  // @ts-ignore
-  sodium.libsodium = lib.libsodium;
-  sodium.memcmp = lib.memcmp;
-  sodium.memzero = lib.memzero;
-  sodium.output_formats = lib.output_formats;
-  sodium.pad = lib.pad;
-  sodium.unpad = lib.unpad;
-  sodium.symbols = lib.symbols;
-  sodium.to_base64 = lib.to_base64;
-  sodium.to_hex = lib.to_hex;
-  sodium.to_string = lib.to_string;
-  sodium.crypto_aead_chacha20poly1305_decrypt =
-    lib.crypto_aead_chacha20poly1305_decrypt;
-  sodium.crypto_aead_chacha20poly1305_decrypt_detached =
-    lib.crypto_aead_chacha20poly1305_decrypt_detached;
-  sodium.crypto_aead_chacha20poly1305_encrypt =
-    lib.crypto_aead_chacha20poly1305_encrypt;
-  sodium.crypto_aead_chacha20poly1305_encrypt_detached =
-    lib.crypto_aead_chacha20poly1305_encrypt_detached;
-  sodium.crypto_aead_chacha20poly1305_ietf_decrypt =
-    lib.crypto_aead_chacha20poly1305_ietf_decrypt;
-  sodium.crypto_aead_chacha20poly1305_ietf_decrypt_detached =
-    lib.crypto_aead_chacha20poly1305_ietf_decrypt_detached;
-  sodium.crypto_aead_chacha20poly1305_ietf_encrypt =
-    lib.crypto_aead_chacha20poly1305_ietf_encrypt;
-  sodium.crypto_aead_chacha20poly1305_ietf_encrypt_detached =
-    lib.crypto_aead_chacha20poly1305_ietf_encrypt_detached;
-  sodium.crypto_aead_chacha20poly1305_ietf_keygen =
-    lib.crypto_aead_chacha20poly1305_ietf_keygen;
-  sodium.crypto_aead_chacha20poly1305_keygen =
-    lib.crypto_aead_chacha20poly1305_keygen;
-  sodium.crypto_aead_xchacha20poly1305_ietf_decrypt =
-    lib.crypto_aead_xchacha20poly1305_ietf_decrypt;
-  sodium.crypto_aead_xchacha20poly1305_ietf_decrypt_detached =
-    lib.crypto_aead_xchacha20poly1305_ietf_decrypt_detached;
-  sodium.crypto_aead_xchacha20poly1305_ietf_encrypt =
-    lib.crypto_aead_xchacha20poly1305_ietf_encrypt;
-  sodium.crypto_aead_xchacha20poly1305_ietf_encrypt_detached =
-    lib.crypto_aead_xchacha20poly1305_ietf_encrypt_detached;
-  sodium.crypto_aead_xchacha20poly1305_ietf_keygen =
-    lib.crypto_aead_xchacha20poly1305_ietf_keygen;
-  sodium.crypto_auth = lib.crypto_auth;
-  sodium.crypto_auth_keygen = lib.crypto_auth_keygen;
-  sodium.crypto_auth_verify = lib.crypto_auth_verify;
-  sodium.crypto_box_beforenm = lib.crypto_box_beforenm;
-  sodium.crypto_box_detached = lib.crypto_box_detached;
-  sodium.crypto_box_easy = lib.crypto_box_easy;
-  sodium.crypto_box_easy_afternm = lib.crypto_box_easy_afternm;
-  sodium.crypto_box_keypair = lib.crypto_box_keypair;
-  sodium.crypto_box_open_detached = lib.crypto_box_open_detached;
-  sodium.crypto_box_open_easy = lib.crypto_box_open_easy;
-  sodium.crypto_box_open_easy_afternm = lib.crypto_box_open_easy_afternm;
-  sodium.crypto_box_seal = lib.crypto_box_seal;
-  sodium.crypto_box_seal_open = lib.crypto_box_seal_open;
-  sodium.crypto_box_seed_keypair = lib.crypto_box_seed_keypair;
-  sodium.crypto_generichash = lib.crypto_generichash;
-  sodium.crypto_generichash_final = lib.crypto_generichash_final;
-  sodium.crypto_generichash_init = lib.crypto_generichash_init;
-  sodium.crypto_generichash_keygen = lib.crypto_generichash_keygen;
-  sodium.crypto_generichash_update = lib.crypto_generichash_update;
-  sodium.crypto_hash = lib.crypto_hash;
-  sodium.crypto_kdf_derive_from_key = lib.crypto_kdf_derive_from_key;
-  sodium.crypto_kdf_keygen = lib.crypto_kdf_keygen;
-  sodium.crypto_kx_client_session_keys = lib.crypto_kx_client_session_keys;
-  sodium.crypto_kx_keypair = lib.crypto_kx_keypair;
-  sodium.crypto_kx_seed_keypair = lib.crypto_kx_seed_keypair;
-  sodium.crypto_kx_server_session_keys = lib.crypto_kx_server_session_keys;
-  sodium.crypto_pwhash = lib.crypto_pwhash;
-  sodium.crypto_pwhash_str = lib.crypto_pwhash_str;
-  sodium.crypto_pwhash_str_needs_rehash = lib.crypto_pwhash_str_needs_rehash;
-  sodium.crypto_pwhash_str_verify = lib.crypto_pwhash_str_verify;
-  sodium.crypto_scalarmult = lib.crypto_scalarmult;
-  sodium.crypto_scalarmult_base = lib.crypto_scalarmult_base;
-  sodium.crypto_secretbox_detached = lib.crypto_secretbox_detached;
-  sodium.crypto_secretbox_easy = lib.crypto_secretbox_easy;
-  sodium.crypto_secretbox_keygen = lib.crypto_secretbox_keygen;
-  sodium.crypto_secretbox_open_detached = lib.crypto_secretbox_open_detached;
-  sodium.crypto_secretbox_open_easy = lib.crypto_secretbox_open_easy;
-  sodium.crypto_secretstream_xchacha20poly1305_init_pull =
-    lib.crypto_secretstream_xchacha20poly1305_init_pull;
-  sodium.crypto_secretstream_xchacha20poly1305_init_push =
-    lib.crypto_secretstream_xchacha20poly1305_init_push;
-  sodium.crypto_secretstream_xchacha20poly1305_keygen =
-    lib.crypto_secretstream_xchacha20poly1305_keygen;
-  sodium.crypto_secretstream_xchacha20poly1305_pull =
-    lib.crypto_secretstream_xchacha20poly1305_pull;
-  sodium.crypto_secretstream_xchacha20poly1305_push =
-    lib.crypto_secretstream_xchacha20poly1305_push;
-  sodium.crypto_secretstream_xchacha20poly1305_rekey =
-    lib.crypto_secretstream_xchacha20poly1305_rekey;
-  sodium.crypto_shorthash = lib.crypto_shorthash;
-  sodium.crypto_shorthash_keygen = lib.crypto_shorthash_keygen;
-  sodium.crypto_sign = lib.crypto_sign;
-  sodium.crypto_sign_detached = lib.crypto_sign_detached;
-  sodium.crypto_sign_ed25519_pk_to_curve25519 =
-    lib.crypto_sign_ed25519_pk_to_curve25519;
-  sodium.crypto_sign_ed25519_sk_to_curve25519 =
-    lib.crypto_sign_ed25519_sk_to_curve25519;
-  sodium.crypto_sign_final_create = lib.crypto_sign_final_create;
-  sodium.crypto_sign_final_verify = lib.crypto_sign_final_verify;
-  sodium.crypto_sign_init = lib.crypto_sign_init;
-  sodium.crypto_sign_keypair = lib.crypto_sign_keypair;
-  sodium.crypto_sign_open = lib.crypto_sign_open;
-  sodium.crypto_sign_seed_keypair = lib.crypto_sign_seed_keypair;
-  sodium.crypto_sign_update = lib.crypto_sign_update;
-  sodium.crypto_sign_verify_detached = lib.crypto_sign_verify_detached;
-  sodium.randombytes_buf = lib.randombytes_buf;
-  sodium.randombytes_buf_deterministic = lib.randombytes_buf_deterministic;
-  sodium.randombytes_close = lib.randombytes_close;
-  sodium.randombytes_random = lib.randombytes_random;
-  sodium.randombytes_stir = lib.randombytes_stir;
-  sodium.randombytes_uniform = lib.randombytes_uniform;
-  sodium.sodium_version_string = lib.sodium_version_string;
-  sodium.SODIUM_LIBRARY_VERSION_MAJOR = lib.SODIUM_LIBRARY_VERSION_MAJOR;
-  sodium.SODIUM_LIBRARY_VERSION_MINOR = lib.SODIUM_LIBRARY_VERSION_MINOR;
-  sodium.crypto_aead_chacha20poly1305_ABYTES =
-    lib.crypto_aead_chacha20poly1305_ABYTES;
-  sodium.crypto_aead_chacha20poly1305_IETF_ABYTES =
-    lib.crypto_aead_chacha20poly1305_IETF_ABYTES;
-  sodium.crypto_aead_chacha20poly1305_IETF_KEYBYTES =
-    lib.crypto_aead_chacha20poly1305_IETF_KEYBYTES;
-  sodium.crypto_aead_chacha20poly1305_IETF_MESSAGEBYTES_MAX =
-    lib.crypto_aead_chacha20poly1305_IETF_MESSAGEBYTES_MAX;
-  sodium.crypto_aead_chacha20poly1305_IETF_NPUBBYTES =
-    lib.crypto_aead_chacha20poly1305_IETF_NPUBBYTES;
-  sodium.crypto_aead_chacha20poly1305_IETF_NSECBYTES =
-    lib.crypto_aead_chacha20poly1305_IETF_NSECBYTES;
-  sodium.crypto_aead_chacha20poly1305_KEYBYTES =
-    lib.crypto_aead_chacha20poly1305_KEYBYTES;
-  sodium.crypto_aead_chacha20poly1305_MESSAGEBYTES_MAX =
-    lib.crypto_aead_chacha20poly1305_MESSAGEBYTES_MAX;
-  sodium.crypto_aead_chacha20poly1305_NPUBBYTES =
-    lib.crypto_aead_chacha20poly1305_NPUBBYTES;
-  sodium.crypto_aead_chacha20poly1305_NSECBYTES =
-    lib.crypto_aead_chacha20poly1305_NSECBYTES;
-  sodium.crypto_aead_chacha20poly1305_ietf_ABYTES =
-    lib.crypto_aead_chacha20poly1305_ietf_ABYTES;
-  sodium.crypto_aead_chacha20poly1305_ietf_KEYBYTES =
-    lib.crypto_aead_chacha20poly1305_ietf_KEYBYTES;
-  sodium.crypto_aead_chacha20poly1305_ietf_MESSAGEBYTES_MAX =
-    lib.crypto_aead_chacha20poly1305_ietf_MESSAGEBYTES_MAX;
-  sodium.crypto_aead_chacha20poly1305_ietf_NPUBBYTES =
-    lib.crypto_aead_chacha20poly1305_ietf_NPUBBYTES;
-  sodium.crypto_aead_chacha20poly1305_ietf_NSECBYTES =
-    lib.crypto_aead_chacha20poly1305_ietf_NSECBYTES;
-  sodium.crypto_aead_xchacha20poly1305_IETF_ABYTES =
-    lib.crypto_aead_xchacha20poly1305_IETF_ABYTES;
-  sodium.crypto_aead_xchacha20poly1305_IETF_KEYBYTES =
-    lib.crypto_aead_xchacha20poly1305_IETF_KEYBYTES;
-  sodium.crypto_aead_xchacha20poly1305_IETF_MESSAGEBYTES_MAX =
-    lib.crypto_aead_xchacha20poly1305_IETF_MESSAGEBYTES_MAX;
-  sodium.crypto_aead_xchacha20poly1305_IETF_NPUBBYTES =
-    lib.crypto_aead_xchacha20poly1305_IETF_NPUBBYTES;
-  sodium.crypto_aead_xchacha20poly1305_IETF_NSECBYTES =
-    lib.crypto_aead_xchacha20poly1305_IETF_NSECBYTES;
-  sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES =
-    lib.crypto_aead_xchacha20poly1305_ietf_ABYTES;
-  sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
-    lib.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
-  sodium.crypto_aead_xchacha20poly1305_ietf_MESSAGEBYTES_MAX =
-    lib.crypto_aead_xchacha20poly1305_ietf_MESSAGEBYTES_MAX;
-  sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
-    lib.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES;
-  sodium.crypto_aead_xchacha20poly1305_ietf_NSECBYTES =
-    lib.crypto_aead_xchacha20poly1305_ietf_NSECBYTES;
-  sodium.crypto_auth_BYTES = lib.crypto_auth_BYTES;
-  sodium.crypto_auth_KEYBYTES = lib.crypto_auth_KEYBYTES;
-  sodium.crypto_box_BEFORENMBYTES = lib.crypto_box_BEFORENMBYTES;
-  sodium.crypto_box_MACBYTES = lib.crypto_box_MACBYTES;
-  sodium.crypto_box_MESSAGEBYTES_MAX = lib.crypto_box_MESSAGEBYTES_MAX;
-  sodium.crypto_box_NONCEBYTES = lib.crypto_box_NONCEBYTES;
-  sodium.crypto_box_PUBLICKEYBYTES = lib.crypto_box_PUBLICKEYBYTES;
-  sodium.crypto_box_SEALBYTES = lib.crypto_box_SEALBYTES;
-  sodium.crypto_box_SECRETKEYBYTES = lib.crypto_box_SECRETKEYBYTES;
-  sodium.crypto_box_SEEDBYTES = lib.crypto_box_SEEDBYTES;
-  sodium.crypto_generichash_BYTES = lib.crypto_generichash_BYTES;
-  sodium.crypto_generichash_BYTES_MAX = lib.crypto_generichash_BYTES_MAX;
-  sodium.crypto_generichash_BYTES_MIN = lib.crypto_generichash_BYTES_MIN;
-  sodium.crypto_generichash_KEYBYTES = lib.crypto_generichash_KEYBYTES;
-  sodium.crypto_generichash_KEYBYTES_MAX = lib.crypto_generichash_KEYBYTES_MAX;
-  sodium.crypto_generichash_KEYBYTES_MIN = lib.crypto_generichash_KEYBYTES_MIN;
-  sodium.crypto_hash_BYTES = lib.crypto_hash_BYTES;
-  sodium.crypto_kdf_BYTES_MAX = lib.crypto_kdf_BYTES_MAX;
-  sodium.crypto_kdf_BYTES_MIN = lib.crypto_kdf_BYTES_MIN;
-  sodium.crypto_kdf_CONTEXTBYTES = lib.crypto_kdf_CONTEXTBYTES;
-  sodium.crypto_kdf_KEYBYTES = lib.crypto_kdf_KEYBYTES;
-  sodium.crypto_kx_PUBLICKEYBYTES = lib.crypto_kx_PUBLICKEYBYTES;
-  sodium.crypto_kx_SECRETKEYBYTES = lib.crypto_kx_SECRETKEYBYTES;
-  sodium.crypto_kx_SEEDBYTES = lib.crypto_kx_SEEDBYTES;
-  sodium.crypto_kx_SESSIONKEYBYTES = lib.crypto_kx_SESSIONKEYBYTES;
-  sodium.crypto_pwhash_ALG_ARGON2I13 = lib.crypto_pwhash_ALG_ARGON2I13;
-  sodium.crypto_pwhash_ALG_ARGON2ID13 = lib.crypto_pwhash_ALG_ARGON2ID13;
-  sodium.crypto_pwhash_ALG_DEFAULT = lib.crypto_pwhash_ALG_DEFAULT;
-  sodium.crypto_pwhash_BYTES_MAX = lib.crypto_pwhash_BYTES_MAX;
-  sodium.crypto_pwhash_BYTES_MIN = lib.crypto_pwhash_BYTES_MIN;
-  sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE =
-    lib.crypto_pwhash_MEMLIMIT_INTERACTIVE;
-  sodium.crypto_pwhash_MEMLIMIT_MAX = lib.crypto_pwhash_MEMLIMIT_MAX;
-  sodium.crypto_pwhash_MEMLIMIT_MIN = lib.crypto_pwhash_MEMLIMIT_MIN;
-  sodium.crypto_pwhash_MEMLIMIT_MODERATE = lib.crypto_pwhash_MEMLIMIT_MODERATE;
-  sodium.crypto_pwhash_MEMLIMIT_SENSITIVE =
-    lib.crypto_pwhash_MEMLIMIT_SENSITIVE;
-  sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE =
-    lib.crypto_pwhash_OPSLIMIT_INTERACTIVE;
-  sodium.crypto_pwhash_OPSLIMIT_MAX = lib.crypto_pwhash_OPSLIMIT_MAX;
-  sodium.crypto_pwhash_OPSLIMIT_MIN = lib.crypto_pwhash_OPSLIMIT_MIN;
-  sodium.crypto_pwhash_OPSLIMIT_MODERATE = lib.crypto_pwhash_OPSLIMIT_MODERATE;
-  sodium.crypto_pwhash_OPSLIMIT_SENSITIVE =
-    lib.crypto_pwhash_OPSLIMIT_SENSITIVE;
-  sodium.crypto_pwhash_PASSWD_MAX = lib.crypto_pwhash_PASSWD_MAX;
-  sodium.crypto_pwhash_PASSWD_MIN = lib.crypto_pwhash_PASSWD_MIN;
-  sodium.crypto_pwhash_SALTBYTES = lib.crypto_pwhash_SALTBYTES;
-  sodium.crypto_pwhash_STRBYTES = lib.crypto_pwhash_STRBYTES;
-  sodium.crypto_scalarmult_BYTES = lib.crypto_scalarmult_BYTES;
-  sodium.crypto_scalarmult_SCALARBYTES = lib.crypto_scalarmult_SCALARBYTES;
-  sodium.crypto_secretbox_KEYBYTES = lib.crypto_secretbox_KEYBYTES;
-  sodium.crypto_secretbox_MACBYTES = lib.crypto_secretbox_MACBYTES;
-  sodium.crypto_secretbox_MESSAGEBYTES_MAX =
-    lib.crypto_secretbox_MESSAGEBYTES_MAX;
-  sodium.crypto_secretbox_NONCEBYTES = lib.crypto_secretbox_NONCEBYTES;
-  sodium.crypto_secretstream_xchacha20poly1305_ABYTES =
-    lib.crypto_secretstream_xchacha20poly1305_ABYTES;
-  sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES =
-    lib.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
-  sodium.crypto_secretstream_xchacha20poly1305_KEYBYTES =
-    lib.crypto_secretstream_xchacha20poly1305_KEYBYTES;
-  sodium.crypto_secretstream_xchacha20poly1305_MESSAGEBYTES_MAX =
-    lib.crypto_secretstream_xchacha20poly1305_MESSAGEBYTES_MAX;
-  sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL =
-    lib.crypto_secretstream_xchacha20poly1305_TAG_FINAL;
-  sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE =
-    lib.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE;
-  sodium.crypto_secretstream_xchacha20poly1305_TAG_PUSH =
-    lib.crypto_secretstream_xchacha20poly1305_TAG_PUSH;
-  sodium.crypto_secretstream_xchacha20poly1305_TAG_REKEY =
-    lib.crypto_secretstream_xchacha20poly1305_TAG_REKEY;
-  sodium.crypto_shorthash_BYTES = lib.crypto_shorthash_BYTES;
-  sodium.crypto_shorthash_KEYBYTES = lib.crypto_shorthash_KEYBYTES;
-  sodium.crypto_sign_BYTES = lib.crypto_sign_BYTES;
-  sodium.crypto_sign_MESSAGEBYTES_MAX = lib.crypto_sign_MESSAGEBYTES_MAX;
-  sodium.crypto_sign_PUBLICKEYBYTES = lib.crypto_sign_PUBLICKEYBYTES;
-  sodium.crypto_sign_SECRETKEYBYTES = lib.crypto_sign_SECRETKEYBYTES;
-  sodium.crypto_sign_SEEDBYTES = lib.crypto_sign_SEEDBYTES;
-  sodium.SODIUM_VERSION_STRING = lib.SODIUM_VERSION_STRING;
-  sodium.crypto_pwhash_STRPREFIX = lib.crypto_pwhash_STRPREFIX;
 
   resolve(undefined);
 });
