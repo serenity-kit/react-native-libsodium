@@ -16,35 +16,68 @@ export type {
 } from 'libsodium-wrappers';
 import * as hkdf from '@noble/hashes/hkdf';
 import { sha256 } from '@noble/hashes/sha256';
+import type {
+  CryptoBox,
+  CryptoKX,
+  KeyPair,
+  KeyType,
+  MessageTag,
+  SecretBox,
+  StateAddress,
+  StringCryptoBox,
+  StringCryptoKX,
+  StringKeyPair,
+  StringMessageTag,
+  StringOutputFormat,
+  StringSecretBox,
+  Uint8ArrayOutputFormat,
+} from 'libsodium-wrappers';
 
-type SodiumPackage = typeof import('libsodium-wrappers');
+type SodiumPackage = typeof import('libsodium-wrappers') & {
+  CryptoBox: CryptoBox;
+  CryptoKX: CryptoKX;
+  KeyPair: KeyPair;
+  KeyType: KeyType;
+  MessageTag: MessageTag;
+  SecretBox: SecretBox;
+  StateAddress: StateAddress;
+  StringCryptoBox: StringCryptoBox;
+  StringCryptoKX: StringCryptoKX;
+  StringKeyPair: StringKeyPair;
+  StringMessageTag: StringMessageTag;
+  StringOutputFormat: StringOutputFormat;
+  StringSecretBox: StringSecretBox;
+  Uint8ArrayOutputFormat: Uint8ArrayOutputFormat;
+  loadSumoVersion: () => void;
+};
 
 type Sodium = {
+  // needed to overwrite so the readonly properties can be re-assigned
   -readonly [key in keyof SodiumPackage]: SodiumPackage[key];
 };
 
-// @ts-expect-error initial object is empty and only filed after ready is resolved
-let sodium: Sodium = {};
-
-let isloadSumoVersion = false;
+let isLoadSumoVersion = false;
 
 export const loadSumoVersion = () => {
-  isloadSumoVersion = true;
+  isLoadSumoVersion = true;
 };
+
+// @ts-expect-error initial object is empty and only filed after ready is resolved
+let sodium: Sodium = { loadSumoVersion };
 
 export const ready = new Promise<void>(async (resolve) => {
   // wait for next tick to allow loadSumoVersion to be called
   await new Promise((r) => setTimeout(r, 0));
 
   let lib: typeof import('libsodium-wrappers');
-  if (isloadSumoVersion) {
+  if (isLoadSumoVersion) {
     lib = await import('libsodium-wrappers-sumo');
   } else {
     lib = await import('libsodium-wrappers');
   }
   await lib.ready;
   // only after ready the lib is available
-  if (isloadSumoVersion) {
+  if (isLoadSumoVersion) {
     lib = await import('libsodium-wrappers-sumo');
   } else {
     lib = await import('libsodium-wrappers');
