@@ -86,16 +86,16 @@ export const ready = new Promise<void>(async (resolve) => {
   await new Promise((r) => setTimeout(r, 0));
 
   if (isLoadSumoVersion) {
-    lib = await import('libsodium-wrappers-sumo');
+    lib = (await import('libsodium-wrappers-sumo')).default;
   } else {
-    lib = await import('libsodium-wrappers');
+    lib = (await import('libsodium-wrappers')).default;
   }
   await lib.ready;
   // only after ready the lib is available
   if (isLoadSumoVersion) {
-    lib = await import('libsodium-wrappers-sumo');
+    lib = (await import('libsodium-wrappers-sumo')).default;
   } else {
-    lib = await import('libsodium-wrappers');
+    lib = (await import('libsodium-wrappers')).default;
   }
 
   // get all keys
