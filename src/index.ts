@@ -1,3 +1,3 @@
 export * from './lib';
-import sodium from './lib';
+import * as sodium from './lib';
 export default sodium;
