@@ -14,6 +14,22 @@ export type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
+import type {
+  CryptoBox,
+  CryptoKX,
+  KeyPair,
+  KeyType,
+  MessageTag,
+  SecretBox,
+  StateAddress,
+  StringCryptoBox,
+  StringCryptoKX,
+  StringKeyPair,
+  StringMessageTag,
+  StringOutputFormat,
+  StringSecretBox,
+  Uint8ArrayOutputFormat,
+} from 'libsodium-wrappers';
 import * as hkdf from '@noble/hashes/hkdf';
 import { sha256 } from '@noble/hashes/sha256';
 
@@ -28,6 +44,20 @@ let lib: typeof import('libsodium-wrappers');
 // @ts-expect-error this is a proxy and basically can fail if loading is not complete
 let sodium: typeof import('libsodium-wrappers') & {
   loadSumoVersion: () => void;
+  CryptoBox: CryptoBox;
+  CryptoKX: CryptoKX;
+  KeyPair: KeyPair;
+  KeyType: KeyType;
+  MessageTag: MessageTag;
+  SecretBox: SecretBox;
+  StateAddress: StateAddress;
+  StringCryptoBox: StringCryptoBox;
+  StringCryptoKX: StringCryptoKX;
+  StringKeyPair: StringKeyPair;
+  StringMessageTag: StringMessageTag;
+  StringOutputFormat: StringOutputFormat;
+  StringSecretBox: StringSecretBox;
+  Uint8ArrayOutputFormat: Uint8ArrayOutputFormat;
 } = new Proxy(
   {},
   {
