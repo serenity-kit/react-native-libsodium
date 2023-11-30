@@ -14,8 +14,6 @@ export type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
-import * as hkdf from '@noble/hashes/hkdf';
-import { sha256 } from '@noble/hashes/sha256';
 import type {
   CryptoBox,
   CryptoKX,
@@ -32,8 +30,20 @@ import type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
+import * as hkdf from '@noble/hashes/hkdf';
+import { sha256 } from '@noble/hashes/sha256';
 
-type SodiumPackage = typeof import('libsodium-wrappers') & {
+let isLoadSumoVersion = false;
+
+export const loadSumoVersion = () => {
+  isLoadSumoVersion = true;
+};
+
+let lib: typeof import('libsodium-wrappers');
+
+// @ts-expect-error this is a proxy and basically can fail if loading is not complete
+let sodium: typeof import('libsodium-wrappers') & {
+  loadSumoVersion: () => void;
   CryptoBox: CryptoBox;
   CryptoKX: CryptoKX;
   KeyPair: KeyPair;
@@ -48,29 +58,15 @@ type SodiumPackage = typeof import('libsodium-wrappers') & {
   StringOutputFormat: StringOutputFormat;
   StringSecretBox: StringSecretBox;
   Uint8ArrayOutputFormat: Uint8ArrayOutputFormat;
-  loadSumoVersion: () => void;
-};
-
-type Sodium = {
-  // needed to overwrite so the readonly properties can be re-assigned
-  -readonly [key in keyof SodiumPackage]: SodiumPackage[key];
-};
-
-let isLoadSumoVersion = false;
-
-export const loadSumoVersion = () => {
-  isLoadSumoVersion = true;
-};
-
-let lib: typeof import('libsodium-wrappers');
-
-// @ts-expect-error this is a proxy and basically can fail if loading is not complete
-let sodium: Sodium = new Proxy(
+} = new Proxy(
   {},
   {
     get(_, prop) {
       if (prop === 'loadSumoVersion') {
         return loadSumoVersion;
+      }
+      if (prop === 'ready') {
+        return ready;
       }
       if (lib) {
         // @ts-expect-error
@@ -350,8 +346,6 @@ export const ready = new Promise<void>(async (resolve) => {
 
   resolve(undefined);
 });
-
-sodium.ready = ready;
 
 export default sodium;
 
