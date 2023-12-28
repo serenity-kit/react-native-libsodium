@@ -968,6 +968,59 @@ namespace ReactNativeLibsodium
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_open_easy", std::move(jsi_crypto_box_open_easy));
 
+        auto jsi_crypto_box_seal = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_box_seal"),
+            2,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_box_seal";
+
+                std::string messageArgumentName = "message";
+                unsigned int messageArgumentPosition = 0;
+                JsiArgType messageArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[messageArgumentPosition], messageArgumentName, true);
+
+                std::string publicKeyArgumentName = "publicKey";
+                unsigned int publicKeyArgumentPosition = 1;
+                validateIsArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
+
+                auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                if (publicKey.length(runtime) != crypto_box_PUBLICKEYBYTES)
+                {
+                    throw jsi::JSError(runtime, "invalid publicKey length");
+                }
+
+                std::vector<uint8_t> ciphertext;
+                int result = -1;
+
+                if (messageArgType == JsiArgType::string)
+                {
+                    std::string messageString = arguments[messageArgumentPosition].asString(runtime).utf8(runtime);
+                    ciphertext.resize(messageString.length() + crypto_box_SEALBYTES);
+                    result = crypto_box_seal(
+                        ciphertext.data(),
+                        reinterpret_cast<const unsigned char *>(messageString.data()),
+                        messageString.length(),
+                        publicKey.data(runtime));
+                }
+                else
+                {
+                    auto messageArrayBuffer = arguments[messageArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                    ciphertext.resize(messageArrayBuffer.length(runtime) + crypto_box_SEALBYTES);
+                    result = crypto_box_seal(
+                        ciphertext.data(),
+                        messageArrayBuffer.data(runtime),
+                        messageArrayBuffer.length(runtime),
+                        publicKey.data(runtime));
+                }
+
+                throwOnBadResult(functionName, runtime, result);
+                return arrayBufferAsObject(runtime, ciphertext);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_seal", std::move(jsi_crypto_box_seal));
+
         auto jsi_crypto_pwhash = jsi::Function::createFromHostFunction(
             jsiRuntime,
             jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_pwhash"),
