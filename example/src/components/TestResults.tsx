@@ -10,6 +10,7 @@ import '../tests/crypto_auth_keygen_test';
 import '../tests/crypto_auth_test';
 import '../tests/crypto_auth_verify_test';
 import '../tests/crypto_box_easy_test';
+import '../tests/crypto_box_seal_test';
 import '../tests/crypto_box_keypair_test';
 import '../tests/crypto_box_open_easy_test';
 import '../tests/crypto_generichash_test';
