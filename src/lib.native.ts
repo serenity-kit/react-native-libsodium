@@ -118,6 +118,15 @@ declare global {
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_box_seal(
+    message: string | ArrayBuffer,
+    publicKey: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_box_seal_open(
+    ciphertext: string | ArrayBuffer,
+    publicKey: ArrayBuffer,
+    secretKey: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_generichash(
     hashLength: number,
     message: string | ArrayBuffer,
@@ -523,6 +532,57 @@ export function crypto_box_open_easy(
   result = global.jsi_crypto_box_open_easy(
     ciphertextParam,
     nonce.buffer,
+    publicKey.buffer,
+    privateKey.buffer
+  );
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_box_seal(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_box_seal(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_box_seal(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_box_seal(ciphertextParam, publicKey.buffer);
+  return convertToOutputFormat(result, outputFormat);
+}
+
+export function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): Uint8Array;
+export function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: StringOutputFormat
+): string;
+export function crypto_box_seal_open(
+  ciphertext: string | Uint8Array,
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  const ciphertextParam =
+    typeof ciphertext === 'string' ? ciphertext : ciphertext.buffer;
+  result = global.jsi_crypto_box_seal_open(
+    ciphertextParam,
     publicKey.buffer,
     privateKey.buffer
   );
