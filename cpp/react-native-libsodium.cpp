@@ -1539,5 +1539,43 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_expand", std::move(jsi_crypto_kdf_hkdf_sha256_expand));
+
+        auto jsi_crypto_scalarmult = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_scalarmult"),
+            3,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_scalarmult";
+
+                std::string privateKeyArgumentName = "privateKey";
+                unsigned int privateKeyArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[privateKeyArgumentPosition], privateKeyArgumentName, true);
+
+                std::string publicKeyArgumentName = "publicKey";
+                unsigned int publicKeyArgumentPosition = 1;
+                validateIsArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
+
+                auto privateKey = arguments[privateKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                if (privateKey.length(runtime) != crypto_secretbox_KEYBYTES)
+                {
+                    throw jsi::JSError(runtime, "invalid private key length");
+                }
+                if (publicKey.length(runtime) != crypto_secretbox_KEYBYTES)
+                {
+                    throw jsi::JSError(runtime, "invalid public key length");
+                }
+
+                std::vector<uint8_t> result;
+                result.resize(crypto_scalarmult_BYTES);
+
+                crypto_scalarmult(result.data(), privateKey.data(runtime), publicKey.data(runtime));
+
+                return arrayBufferAsObject(runtime, result);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_scalarmult", std::move(jsi_crypto_scalarmult));
     }
 } // namespace ReactNativeLibsodium
