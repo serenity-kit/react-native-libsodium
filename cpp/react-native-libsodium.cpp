@@ -709,7 +709,7 @@ namespace ReactNativeLibsodium
                 auto pkDataArrayBuffer =
                     arguments[pkArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-                unsigned long long curve25519PublickeyLength = crypto_box_PUBLICKEYBYTES;
+                unsigned long long curve25519PublickeyLength = crypto_scalarmult_curve25519_BYTES;
                 std::vector<uint8_t> publickey(curve25519PublickeyLength);
                 crypto_sign_ed25519_pk_to_curve25519(publickey.data(), pkDataArrayBuffer.data(runtime));
 
@@ -734,12 +734,12 @@ namespace ReactNativeLibsodium
                 auto skDataArrayBuffer =
                     arguments[skArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
 
-                unsigned long long curve25519SecretkeyLength = crypto_box_PUBLICKEYBYTES;
+                unsigned long long curve25519SecretkeyLength = crypto_scalarmult_curve25519_BYTES;
                 std::vector<uint8_t> secretKey(curve25519SecretkeyLength);
                 crypto_sign_ed25519_sk_to_curve25519(secretKey.data(), skDataArrayBuffer.data(runtime));
 
-                jsi::Object returnPublicKeyBufferAsObject = arrayBufferAsObject(runtime, secretKey);
-                return returnPublicKeyBufferAsObject;
+                jsi::Object returnSecretKeyBufferAsObject = arrayBufferAsObject(runtime, secretKey);
+                return returnSecretKeyBufferAsObject;
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_ed25519_sk_to_curve25519", std::move(jsi_crypto_sign_ed25519_sk_to_curve25519));
