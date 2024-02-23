@@ -421,13 +421,13 @@ export function crypto_sign_verify_detached(
 export function crypto_sign_ed25519_pk_to_curve25519(
   pk: Uint8Array
 ): unknown {
-  return global.crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
+  return global.jsi_crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
 }
 
 export function crypto_sign_ed25519_sk_to_curve25519(
   sk: Uint8Array
 ): unknown {
-  return global.crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
+  return global.jsi_crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
 }
 
 export function crypto_secretbox_easy(
@@ -855,9 +855,9 @@ export default {
   crypto_secretbox_keygen,
   crypto_secretbox_NONCEBYTES,
   crypto_secretbox_open_easy,
+  crypto_sign_detached,
   crypto_sign_keypair,
   crypto_sign_seed_keypair,
-  crypto_sign_detached,
   crypto_sign_verify_detached,
   crypto_sign_ed25519_pk_to_curve25519,
   crypto_sign_ed25519_sk_to_curve25519,
