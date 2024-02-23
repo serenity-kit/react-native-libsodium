@@ -96,6 +96,8 @@ declare global {
     message: string | ArrayBuffer,
     publicKey: ArrayBuffer
   ): boolean;
+  function jsi_crypto_sign_ed25519_pk_to_curve25519(pk: ArrayBuffer): ArrayBuffer;
+  function jsi_crypto_sign_ed25519_sk_to_curve25519(sk: ArrayBuffer): ArrayBuffer;
   function jsi_crypto_secretbox_easy(
     message: string | ArrayBuffer,
     nonce: ArrayBuffer,
@@ -414,6 +416,18 @@ export function crypto_sign_verify_detached(
     publicKey.buffer
   );
   return result;
+}
+
+export function crypto_sign_ed25519_pk_to_curve25519(
+  pk: Uint8Array
+): unknown {
+  return global.jsi_crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
+}
+
+export function crypto_sign_ed25519_sk_to_curve25519(
+  sk: Uint8Array
+): unknown {
+  return global.jsi_crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
 }
 
 export function crypto_secretbox_easy(
@@ -843,7 +857,10 @@ export default {
   crypto_secretbox_open_easy,
   crypto_sign_detached,
   crypto_sign_keypair,
+  crypto_sign_seed_keypair,
   crypto_sign_verify_detached,
+  crypto_sign_ed25519_pk_to_curve25519,
+  crypto_sign_ed25519_sk_to_curve25519,
   from_base64,
   randombytes_buf,
   randombytes_uniform,
