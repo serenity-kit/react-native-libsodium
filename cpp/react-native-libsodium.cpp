@@ -696,7 +696,7 @@ namespace ReactNativeLibsodium
 
         auto jsi_crypto_sign_ed25519_pk_to_curve25519 = jsi::Function::createFromHostFunction(
             jsiRuntime,
-            jsi::PropNameID::forUtf8(jsiRuntime, "crypto_sign_ed25519_pk_to_curve25519"),
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_ed25519_pk_to_curve25519"),
             1,
             [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
             {
@@ -721,7 +721,7 @@ namespace ReactNativeLibsodium
 
         auto jsi_crypto_sign_ed25519_sk_to_curve25519 = jsi::Function::createFromHostFunction(
             jsiRuntime,
-            jsi::PropNameID::forUtf8(jsiRuntime, "crypto_sign_ed25519_sk_to_curve25519"),
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_ed25519_sk_to_curve25519"),
             1,
             [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
             {
@@ -743,7 +743,7 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_ed25519_sk_to_curve25519", std::move(jsi_crypto_sign_ed25519_sk_to_curve25519));
-      
+
         auto jsi_crypto_secretbox_easy = jsi::Function::createFromHostFunction(
             jsiRuntime,
             jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_secretbox_easy"),

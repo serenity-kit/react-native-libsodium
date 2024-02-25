@@ -96,8 +96,12 @@ declare global {
     message: string | ArrayBuffer,
     publicKey: ArrayBuffer
   ): boolean;
-  function jsi_crypto_sign_ed25519_pk_to_curve25519(pk: ArrayBuffer): ArrayBuffer;
-  function jsi_crypto_sign_ed25519_sk_to_curve25519(sk: ArrayBuffer): ArrayBuffer;
+  function jsi_crypto_sign_ed25519_pk_to_curve25519(
+    pk: ArrayBuffer
+  ): ArrayBuffer;
+  function jsi_crypto_sign_ed25519_sk_to_curve25519(
+    sk: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_secretbox_easy(
     message: string | ArrayBuffer,
     nonce: ArrayBuffer,
@@ -160,7 +164,7 @@ declare global {
     public_nonce: ArrayBuffer,
     key: ArrayBuffer
   ): ArrayBuffer;
-  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt(
+  function jsi_crypto_aead_xchacha20poly1305_ietf_decrypt( // This is duplicated
     ciphertext: string | ArrayBuffer,
     additionalData: string,
     public_nonce: ArrayBuffer,
@@ -420,13 +424,13 @@ export function crypto_sign_verify_detached(
 
 export function crypto_sign_ed25519_pk_to_curve25519(
   pk: Uint8Array
-): unknown {
+): ArrayBuffer {
   return global.jsi_crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
 }
 
 export function crypto_sign_ed25519_sk_to_curve25519(
   sk: Uint8Array
-): unknown {
+): ArrayBuffer {
   return global.jsi_crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
 }
 
