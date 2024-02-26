@@ -423,15 +423,19 @@ export function crypto_sign_verify_detached(
 }
 
 export function crypto_sign_ed25519_pk_to_curve25519(
-  pk: Uint8Array
-): ArrayBuffer {
-  return global.jsi_crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
+  pk: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): string | Uint8Array {
+  const result = global.jsi_crypto_sign_ed25519_pk_to_curve25519(pk.buffer);
+  return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_sign_ed25519_sk_to_curve25519(
-  sk: Uint8Array
-): ArrayBuffer {
-  return global.jsi_crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
+  sk: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): string | Uint8Array {
+  const result = global.jsi_crypto_sign_ed25519_sk_to_curve25519(sk.buffer);
+  return convertToOutputFormat(result, outputFormat);
 }
 
 export function crypto_secretbox_easy(
