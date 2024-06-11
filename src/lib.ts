@@ -14,6 +14,8 @@ export type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
+import * as hkdf from '@noble/hashes/hkdf';
+import { sha256 } from '@noble/hashes/sha256';
 import type {
   CryptoBox,
   CryptoKX,
@@ -30,8 +32,6 @@ import type {
   StringSecretBox,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
-import * as hkdf from '@noble/hashes/hkdf';
-import { sha256 } from '@noble/hashes/sha256';
 
 let isLoadSumoVersion = false;
 
@@ -153,6 +153,7 @@ export const ready = new Promise<void>(async (resolve) => {
   crypto_box_easy = lib.crypto_box_easy;
   crypto_box_easy_afternm = lib.crypto_box_easy_afternm;
   crypto_box_keypair = lib.crypto_box_keypair;
+  crypto_box_seed_keypair = lib.crypto_box_seed_keypair;
   crypto_box_open_detached = lib.crypto_box_open_detached;
   crypto_box_open_easy = lib.crypto_box_open_easy;
   crypto_box_open_easy_afternm = lib.crypto_box_open_easy_afternm;
