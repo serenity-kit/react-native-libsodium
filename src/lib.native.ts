@@ -30,6 +30,7 @@ declare global {
   var jsi_crypto_box_PUBLICKEYBYTES: number;
   var jsi_crypto_box_SECRETKEYBYTES: number;
   var jsi_crypto_box_NONCEBYTES: number;
+  var jsi_crypto_box_SEEDBYTES: number;
   var jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
   var jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
   var jsi_crypto_kdf_KEYBYTES: number;
@@ -76,6 +77,10 @@ declare global {
   function jsi_crypto_aead_xchacha20poly1305_ietf_keygen(): ArrayBuffer;
   function jsi_crypto_kdf_keygen(): ArrayBuffer;
   function jsi_crypto_box_keypair(): {
+    publicKey: ArrayBuffer;
+    secretKey: ArrayBuffer;
+  };
+  function jsi_crypto_box_seed_keypair(seed: ArrayBuffer): {
     publicKey: ArrayBuffer;
     secretKey: ArrayBuffer;
   };
@@ -183,6 +188,7 @@ export const crypto_secretbox_NONCEBYTES =
 export const crypto_box_PUBLICKEYBYTES = global.jsi_crypto_box_PUBLICKEYBYTES;
 export const crypto_box_SECRETKEYBYTES = global.jsi_crypto_box_SECRETKEYBYTES;
 export const crypto_box_NONCEBYTES = global.jsi_crypto_box_NONCEBYTES;
+export const crypto_box_SEEDBYTES = global.jsi_crypto_box_SEEDBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES =
   global.jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
 export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES =
@@ -338,6 +344,26 @@ export function crypto_box_keypair(
 ): StringKeyPair;
 export function crypto_box_keypair(outputFormat: OutputFormat): unknown {
   const result = global.jsi_crypto_box_keypair();
+  return {
+    keyType: 'x25519',
+    publicKey: convertToOutputFormat(result.publicKey, outputFormat),
+    privateKey: convertToOutputFormat(result.secretKey, outputFormat),
+  };
+}
+
+export function crypto_box_seed_keypair(
+  seed: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+): KeyPair;
+export function crypto_box_seed_keypair(
+  seed: Uint8Array,
+  outputFormat: StringOutputFormat
+): StringKeyPair;
+export function crypto_box_seed_keypair(
+  seed: Uint8Array,
+  outputFormat: OutputFormat
+): unknown {
+  const result = global.jsi_crypto_box_seed_keypair(seed.buffer);
   return {
     keyType: 'x25519',
     publicKey: convertToOutputFormat(result.publicKey, outputFormat),
@@ -813,6 +839,7 @@ export default {
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
   crypto_box_easy,
+  crypto_box_seed_keypair,
   crypto_box_keypair,
   crypto_box_NONCEBYTES,
   crypto_box_open_easy,

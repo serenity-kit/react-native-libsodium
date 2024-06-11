@@ -194,6 +194,7 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_PUBLICKEYBYTES", static_cast<int>(crypto_box_PUBLICKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SECRETKEYBYTES", static_cast<int>(crypto_box_SECRETKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_NONCEBYTES", static_cast<int>(crypto_box_NONCEBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SEEDBYTES", static_cast<int>(crypto_box_SEEDBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_KEYBYTES", static_cast<int>(crypto_aead_xchacha20poly1305_ietf_KEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_aead_xchacha20poly1305_ietf_NPUBBYTES", static_cast<int>(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_KEYBYTES", static_cast<int>(crypto_kdf_KEYBYTES));
@@ -468,6 +469,38 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_keypair", std::move(jsi_crypto_box_keypair));
+
+        auto jsi_crypto_box_seed_keypair = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "crypto_box_seed_keypair"),
+            1,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_box_seed_keypair";
+
+                std::string seedArgumentName = "seed";
+                unsigned int seedArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[seedArgumentPosition], seedArgumentName, true);
+
+                auto seedDataArrayBuffer =
+                    arguments[seedArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                unsigned long long publickeyLength = crypto_box_PUBLICKEYBYTES;
+                unsigned long long secretkeyLength = crypto_box_SECRETKEYBYTES;
+                std::vector<uint8_t> publickey(publickeyLength);
+                std::vector<uint8_t> secretkey(secretkeyLength);
+                crypto_box_seed_keypair(publickey.data(), secretkey.data(), seedDataArrayBuffer.data(runtime));
+
+                jsi::Object returnPublicKeyBufferAsObject = arrayBufferAsObject(runtime, publickey);
+                jsi::Object returnSecretKeyBufferAsObject = arrayBufferAsObject(runtime, secretkey);
+
+                auto object = jsi::Object(runtime);
+                object.setProperty(runtime, "publicKey", returnPublicKeyBufferAsObject);
+                object.setProperty(runtime, "secretKey", returnSecretKeyBufferAsObject);
+                return object;
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_seed_keypair", std::move(jsi_crypto_box_seed_keypair));
 
         auto jsi_crypto_sign_keypair = jsi::Function::createFromHostFunction(
             jsiRuntime,
