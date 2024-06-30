@@ -178,6 +178,10 @@ declare global {
     info: string,
     length: number
   ): ArrayBuffer;
+  function jsi_crypto_scalarmult(
+    privateKey: ArrayBuffer,
+    publicKey: ArrayBuffer
+  ): ArrayBuffer;
 }
 
 export const crypto_auth_BYTES = global.jsi_crypto_auth_BYTES;
@@ -821,6 +825,20 @@ export function _unstable_crypto_kdf_hkdf_sha256_expand(
   );
 }
 
+export function crypto_scalarmult(
+  privateKey: Uint8Array,
+  publicKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null,
+) {
+  let result: ArrayBuffer;
+  result = global.jsi_crypto_scalarmult(
+    privateKey.buffer,
+    publicKey.buffer,
+  );
+
+  return convertToOutputFormat(result, outputFormat);
+}
+
 // add no-op ready to match the libsodium-wrappers API
 export const ready: Promise<void> = new Promise((resolve) => resolve());
 
@@ -871,6 +889,7 @@ export default {
   crypto_sign_detached,
   crypto_sign_keypair,
   crypto_sign_verify_detached,
+  crypto_scalarmult,
   from_base64,
   randombytes_buf,
   randombytes_uniform,
