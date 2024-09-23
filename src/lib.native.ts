@@ -51,6 +51,7 @@ declare global {
   var jsi_crypto_kdf_hkdf_sha256_BYTES_MAX: number;
   var jsi_crypto_kdf_hkdf_sha256_BYTES_MIN: number;
   var jsi_crypto_kdf_hkdf_sha256_KEYBYTES: number;
+  var jsi_crypto_pwhash_ALG_ARGON2ID13: number;
 
   function jsi_crypto_auth(
     message: string | ArrayBuffer,
@@ -145,6 +146,9 @@ declare global {
     memLimit: number,
     algorithm: number
   ): ArrayBuffer;
+  function jsi_crypto_sign_ed25519_pk_to_curve25519(
+    publicKey: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_kdf_derive_from_key(
     subkeyLength: number,
     subkeyId: number,
@@ -221,6 +225,8 @@ export const _unstable_crypto_kdf_hkdf_sha256_BYTES_MIN =
   global.jsi_crypto_kdf_hkdf_sha256_BYTES_MIN;
 export const _unstable_crypto_kdf_hkdf_sha256_KEYBYTES =
   global.jsi_crypto_kdf_hkdf_sha256_KEYBYTES;
+export const crypto_pwhash_ALG_ARGON2ID13 =
+  global.jsi_crypto_pwhash_ALG_ARGON2ID13;
 
 export const from_base64 = (
   input: string,
@@ -685,6 +691,13 @@ export function crypto_pwhash(
   );
   return convertToOutputFormat(result, outputFormat);
 }
+export function crypto_sign_ed25519_pk_to_curve25519(
+  publicKey: Uint8Array,
+  outputFormat?: Uint8ArrayOutputFormat | null
+) {
+  const result = global.jsi_crypto_sign_ed25519_pk_to_curve25519(publicKey);
+  return convertToOutputFormat(result, outputFormat);
+}
 
 export function crypto_kdf_derive_from_key(
   subkey_len: number,
@@ -857,12 +870,14 @@ export default {
   crypto_kdf_KEYBYTES,
   crypto_kdf_keygen,
   crypto_pwhash,
+  crypto_sign_ed25519_pk_to_curve25519,
   crypto_pwhash_ALG_DEFAULT,
   crypto_pwhash_BYTES_MAX,
   crypto_pwhash_BYTES_MIN,
   crypto_pwhash_MEMLIMIT_INTERACTIVE,
   crypto_pwhash_OPSLIMIT_INTERACTIVE,
   crypto_pwhash_SALTBYTES,
+  crypto_pwhash_ALG_ARGON2ID13,
   crypto_secretbox_easy,
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_keygen,

@@ -213,6 +213,7 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_BYTES_MAX", static_cast<int>(crypto_kdf_hkdf_sha256_BYTES_MAX));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_BYTES_MIN", static_cast<int>(crypto_kdf_hkdf_sha256_BYTES_MIN));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_kdf_hkdf_sha256_KEYBYTES", static_cast<int>(crypto_kdf_hkdf_sha256_KEYBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_ALG_ARGON2ID13", static_cast<int>(crypto_pwhash_ALG_ARGON2ID13));
 
         auto jsi_from_base64_to_arraybuffer = jsi::Function::createFromHostFunction(
             jsiRuntime,
@@ -1195,6 +1196,33 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash", std::move(jsi_crypto_pwhash));
+
+        auto jsi_crypto_sign_ed25519_pk_to_curve25519 = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_sign_ed25519_pk_to_curve25519"),
+            1,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "crypto_sign_ed25519_pk_to_curve25519";
+
+                std::string publicKeyArgumentName = "publicKey";
+                unsigned int publicKeyArgumentPosition = 0;
+                validateIsArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
+
+                auto publicKeyArrayBuffer = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+
+                std::vector<uint8_t> publicKey(crypto_sign_PUBLICKEYBYTES);
+                int result = -1;
+
+                result = crypto_sign_ed25519_pk_to_curve25519(
+                    publicKey.data(),
+                    publicKeyArrayBuffer.data(runtime));
+
+                throwOnBadResult(functionName, runtime, result);
+                return arrayBufferAsObject(runtime, publicKey);
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_sign_ed25519_pk_to_curve25519", std::move(jsi_crypto_sign_ed25519_pk_to_curve25519));
 
         auto jsi_crypto_kdf_derive_from_key = jsi::Function::createFromHostFunction(
             jsiRuntime,
