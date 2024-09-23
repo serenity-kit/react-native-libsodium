@@ -695,7 +695,9 @@ export function crypto_sign_ed25519_pk_to_curve25519(
   publicKey: Uint8Array,
   outputFormat?: Uint8ArrayOutputFormat | null
 ) {
-  const result = global.jsi_crypto_sign_ed25519_pk_to_curve25519(publicKey);
+  const result = global.jsi_crypto_sign_ed25519_pk_to_curve25519(
+    publicKey.buffer
+  );
   return convertToOutputFormat(result, outputFormat);
 }
 
