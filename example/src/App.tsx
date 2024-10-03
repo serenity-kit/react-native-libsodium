@@ -8,7 +8,7 @@ loadSumoVersion();
 
 function LibsodiumTests() {
   if (sodium.crypto_secretbox_KEYBYTES !== 32) {
-    throw new Error('export default not working');
+    throw new Error('export default not working.');
   }
 
   return (
