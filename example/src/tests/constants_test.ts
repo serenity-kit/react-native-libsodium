@@ -13,6 +13,7 @@ import {
   crypto_secretbox_KEYBYTES,
   crypto_secretbox_NONCEBYTES,
   crypto_sign_SEEDBYTES,
+  crypto_pwhash_ALG_ARGON2ID13,
 } from 'react-native-libsodium';
 import { expect, test } from '../utils/testRunner';
 
@@ -31,4 +32,5 @@ test('constants', () => {
   expect(_unstable_crypto_kdf_hkdf_sha256_KEYBYTES).toEqual(32);
   expect(_unstable_crypto_kdf_hkdf_sha256_BYTES_MIN).toEqual(0);
   expect(_unstable_crypto_kdf_hkdf_sha256_BYTES_MAX).toEqual(8160);
+  expect(crypto_pwhash_ALG_ARGON2ID13).toEqual(2);
 });
