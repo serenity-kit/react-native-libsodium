@@ -7,10 +7,4 @@
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:LibsodiumExample.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:LibsodiumExample.xcodeproj">
-   </FileRef>
 </Workspace>
