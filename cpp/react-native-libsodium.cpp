@@ -309,6 +309,42 @@ namespace ReactNativeLibsodium
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_to_base64", std::move(jsi_to_base64));
 
+        auto jsi_from_hex_to_arraybuffer = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "from_hex"),
+            2,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+            {
+                const std::string functionName = "from_hex";
+
+                std::string valueArgumentName = "value";
+                unsigned int valueArgumentPosition = 0;
+                validateRequired(functionName, runtime, arguments[valueArgumentPosition], valueArgumentName);
+
+                std::string hexString = arguments[0].asString(runtime).utf8(runtime);
+
+                std::vector<uint8_t> uint8Vector;
+                uint8Vector.resize(hexString.size());
+
+                size_t length = 0;
+                int result = sodium_hex2bin(
+                    reinterpret_cast<unsigned char *>(uint8Vector.data()),
+                    uint8Vector.size(),
+                    reinterpret_cast<const char *>(hexString.data()),
+                    hexString.size(),
+                    nullptr,
+                    &length,
+                    nullptr);
+
+                throwOnBadResult(functionName, runtime, result);
+
+                uint8Vector.resize(length);
+                jsi::Object returnBufferAsObject = arrayBufferAsObject(runtime, uint8Vector);
+                return returnBufferAsObject;
+            });
+
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_from_hex_to_arraybuffer", std::move(jsi_from_hex_to_arraybuffer));
+
         auto jsi_to_hex = jsi::Function::createFromHostFunction(
             jsiRuntime,
             jsi::PropNameID::forUtf8(jsiRuntime, "jsi_to_hex"),
