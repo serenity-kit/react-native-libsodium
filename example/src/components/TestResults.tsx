@@ -77,7 +77,7 @@ export const TestResults: React.FC = () => {
                 'stack' in result.error && (
                   <View style={{ backgroundColor: '#ddd', padding: 16 }}>
                     <Text style={{ fontFamily: 'monospace' }}>
-                      {result.error.stack}
+                      {result.error.stack as string}
                     </Text>
                   </View>
                 )}
