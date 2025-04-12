@@ -7,7 +7,7 @@ jobs:
     name: Build Android Example App
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Unpack Libsodium
       - name: Unpack Libsodium
         run: yarn postinstall
