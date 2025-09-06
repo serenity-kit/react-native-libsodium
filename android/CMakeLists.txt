@@ -39,5 +39,8 @@ add_library(libsodium
   cpp-adapter.cpp
 )
 
+# Enable Android 16kb native library alignment
+target_link_options(libsodium PRIVATE "-Wl,-z,max-page-size=16384")
+
 # link the sodium lib with our "libsodium" library target defined earlier
 target_link_libraries(libsodium sodium)
