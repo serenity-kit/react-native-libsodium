@@ -29,7 +29,9 @@ Pod::Spec.new do |s|
         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
     }
     s.dependency "React-Codegen"
-    s.dependency "RCT-Folly"
+    if ENV['RCT_USE_RN_DEP'] != '1'
+      s.dependency 'RCT-Folly', folly_version
+    end
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"
