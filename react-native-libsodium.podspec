@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
     }
     s.dependency "React-Codegen"
     if ENV['RCT_USE_RN_DEP'] != '1'
-      s.dependency 'RCT-Folly', folly_version
+      s.dependency 'RCT-Folly'
     end
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
