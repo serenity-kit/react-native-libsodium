@@ -5,9 +5,12 @@ on: [push]
 jobs:
   test:
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
       - name: Install node_modules
         run: yarn install --frozen-lockfile
       - name: Install node_modules for example/
@@ -16,7 +19,7 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run e2e tests
         run: yarn test:e2e:web
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
