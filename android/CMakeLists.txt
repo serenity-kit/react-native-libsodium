@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set (CMAKE_VERBOSE_MAKEFILE ON)
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 20)
 
 # add directories to "include" search paths
 include_directories(
@@ -38,6 +38,9 @@ add_library(libsodium
   ../cpp/react-native-libsodium.h
   cpp-adapter.cpp
 )
+
+# Enable Android 16kb native library alignment
+target_link_options(libsodium PRIVATE "-Wl,-z,max-page-size=16384")
 
 # link the sodium lib with our "libsodium" library target defined earlier
 target_link_libraries(libsodium sodium)
