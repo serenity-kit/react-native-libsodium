@@ -133,6 +133,10 @@ declare global {
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_box_beforenm(
+    message: ArrayBuffer,
+    publicKey: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_generichash(
     hashLength: number,
     message: string | ArrayBuffer,
@@ -621,6 +625,13 @@ export function crypto_box_seal_open(
   return convertToOutputFormat(result, outputFormat);
 }
 
+export function crypto_box_beforenm(
+  publicKey: Uint8Array,
+  privateKey: Uint8Array
+) {
+  return global.jsi_crypto_box_beforenm(publicKey.buffer, privateKey.buffer);
+}
+
 export function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
@@ -860,6 +871,7 @@ export default {
   crypto_box_open_easy,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_box_beforenm,
   crypto_generichash,
   crypto_generichash_BYTES,
   crypto_generichash_BYTES_MIN,
