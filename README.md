@@ -87,6 +87,7 @@ import {
   crypto_sign_SEEDBYTES,
   crypto_sign_verify_detached,
   from_base64,
+  from_hex,
   randombytes_buf,
   randombytes_uniform,
   to_base64,
