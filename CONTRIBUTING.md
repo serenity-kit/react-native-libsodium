@@ -61,10 +61,22 @@ To fix formatting errors, run the following:
 yarn lint --fix
 ```
 
+### Testing
+
 Remember to add tests for your change if possible. Run the unit tests by:
 
+For testing we use the example app which has a component [TestResults.tsx](./example/src/components/TestResults.tsx) that runs the tests.
+
+If you add a new test, you need to add it to the [tests](./example/src/tests) folder and import it in the [TestResults.tsx](./example/src/components/TestResults.tsx) component.
+
+Verify that the results are the same in the web, iOS and Android. Basically in all environments all tests should pass.
+
 ```sh
-yarn test
+# Web
+yarn test:e2e:web
+# iOS
+maestro test e2e-tests/maestro-flow-ios.yml
+# Android (see Github Actions workflow for more details)
 ```
 
 ### Commit message convention
