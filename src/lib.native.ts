@@ -71,6 +71,7 @@ declare global {
     input: string | ArrayBuffer,
     variant: base64_variants
   ): string;
+  function jsi_from_hex_to_arraybuffer(input: string): ArrayBuffer;
   function jsi_to_hex(input: string | ArrayBuffer): string;
   function jsi_randombytes_buf(length: number): ArrayBuffer;
   function jsi_randombytes_uniform(upper_bound: number): number;
@@ -244,6 +245,11 @@ export const to_base64 = (
   const variantToUse = variant || base64_variants.URLSAFE_NO_PADDING;
   const inputParam = typeof input === 'string' ? input : input.buffer;
   return global.jsi_to_base64(inputParam, variantToUse);
+};
+
+export const from_hex = (input: string): Uint8Array => {
+  const result = global.jsi_from_hex_to_arraybuffer(input);
+  return new Uint8Array(result);
 };
 
 export function to_hex(input: string | Uint8Array): string {
@@ -889,6 +895,7 @@ export default {
   crypto_sign_keypair,
   crypto_sign_verify_detached,
   from_base64,
+  from_hex,
   randombytes_buf,
   randombytes_uniform,
   ready,
