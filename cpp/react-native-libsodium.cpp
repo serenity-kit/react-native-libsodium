@@ -192,6 +192,7 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_OPSLIMIT_INTERACTIVE));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_MEMLIMIT_INTERACTIVE));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_PUBLICKEYBYTES", static_cast<int>(crypto_box_PUBLICKEYBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_BEFORENMBYTES", static_cast<int>(crypto_box_BEFORENMBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SECRETKEYBYTES", static_cast<int>(crypto_box_SECRETKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_NONCEBYTES", static_cast<int>(crypto_box_NONCEBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SEEDBYTES", static_cast<int>(crypto_box_SEEDBYTES));
