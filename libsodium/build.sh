@@ -4,7 +4,7 @@
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $script_dir
 
-source_file='libsodium-1.0.19-stable.tar.gz'
+source_file='libsodium-1.0.20-stable.tar.gz'
 source_dir='libsodium-stable'
 build_dir='build'
 
@@ -22,7 +22,7 @@ cd $source_dir
 current_platform=`uname`
 
 if [ "$current_platform" == 'Darwin' ]; then
-  IOS_VERSION_MIN=10.0.0 dist-build/apple-xcframework.sh
+  LIBSODIUM_MINIMAL_BUILD=1 IOS_VERSION_MIN=15.1.0 dist-build/apple-xcframework.sh
 fi
 
 NDK_PLATFORM=android-21 dist-build/android-armv7-a.sh
