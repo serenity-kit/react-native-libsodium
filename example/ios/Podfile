@@ -4,16 +4,8 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
-# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
-#
-# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
-# ```js
-# module.exports = {
-#   dependencies: {
-#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
-# ```
-flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+# Flipper is disabled - incompatible with newer Xcode versions
+flipper_config = FlipperConfiguration.disabled
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -56,5 +48,31 @@ target 'LibsodiumExample' do
       :mac_catalyst_enabled => false
     )
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # Xcode 26 / libc++ removes std::unary_function in C++17; boost 1.76 still references it.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        macro = '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION'
+        define_flag = "-D#{macro}"
+
+        cpp_flags = config.build_settings['OTHER_CPLUSPLUSFLAGS']
+        cpp_flags = [cpp_flags] if cpp_flags.is_a?(String)
+        cpp_flags = ['$(inherited)'] if cpp_flags.nil?
+        cpp_flags << define_flag unless cpp_flags.include?(define_flag)
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = cpp_flags
+
+        c_flags = config.build_settings['OTHER_CFLAGS']
+        c_flags = [c_flags] if c_flags.is_a?(String)
+        c_flags = ['$(inherited)'] if c_flags.nil?
+        c_flags << define_flag unless c_flags.include?(define_flag)
+        config.build_settings['OTHER_CFLAGS'] = c_flags
+
+        defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']
+        defs = [defs] if defs.is_a?(String)
+        defs = ['$(inherited)'] if defs.nil?
+        defs << macro unless defs.include?(macro)
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+      end
+    end
   end
 end
