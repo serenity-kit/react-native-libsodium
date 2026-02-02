@@ -1,6 +1,21 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
+boost_podspec_path = File.expand_path(
+  '../node_modules/react-native/third-party-podspecs/boost.podspec',
+  __dir__
+)
+boost_source_old = 'https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2'
+boost_source_new = 'https://archives.boost.io/release/1.76.0/source/boost_1_76_0.tar.bz2'
+if File.exist?(boost_podspec_path)
+  boost_podspec_contents = File.read(boost_podspec_path)
+  if boost_podspec_contents.include?(boost_source_old)
+    boost_podspec_contents = boost_podspec_contents.gsub(boost_source_old, boost_source_new)
+    File.write(boost_podspec_path, boost_podspec_contents)
+    Pod::UI.puts 'Patched boost podspec to use archives.boost.io'
+  end
+end
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 

@@ -36,6 +36,8 @@ npm install react-native-libsodium
 cd ios && pod install
 ```
 
+Note: The example app’s `example/ios/Podfile` patches the Boost podspec URL to use `archives.boost.io` because the default `boostorg.jfrog.io` endpoint redirects and can fail checksum verification.
+
 ## Usage
 
 **Hint:** see the `example` app in the repository regarding how to use the functions
