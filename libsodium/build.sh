@@ -4,7 +4,7 @@
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $script_dir
 
-source_file='libsodium-1.0.20-stable.tar.gz'
+source_file='libsodium-1.0.21-stable.tar.gz'
 source_dir='libsodium-stable'
 build_dir='build'
 
