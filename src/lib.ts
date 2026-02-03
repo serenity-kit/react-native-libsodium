@@ -5,13 +5,15 @@ export type {
   KeyType,
   MessageTag,
   SecretBox,
-  StateAddress,
   StringCryptoBox,
   StringCryptoKX,
   StringKeyPair,
   StringMessageTag,
-  StringOutputFormat,
   StringSecretBox,
+} from './libsodium-types';
+export type {
+  StateAddress,
+  StringOutputFormat,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
 import * as hkdf from '@noble/hashes/hkdf';
@@ -23,13 +25,15 @@ import type {
   KeyType,
   MessageTag,
   SecretBox,
-  StateAddress,
   StringCryptoBox,
   StringCryptoKX,
   StringKeyPair,
   StringMessageTag,
-  StringOutputFormat,
   StringSecretBox,
+} from './libsodium-types';
+import type {
+  StateAddress,
+  StringOutputFormat,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
 

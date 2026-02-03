@@ -19,13 +19,13 @@ test('crypto_generichash', () => {
   ]);
 
   expect(
-    crypto_generichash(crypto_generichash_BYTES_MIN, message).length
+    crypto_generichash(crypto_generichash_BYTES_MIN, message, null).length
   ).toEqual(crypto_generichash_BYTES_MIN);
-  expect(crypto_generichash(crypto_generichash_BYTES, message).length).toEqual(
-    crypto_generichash_BYTES
-  );
   expect(
-    crypto_generichash(crypto_generichash_BYTES_MAX, message).length
+    crypto_generichash(crypto_generichash_BYTES, message, null).length
+  ).toEqual(crypto_generichash_BYTES);
+  expect(
+    crypto_generichash(crypto_generichash_BYTES_MAX, message, null).length
   ).toEqual(crypto_generichash_BYTES_MAX);
   expect(
     crypto_generichash(
@@ -34,9 +34,9 @@ test('crypto_generichash', () => {
       randombytes_buf(crypto_generichash_KEYBYTES_MIN)
     ).length
   ).toEqual(crypto_generichash_BYTES);
-  expect(crypto_generichash(crypto_generichash_BYTES, message2).length).toEqual(
-    crypto_generichash_BYTES
-  );
+  expect(
+    crypto_generichash(crypto_generichash_BYTES, message2, null).length
+  ).toEqual(crypto_generichash_BYTES);
   expect(
     crypto_generichash(
       crypto_generichash_BYTES,
@@ -66,7 +66,7 @@ test('crypto_generichash', () => {
     ).length
   ).toEqual(crypto_generichash_BYTES);
 
-  expect(crypto_generichash(crypto_generichash_BYTES, message)).toEqual(
+  expect(crypto_generichash(crypto_generichash_BYTES, message, null)).toEqual(
     new Uint8Array([
       29, 192, 23, 114, 238, 1, 113, 245, 246, 20, 198, 115, 227, 199, 250, 17,
       7, 168, 207, 114, 123, 223, 90, 109, 173, 179, 121, 233, 60, 13, 29, 0,
