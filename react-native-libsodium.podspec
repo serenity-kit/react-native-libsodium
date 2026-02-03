@@ -14,6 +14,15 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "11.0" }
   s.source       = { :git => "https://github.com/serenity-kit/react-native-libsodium.git", :tag => "#{s.version}" }
 
+  # Ensure vendored libsodium is unpacked even when npm/yarn postinstall scripts
+  # are skipped (e.g. some CI/EAS builds).
+  s.prepare_command = <<-CMD
+    set -e
+    if [ ! -d "libsodium/build/libsodium-apple/Clibsodium.xcframework" ]; then
+      tar -xzf libsodium/build.tgz --directory libsodium
+    fi
+  CMD
+
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{h,cpp}"
 
   s.vendored_frameworks = "libsodium/build/libsodium-apple/Clibsodium.xcframework"
