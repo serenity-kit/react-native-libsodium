@@ -2,6 +2,7 @@ import {
   crypto_box_NONCEBYTES,
   crypto_box_keypair,
   crypto_box_open_easy,
+  from_string,
   randombytes_buf,
   to_base64,
   to_string,
@@ -102,7 +103,7 @@ test('crypto_box_open_easy', () => {
   expect(() => {
     const badNonce = randombytes_buf(crypto_box_NONCEBYTES + 1);
     crypto_box_open_easy(
-      message,
+      from_string(message),
       badNonce,
       receiverKeyPair.publicKey,
       senderKeyPair.privateKey
@@ -111,7 +112,7 @@ test('crypto_box_open_easy', () => {
 
   expect(() => {
     crypto_box_open_easy(
-      message,
+      from_string(message),
       nonce,
       new Uint8Array([
         232, 167, 21, 228, 54, 165, 143, 50, 85, 27, 167, 176, 163, 211, 176, 7,
@@ -124,7 +125,7 @@ test('crypto_box_open_easy', () => {
 
   expect(() => {
     crypto_box_open_easy(
-      message,
+      from_string(message),
       nonce,
       receiverKeyPair.publicKey,
       new Uint8Array([

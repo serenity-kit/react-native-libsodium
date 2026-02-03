@@ -1,7 +1,6 @@
 export { base64_variants, to_string } from './libsodium-js-utils';
+import type { KeyPair, StringKeyPair } from './libsodium-types';
 import type {
-  KeyPair,
-  StringKeyPair,
   StringOutputFormat,
   Uint8ArrayOutputFormat,
 } from 'libsodium-wrappers';
