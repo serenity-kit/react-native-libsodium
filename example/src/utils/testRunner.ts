@@ -93,7 +93,13 @@ export function test(description: string, callback: TestCallback) {
 }
 
 class Expect {
-  constructor(readonly actual: unknown, private inverse: boolean = false) {}
+  readonly actual: unknown;
+  private inverse: boolean;
+
+  constructor(actual: unknown, inverse: boolean = false) {
+    this.actual = actual;
+    this.inverse = inverse;
+  }
   get not() {
     this.inverse = !this.inverse;
     return this;
