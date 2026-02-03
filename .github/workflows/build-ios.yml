@@ -10,7 +10,7 @@ jobs:
       run:
         working-directory: example/ios
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # Unpack Libsodium
       - name: Unpack Libsodium
         run: yarn postinstall
@@ -20,7 +20,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
       - name: Restore node_modules from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -39,7 +39,7 @@ jobs:
           bundler-cache: true
           working-directory: example/ios
       - name: Restore Pods cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             example/ios/Pods
