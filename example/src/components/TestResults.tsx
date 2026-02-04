@@ -69,14 +69,22 @@ export const TestResults: React.FC = () => {
               {!result.success && (
                 <Text style={styles.errorText}>{'' + result.error}</Text>
               )}
-              {!result.success &&
-                typeof result.error === 'object' &&
-                result.error &&
-                'stack' in result.error && (
+              {(() => {
+                if (
+                  result.success ||
+                  typeof result.error !== 'object' ||
+                  !result.error ||
+                  !('stack' in result.error)
+                ) {
+                  return null;
+                }
+                const stack = (result.error as { stack?: unknown }).stack;
+                return stack != null ? (
                   <View style={styles.stackContainer}>
-                    <Text style={styles.stackText}>{result.error.stack}</Text>
+                    <Text style={styles.stackText}>{String(stack)}</Text>
                   </View>
-                )}
+                ) : null;
+              })()}
             </View>
           );
         })}
