@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: 20.19.0
       - name: Install node_modules
         run: yarn install --frozen-lockfile
       - name: Install node_modules for example/
