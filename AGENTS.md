@@ -25,7 +25,7 @@
 ## Coding Style & Naming Conventions
 - Indentation: 2 spaces, LF endings (see `.editorconfig`).
 - Formatting: Prettier with single quotes and trailing commas (ES5).
-- Linting: ESLint with `@react-native-community` config; keep TypeScript types explicit where helpful.
+- Linting: ESLint with `@react-native` config; keep TypeScript types explicit where helpful.
 
 ## Testing Guidelines
 - Unit tests run with Jest (`yarn test`).
