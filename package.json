@@ -62,10 +62,10 @@
     "@eslint/compat": "^1.2.0",
     "@expo/config-plugins": "^10.1.1",
     "@playwright/test": "^1.58.1",
-    "@react-native/eslint-config": "0.79.0",
+    "@react-native/eslint-config": "0.83.1",
     "@release-it/conventional-changelog": "^10.0.4",
     "@types/jest": "^30.0.0",
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.2.0",
     "commitlint": "^20.4.1",
     "del-cli": "^7.0.0",
     "eslint": "^9.0.0",
@@ -74,14 +74,14 @@
     "jest": "^30.2.0",
     "pod-install": "^1.0.9",
     "prettier": "^3.8.1",
-    "react": "19.0.0",
-    "react-native": "0.79.0",
+    "react": "19.2.0",
+    "react-native": "0.83.1",
     "react-native-builder-bob": "^0.40.17",
     "release-it": "^19.2.4",
     "typescript": "^5.9.3"
   },
   "resolutions": {
-    "@types/react": "19.0.0"
+    "@types/react": "19.2.0"
   },
   "peerDependencies": {
     "react": "*",

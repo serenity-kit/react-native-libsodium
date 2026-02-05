@@ -11,7 +11,7 @@ runs:
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
-        node-version: 20.19.0
+        node-version: 20.20.0
 
     - name: Cache dependencies
       id: yarn-cache

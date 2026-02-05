@@ -13,7 +13,7 @@ export const to_string = (bytes: Uint8Array): string => {
     try {
       // @ts-ignore
       return decodeURIComponent(escape(String.fromCharCode.apply(null, bytes)));
-    } catch (_) {
+    } catch {
       throw new TypeError('The encoded data was not valid.');
     }
   }
