@@ -30,8 +30,22 @@ jobs:
           key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
+      - name: Setup Ruby (bundle)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+          working-directory: example/ios
       - name: Install node_modules
         run: yarn
+      - name: Fix for ruby
+        working-directory: example/ios
+        run: |
+          bundle config --local build.ffi --with-cflags=-Wno-error=implicit-function-declaration
+          bundle install
+      - name: Install Pods
+        working-directory: example/ios
+        run: bundle exec pod install --no-repo-update
       - name: Build iOS App
         working-directory: example
         # run: yarn run react-native run-ios --configuration Release --simulator "iPhone 13 (15.2)"
