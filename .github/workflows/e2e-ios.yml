@@ -36,8 +36,10 @@ jobs:
           ruby-version: 3.2
           bundler-cache: true
           working-directory: example/ios
-      - name: Install node_modules
-        run: yarn
+      - name: Install node_modules in root
+        run: yarn install --frozen-lockfile
+      - name: Install node_modules in example
+        run: yarn install --frozen-lockfile --cwd example
       - name: Fix for ruby
         working-directory: example/ios
         run: |
