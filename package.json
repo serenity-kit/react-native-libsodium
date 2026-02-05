@@ -58,9 +58,9 @@
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^20.4.1",
+    "@eslint/compat": "^2.0.2",
     "@evilmartians/lefthook": "^2.1.0",
-    "@eslint/compat": "^1.2.0",
-    "@expo/config-plugins": "^10.1.1",
+    "@expo/config-plugins": "^54.0.4",
     "@playwright/test": "^1.58.1",
     "@react-native/eslint-config": "0.83.1",
     "@release-it/conventional-changelog": "^10.0.4",
