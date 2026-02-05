@@ -60,7 +60,7 @@
     "@commitlint/config-conventional": "^20.4.1",
     "@evilmartians/lefthook": "^2.1.0",
     "@eslint/compat": "^1.2.0",
-    "@expo/config-plugins": "^7.2.5",
+    "@expo/config-plugins": "^10.1.1",
     "@playwright/test": "^1.58.1",
     "@react-native/eslint-config": "0.79.0",
     "@release-it/conventional-changelog": "^10.0.4",
