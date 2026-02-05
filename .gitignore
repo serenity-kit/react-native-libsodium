@@ -46,9 +46,12 @@ android.iml
 # Cocoapods
 #
 example/ios/Pods
+example/ios/.xcode.env.local
 
 # Ruby
 example/vendor/
+.gems/
+cocoapods-1.16.2.gem
 
 # node.js
 #

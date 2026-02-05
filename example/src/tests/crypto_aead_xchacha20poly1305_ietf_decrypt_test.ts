@@ -39,7 +39,7 @@ test('crypto_aead_xchacha20poly1305_ietf_decrypt', () => {
   try {
     encryptAndDecryptImage(threeMbImage);
     encryptAndDecryptImage(largeContent);
-  } catch (e) {
+  } catch {
     validImageEncryptionAndDecryption = false;
   }
 
