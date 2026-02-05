@@ -45,6 +45,10 @@ jobs:
         run: |
           bundle config --local build.ffi --with-cflags=-Wno-error=implicit-function-declaration
           bundle install
+      - name: Clean stale podspecs
+        working-directory: example/ios
+        run: |
+          rm -rf Pods/Local\ Podspecs Pods/Manifest.lock
       - name: Install Pods
         working-directory: example/ios
         run: bundle exec pod install --no-repo-update
