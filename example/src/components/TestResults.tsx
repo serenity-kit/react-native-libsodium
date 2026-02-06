@@ -9,6 +9,7 @@ import '../tests/crypto_aead_xchacha20poly1305_ietf_keygen_test';
 import '../tests/crypto_auth_keygen_test';
 import '../tests/crypto_auth_test';
 import '../tests/crypto_auth_verify_test';
+import '../tests/crypto_box_beforenm_test';
 import '../tests/crypto_box_easy_test';
 import '../tests/crypto_box_keypair_test';
 import '../tests/crypto_box_open_easy_test';

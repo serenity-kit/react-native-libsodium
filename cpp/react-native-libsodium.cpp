@@ -192,6 +192,7 @@ namespace ReactNativeLibsodium
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_OPSLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_OPSLIMIT_INTERACTIVE));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_pwhash_MEMLIMIT_INTERACTIVE", static_cast<int>(crypto_pwhash_MEMLIMIT_INTERACTIVE));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_PUBLICKEYBYTES", static_cast<int>(crypto_box_PUBLICKEYBYTES));
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_BEFORENMBYTES", static_cast<int>(crypto_box_BEFORENMBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SECRETKEYBYTES", static_cast<int>(crypto_box_SECRETKEYBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_NONCEBYTES", static_cast<int>(crypto_box_NONCEBYTES));
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_SEEDBYTES", static_cast<int>(crypto_box_SEEDBYTES));
@@ -1121,6 +1122,49 @@ namespace ReactNativeLibsodium
             });
 
         jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_seal_open", std::move(jsi_crypto_box_seal_open));
+
+        auto jsi_crypto_box_beforenm = jsi::Function::createFromHostFunction(
+            jsiRuntime,
+            jsi::PropNameID::forUtf8(jsiRuntime, "jsi_crypto_box_beforenm"),
+            2,
+            [](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *arguments, size_t count) -> jsi::Value
+                {
+                    const std::string functionName = "crypto_box_beforenm";
+    
+                    std::string publicKeyArgumentName = "publicKey";
+                    unsigned int publicKeyArgumentPosition = 0;
+                    JsiArgType publicKeyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[publicKeyArgumentPosition], publicKeyArgumentName, true);
+    
+                    std::string privateKeyArgumentName = "privateKey";
+                    unsigned int privateKeyArgumentPosition = 1;
+                    JsiArgType privateKeyArgType = validateIsStringOrArrayBuffer(functionName, runtime, arguments[privateKeyArgumentPosition], privateKeyArgumentName, true);
+    
+                    auto publicKey = arguments[publicKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+                    auto privateKey = arguments[privateKeyArgumentPosition].asObject(runtime).getArrayBuffer(runtime);
+    
+                    if (publicKey.length(runtime) != crypto_box_PUBLICKEYBYTES)
+                    {
+                        throw jsi::JSError(runtime, "invalid publicKey length");
+                    }
+    
+                    if (privateKey.length(runtime) != crypto_box_SECRETKEYBYTES)
+                    {
+                        throw jsi::JSError(runtime, "invalid privateKey length");
+                    }
+    
+                    // Allocate memory for the shared secret
+                    std::vector<uint8_t> sharedSecret(crypto_box_BEFORENMBYTES);
+                    
+                    int result = crypto_box_beforenm(
+                        sharedSecret.data(),
+                    publicKey.data(runtime),
+                    privateKey.data(runtime));
+                
+                    throwOnBadResult(functionName, runtime, result);
+                    return arrayBufferAsObject(runtime, sharedSecret);
+                });
+            
+        jsiRuntime.global().setProperty(jsiRuntime, "jsi_crypto_box_beforenm", std::move(jsi_crypto_box_beforenm));
 
         auto jsi_crypto_pwhash = jsi::Function::createFromHostFunction(
             jsiRuntime,
