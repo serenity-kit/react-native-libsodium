@@ -27,6 +27,7 @@ import '../tests/crypto_sign_keypair_test';
 import '../tests/crypto_sign_seed_keypair_test';
 import '../tests/crypto_sign_verify_detached_test';
 import '../tests/from_base64_test';
+import '../tests/memzero_test';
 import '../tests/randombytes_buf_test';
 import '../tests/randombytes_uniform_test';
 import '../tests/to_base64_test';
