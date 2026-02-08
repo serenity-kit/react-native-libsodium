@@ -10,6 +10,14 @@ Supported Platforms:
 
 Currently only a subset of the libsodium-wrappers exposed functionality is implemented. For missing functionality we welcome pull-requests or you can sponsor the development. Get in touch with us at `hi@serenity.re`.
 
+## Requirements
+
+- Node.js >= 20.19.4 (CI uses 20.20.0 via `.nvmrc`)
+- Example app follows React Native 0.83 defaults:
+  - iOS deployment target 15.1 (via `min_ios_version_supported`)
+  - Android `minSdkVersion` 24
+  - New Architecture enabled
+
 ## Installation Expo (dev-client)
 
 This package support the Expo plugin system and can be used together with the [Expo dev-client](https://docs.expo.dev/clients/introduction/).
@@ -35,8 +43,6 @@ export default {
 npm install react-native-libsodium
 cd ios && pod install
 ```
-
-Note: The example app’s `example/ios/Podfile` patches the Boost podspec URL to use `archives.boost.io` because the default `boostorg.jfrog.io` endpoint redirects and can fail checksum verification.
 
 ## Usage
 
