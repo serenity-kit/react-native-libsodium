@@ -262,6 +262,15 @@ export function to_hex(input: string | Uint8Array): string {
   return global.jsi_to_hex(inputParam);
 }
 
+export function memzero(bytes: Uint8Array): void {
+  if (!(bytes instanceof Uint8Array)) {
+    throw new TypeError('Only Uint8Array instances can be wiped');
+  }
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = 0;
+  }
+}
+
 export function randombytes_buf(
   length: number,
   outputFormat?: Uint8ArrayOutputFormat | null
@@ -921,6 +930,7 @@ export default {
   crypto_sign_keypair,
   crypto_sign_verify_detached,
   from_base64,
+  memzero,
   randombytes_buf,
   randombytes_uniform,
   ready,
