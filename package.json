@@ -141,6 +141,14 @@
       ]
     ]
   },
+  "codegenConfig": {
+    "name": "LibsodiumSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.libsodium"
+    }
+  },
   "dependencies": {
     "@noble/hashes": "^1.3.2",
     "libsodium-wrappers": "^0.8.2",

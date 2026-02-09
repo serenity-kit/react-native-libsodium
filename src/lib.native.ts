@@ -8,7 +8,7 @@ import { base64_variants, to_string } from './libsodium-js-utils';
 import type { OutputFormat } from './types';
 import { convertToOutputFormat } from './utils';
 
-import { NativeModules } from 'react-native';
+import Libsodium from './NativeLibsodium';
 
 const toArrayBuffer = (input: Uint8Array): ArrayBuffer => {
   const buffer = input.buffer;
@@ -22,16 +22,8 @@ const toArrayBuffer = (input: Uint8Array): ArrayBuffer => {
   return input.slice().buffer;
 };
 
-const Libsodium = NativeModules.Libsodium;
-
-if (Libsodium && typeof Libsodium.install === 'function') {
-  console.log('calling Libsodium.install');
-  Libsodium.install();
-} else if (!Libsodium) {
-  console.warn('Libsodium module not defined');
-} else {
-  console.warn('Libsodium.install not a function');
-}
+console.log('calling Libsodium.install');
+Libsodium.install();
 
 declare global {
   var jsi_crypto_auth_BYTES: number;
