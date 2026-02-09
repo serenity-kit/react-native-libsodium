@@ -11,18 +11,9 @@ buildscript {
   }
 }
 
-def isNewArchitectureEnabled() {
-  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
-}
-
 apply plugin: "com.android.library"
+apply plugin: "com.facebook.react"
 
-
-def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
-
-if (isNewArchitectureEnabled()) {
-  apply plugin: "com.facebook.react"
-}
 
 def getExtOrDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["Libsodium_" + name]
@@ -54,7 +45,6 @@ android {
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
-    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     externalNativeBuild {
       cmake {
         cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
@@ -99,16 +89,11 @@ repositories {
 
 
 dependencies {
-  // For < 0.71, this will be from the local maven repo
-  // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
-  //noinspection GradleDynamicVersion
-  implementation "com.facebook.react:react-native:+"
+  implementation "com.facebook.react:react-android"
 }
 
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "Libsodium"
-    codegenJavaPackageName = "com.libsodium"
-  }
+react {
+  jsRootDir = file("../src/")
+  libraryName = "Libsodium"
+  codegenJavaPackageName = "com.libsodium"
 }

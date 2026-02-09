@@ -1,26 +1,45 @@
 package com.libsodium;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.facebook.react.ReactPackage;
+import com.facebook.react.BaseReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.uimanager.ViewManager;
+import com.facebook.react.module.model.ReactModuleInfo;
+import com.facebook.react.module.model.ReactModuleInfoProvider;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
-public class LibsodiumPackage implements ReactPackage {
-  @NonNull
+public class LibsodiumPackage extends BaseReactPackage {
   @Override
-  public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-    return Collections.singletonList(new LibsodiumModule(reactContext));
+  @Nullable
+  public NativeModule getModule(String name, ReactApplicationContext reactContext) {
+    if (name.equals(LibsodiumModule.NAME)) {
+      return new LibsodiumModule(reactContext);
+    }
+    return null;
   }
 
   @NonNull
   @Override
-  public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
-    return Collections.emptyList();
+  public ReactModuleInfoProvider getReactModuleInfoProvider() {
+    return () -> {
+      Map<String, ReactModuleInfo> moduleInfos = new HashMap<>();
+      moduleInfos.put(
+        LibsodiumModule.NAME,
+        new ReactModuleInfo(
+          LibsodiumModule.NAME,
+          LibsodiumModule.NAME,
+          false,  // canOverrideExistingModule
+          false,  // needsEagerInit
+          false,  // isCxxModule
+          true // isTurboModule
+        )
+      );
+      return moduleInfos;
+    };
   }
 }
