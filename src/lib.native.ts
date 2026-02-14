@@ -36,6 +36,7 @@ if (Libsodium && typeof Libsodium.install === 'function') {
 declare global {
   var jsi_crypto_auth_BYTES: number;
   var jsi_crypto_auth_KEYBYTES: number;
+  var jsi_crypto_box_BEFORENMBYTES: number;
   var jsi_crypto_secretbox_KEYBYTES: number;
   var jsi_crypto_secretbox_NONCEBYTES: number;
   var jsi_crypto_box_PUBLICKEYBYTES: number;
@@ -144,6 +145,10 @@ declare global {
     publicKey: ArrayBuffer,
     secretKey: ArrayBuffer
   ): ArrayBuffer;
+  function jsi_crypto_box_beforenm(
+    publicKey: ArrayBuffer,
+    privateKey: ArrayBuffer
+  ): ArrayBuffer;
   function jsi_crypto_generichash(
     hashLength: number,
     message: string | ArrayBuffer,
@@ -197,6 +202,7 @@ declare global {
 
 export const crypto_auth_BYTES = global.jsi_crypto_auth_BYTES;
 export const crypto_auth_KEYBYTES = global.jsi_crypto_auth_KEYBYTES;
+export const crypto_box_BEFORENMBYTES = global.jsi_crypto_box_BEFORENMBYTES;
 export const crypto_secretbox_KEYBYTES = global.jsi_crypto_secretbox_KEYBYTES;
 export const crypto_secretbox_NONCEBYTES =
   global.jsi_crypto_secretbox_NONCEBYTES;
@@ -648,6 +654,16 @@ export function crypto_box_seal_open(
   return convertToOutputFormat(result, outputFormat);
 }
 
+export function crypto_box_beforenm(
+  publicKey: Uint8Array,
+  privateKey: Uint8Array,
+  outputFormat: OutputFormat
+) {
+  let result: ArrayBuffer;
+  result = global.jsi_crypto_box_beforenm(publicKey.buffer, privateKey.buffer);
+  return convertToOutputFormat(result, outputFormat);
+}
+
 export function crypto_generichash(
   hash_length: number,
   message: string | Uint8Array,
@@ -890,8 +906,10 @@ export default {
   crypto_box_keypair,
   crypto_box_NONCEBYTES,
   crypto_box_open_easy,
+  crypto_box_BEFORENMBYTES,
   crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES,
+  crypto_box_beforenm,
   crypto_generichash,
   crypto_generichash_BYTES,
   crypto_generichash_BYTES_MIN,
