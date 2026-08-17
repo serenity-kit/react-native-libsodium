@@ -2,6 +2,7 @@ import {
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   from_string,
   randombytes_buf,
@@ -119,4 +120,95 @@ test('crypto_aead_xchacha20poly1305_ietf_decrypt', () => {
       randombytes_buf(crypto_aead_xchacha20poly1305_ietf_KEYBYTES + 1)
     );
   }).toThrow();
+});
+
+test('crypto_aead_xchacha20poly1305_ietf_decrypt with Uint8Array and null additional_data', () => {
+  const message = 'Hello, world!';
+  const key = new Uint8Array([
+    108, 17, 177, 237, 16, 132, 96, 213, 10, 50, 109, 157, 209, 207, 131, 239,
+    199, 127, 249, 166, 146, 48, 155, 115, 190, 244, 210, 252, 219, 38, 200,
+    159,
+  ]);
+  const publicNonce = new Uint8Array([
+    137, 27, 59, 167, 152, 253, 53, 78, 125, 80, 246, 158, 107, 239, 217, 210,
+    3, 212, 219, 223, 63, 14, 97, 107,
+  ]);
+  // the ciphertext of 'Hello, world!' created with the string additional_data
+  // 'additional data'
+  const ciphertext = new Uint8Array([
+    249, 165, 41, 20, 8, 68, 254, 59, 157, 166, 196, 51, 98, 212, 168, 126, 136,
+    102, 109, 38, 148, 139, 198, 4, 142, 86, 112, 89, 239,
+  ]);
+  // the UTF-8 bytes of the string 'additional data'
+  const additionalDataBytes = new Uint8Array([
+    97, 100, 100, 105, 116, 105, 111, 110, 97, 108, 32, 100, 97, 116, 97,
+  ]);
+
+  // a Uint8Array additional_data must authenticate the exact same bytes as
+  // its UTF-8 string equivalent
+  expect(
+    to_string(
+      crypto_aead_xchacha20poly1305_ietf_decrypt(
+        null,
+        ciphertext,
+        additionalDataBytes,
+        publicNonce,
+        key
+      )
+    )
+  ).toEqual(message);
+
+  // round-trip with a Uint8Array additional_data that is no valid UTF-8
+  const roundTripKey = crypto_aead_xchacha20poly1305_ietf_keygen();
+  const roundTripNonce = randombytes_buf(
+    crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
+  );
+  const roundTripAdditionalData = new Uint8Array([0, 255, 254, 1, 128, 7]);
+  const roundTripCiphertext = crypto_aead_xchacha20poly1305_ietf_encrypt(
+    message,
+    roundTripAdditionalData,
+    null,
+    roundTripNonce,
+    roundTripKey
+  );
+  expect(
+    to_string(
+      crypto_aead_xchacha20poly1305_ietf_decrypt(
+        null,
+        roundTripCiphertext,
+        roundTripAdditionalData,
+        roundTripNonce,
+        roundTripKey
+      )
+    )
+  ).toEqual(message);
+
+  // a single tampered additional_data byte (first byte flipped from 0 to 1)
+  // must fail to decrypt
+  const tamperedAdditionalData = new Uint8Array([1, 255, 254, 1, 128, 7]);
+  expect(() => {
+    crypto_aead_xchacha20poly1305_ietf_decrypt(
+      null,
+      roundTripCiphertext,
+      tamperedAdditionalData,
+      roundTripNonce,
+      roundTripKey
+    );
+  }).toThrow();
+
+  // null additional_data
+  expect(
+    to_string(
+      crypto_aead_xchacha20poly1305_ietf_decrypt(
+        null,
+        new Uint8Array([
+          249, 165, 41, 20, 8, 68, 254, 59, 157, 166, 196, 51, 98, 245, 181,
+          152, 162, 160, 8, 101, 170, 191, 221, 127, 9, 8, 14, 197, 128,
+        ]),
+        null,
+        publicNonce,
+        key
+      )
+    )
+  ).toEqual(message);
 });

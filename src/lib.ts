@@ -170,6 +170,8 @@ export const ready = new Promise<void>(async (resolve) => {
   crypto_generichash_keygen = lib.crypto_generichash_keygen;
   crypto_generichash_update = lib.crypto_generichash_update;
   crypto_hash = lib.crypto_hash;
+  crypto_hash_sha256 = lib.crypto_hash_sha256;
+  crypto_hash_sha512 = lib.crypto_hash_sha512;
   crypto_kdf_derive_from_key = lib.crypto_kdf_derive_from_key;
   crypto_kdf_keygen = lib.crypto_kdf_keygen;
   crypto_kx_client_session_keys = lib.crypto_kx_client_session_keys;
@@ -290,6 +292,8 @@ export const ready = new Promise<void>(async (resolve) => {
   crypto_generichash_KEYBYTES_MAX = lib.crypto_generichash_KEYBYTES_MAX;
   crypto_generichash_KEYBYTES_MIN = lib.crypto_generichash_KEYBYTES_MIN;
   crypto_hash_BYTES = lib.crypto_hash_BYTES;
+  crypto_hash_sha256_BYTES = lib.crypto_hash_sha256_BYTES;
+  crypto_hash_sha512_BYTES = lib.crypto_hash_sha512_BYTES;
   crypto_kdf_BYTES_MAX = lib.crypto_kdf_BYTES_MAX;
   crypto_kdf_BYTES_MIN = lib.crypto_kdf_BYTES_MIN;
   crypto_kdf_CONTEXTBYTES = lib.crypto_kdf_CONTEXTBYTES;
@@ -423,6 +427,8 @@ export let crypto_generichash_init = sodium.crypto_generichash_init;
 export let crypto_generichash_keygen = sodium.crypto_generichash_keygen;
 export let crypto_generichash_update = sodium.crypto_generichash_update;
 export let crypto_hash = sodium.crypto_hash;
+export let crypto_hash_sha256 = sodium.crypto_hash_sha256;
+export let crypto_hash_sha512 = sodium.crypto_hash_sha512;
 export let crypto_kdf_derive_from_key = sodium.crypto_kdf_derive_from_key;
 export let crypto_kdf_keygen = sodium.crypto_kdf_keygen;
 export let crypto_kx_client_session_keys = sodium.crypto_kx_client_session_keys;
@@ -548,6 +554,8 @@ export let crypto_generichash_KEYBYTES_MAX =
 export let crypto_generichash_KEYBYTES_MIN =
   sodium.crypto_generichash_KEYBYTES_MIN;
 export let crypto_hash_BYTES = sodium.crypto_hash_BYTES;
+export let crypto_hash_sha256_BYTES = sodium.crypto_hash_sha256_BYTES;
+export let crypto_hash_sha512_BYTES = sodium.crypto_hash_sha512_BYTES;
 export let crypto_kdf_BYTES_MAX = sodium.crypto_kdf_BYTES_MAX;
 export let crypto_kdf_BYTES_MIN = sodium.crypto_kdf_BYTES_MIN;
 export let crypto_kdf_CONTEXTBYTES = sodium.crypto_kdf_CONTEXTBYTES;

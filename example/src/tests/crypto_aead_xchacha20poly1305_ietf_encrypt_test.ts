@@ -104,3 +104,55 @@ test('crypto_aead_xchacha20poly1305_ietf_encrypt', () => {
     );
   }).toThrow();
 });
+
+test('crypto_aead_xchacha20poly1305_ietf_encrypt with Uint8Array and null additional_data', () => {
+  const message = 'Hello, world!';
+  const key = new Uint8Array([
+    108, 17, 177, 237, 16, 132, 96, 213, 10, 50, 109, 157, 209, 207, 131, 239,
+    199, 127, 249, 166, 146, 48, 155, 115, 190, 244, 210, 252, 219, 38, 200,
+    159,
+  ]);
+  const publicNonce = new Uint8Array([
+    137, 27, 59, 167, 152, 253, 53, 78, 125, 80, 246, 158, 107, 239, 217, 210,
+    3, 212, 219, 223, 63, 14, 97, 107,
+  ]);
+  // the UTF-8 bytes of the string 'additional data'
+  const additionalDataBytes = new Uint8Array([
+    97, 100, 100, 105, 116, 105, 111, 110, 97, 108, 32, 100, 97, 116, 97,
+  ]);
+
+  // a Uint8Array additional_data must authenticate the exact same bytes as
+  // its UTF-8 string equivalent and therefore produce the same ciphertext
+  expect(
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      message,
+      additionalDataBytes,
+      null,
+      publicNonce,
+      key
+    )
+  ).toEqual(
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      message,
+      'additional data',
+      null,
+      publicNonce,
+      key
+    )
+  );
+
+  expect(
+    crypto_aead_xchacha20poly1305_ietf_encrypt(
+      message,
+      null,
+      null,
+      publicNonce,
+      key
+    )
+  ).toEqual(
+    new Uint8Array([
+      249, 165, 41, 20, 8, 68, 254, 59, 157, 166, 196, 51, 98, 245, 181, 152,
+      162, 160, 8, 101, 170, 191, 221, 127, 9, 8, 14, 197, 128,
+    ])
+  );
+});
